@@ -18,8 +18,13 @@ const Calls = () => {
 
   useEffect(() => {
     initializeCalls();
-    setupIncomingCallListener();
   }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      setupIncomingCallListener();
+    }
+  }, [currentUser]);
 
   const initializeCalls = async () => {
     try {
@@ -108,6 +113,8 @@ const Calls = () => {
   };
 
   const setupIncomingCallListener = () => {
+    if (!currentUser) return;
+
     const channel = supabase
       .channel('incoming-calls')
       .on(
@@ -116,7 +123,7 @@ const Calls = () => {
           event: 'INSERT',
           schema: 'public',
           table: 'calls',
-          filter: `receiver_id=eq.${JSON.parse(localStorage.getItem('currentUser') || '{}').id}`
+          filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
           const call = payload.new;
