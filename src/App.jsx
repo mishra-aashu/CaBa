@@ -12,6 +12,7 @@ import Calls from './components/calls';
 import Blocked from './components/blocked';
 import UserDetails from './components/UserDetails';
 import SharedProfile from './components/shared-profile';
+import Intro from './components/Intro';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useSupabase();
@@ -23,6 +24,8 @@ const ProtectedRoute = ({ children }) => {
 // Home component is now imported
 
 function App() {
+  const [showIntro, setShowIntro] = useState(true);
+
   useEffect(() => {
     const { pathname, search } = window.location;
     if (search.startsWith('?/')) {
@@ -34,24 +37,26 @@ function App() {
   return (
     <SupabaseProvider>
       <BrowserRouter basename="/CaBa/">
-        <Routes>
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/home.html" element={<Navigate to="/" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/chat" element={<Navigate to="/" replace />} />
-          <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
-          <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
-          <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
-          <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
-          <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
-          <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
-        </Routes>
+        {showIntro ? <Intro onComplete={() => setShowIntro(false)} /> : (
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/home.html" element={<Navigate to="/" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/chat" element={<Navigate to="/" replace />} />
+            <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
+            <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
+            <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
+            <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
+            <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
+            <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
+          </Routes>
+        )}
       </BrowserRouter>
     </SupabaseProvider>
   );
