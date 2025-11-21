@@ -278,8 +278,12 @@ const Chat = () => {
       messagesContainer.classList.add(`theme-${themeName}`);
     }
 
+    // Define dark themes that need dark text colors
+    const darkThemes = ['dark', 'cyberpunk', 'dark_professional', 'midnight_city', 'cosmic_purple', 'galaxy', 'night_aurora'];
+
     // Set data-theme for CSS variables
-    document.documentElement.setAttribute('data-theme', themeName === 'dark' ? 'dark' : 'light');
+    const isDarkTheme = darkThemes.includes(themeName);
+    document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
   };
 
   const sendMessage = async (content) => {
