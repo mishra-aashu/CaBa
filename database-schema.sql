@@ -3,14 +3,17 @@
 -- WebRTC Calling Tables
 -- =============================================
 
--- Calls table for call history and management
+-- Add room_id column to existing calls table if it doesn't exist
+ALTER TABLE calls ADD COLUMN IF NOT EXISTS room_id VARCHAR(255);
+
+-- Create calls table if it doesn't exist (for new installations)
 CREATE TABLE IF NOT EXISTS calls (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     caller_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    call_type VARCHAR(20) NOT NULL CHECK (call_type IN ('voice', 'video', 'screen')),
+    call_type VARCHAR(20) NOT NULL DEFAULT 'voice' CHECK (call_type IN ('voice', 'video', 'screen')),
     status VARCHAR(20) NOT NULL DEFAULT 'calling' CHECK (status IN ('calling', 'ringing', 'answered', 'completed', 'missed', 'declined', 'failed', 'busy')),
-    room_id VARCHAR(255) NOT NULL,
+    room_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     answered_at TIMESTAMP WITH TIME ZONE,
     ended_at TIMESTAMP WITH TIME ZONE,
