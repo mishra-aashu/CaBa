@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './intro.css';
+import '../styles/intro.css';
 
 const Intro = ({ onComplete }) => {
   const navigate = useNavigate();
