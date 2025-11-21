@@ -77,6 +77,7 @@ const Chat = () => {
   // Refs
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   // Realtime hooks
   const handleNewMessage = (newMessage) => {
