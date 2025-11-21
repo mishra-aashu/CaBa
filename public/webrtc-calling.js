@@ -1,4 +1,4 @@
-// Using global objects: supabase, FREE_TURN_SERVERS
+// Using global objects: window.supabaseClient, window.FREE_TURN_SERVERS
 
 /**
  * Complete WebRTC Calling System
@@ -48,7 +48,7 @@ class WebRTCCall {
             console.log('🔐 Getting current user...');
 
             // Get current user
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            const { data: { user }, error: authError } = await window.supabaseClient.auth.getUser();
             if (authError || !user) throw new Error('Not authenticated');
 
             this.userId = user.id;
@@ -298,7 +298,7 @@ class WebRTCCall {
      * Initialize RTCPeerConnection
      */
     async initPeerConnection() {
-        this.peerConnection = new RTCPeerConnection(FREE_TURN_SERVERS);
+        this.peerConnection = new RTCPeerConnection(window.FREE_TURN_SERVERS);
 
         // Add local tracks
         if (this.localStream) {
@@ -615,7 +615,7 @@ class WebRTCCall {
 
         // Unsubscribe from channel
         if (this.channel) {
-            supabase.removeChannel(this.channel);
+            window.supabaseClient.removeChannel(this.channel);
             this.channel = null;
         }
 
