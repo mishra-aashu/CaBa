@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase';
 import { useTheme } from '../../contexts/ThemeContext';
+import CallInterface from './CallInterface';
+import IncomingCall from './IncomingCall';
 import '../../styles/calls.css';
 
 const Calls = () => {
   const { theme } = useTheme();
   const [currentUser, setCurrentUser] = useState(null);
   const [contacts, setContacts] = useState([]);
+  const [callHistory, setCallHistory] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activeCall, setActiveCall] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [callType, setCallType] = useState('video');
 
   useEffect(() => {
     initializeCalls();
+    setupIncomingCallListener();
   }, []);
 
   const initializeCalls = async () => {
@@ -25,7 +32,10 @@ const Calls = () => {
       const user = JSON.parse(userStr);
       setCurrentUser(user);
 
-      await loadContacts(user);
+      await Promise.all([
+        loadContacts(user),
+        loadCallHistory(user)
+      ]);
       setLoading(false);
     } catch (error) {
       console.error('Error initializing calls:', error);
@@ -71,6 +81,57 @@ const Calls = () => {
     }
   };
 
+  const loadCallHistory = async (user) => {
+    try {
+      const { data, error } = await supabase
+        .from('calls')
+        .select(`
+          *,
+          caller:users!calls_caller_id_fkey(name, avatar),
+          receiver:users!calls_receiver_id_fkey(name, avatar)
+        `)
+        .or(`caller_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      const historyData = data.map(call => ({
+        ...call,
+        otherUser: call.caller_id === user.id ? call.receiver : call.caller
+      }));
+
+      setCallHistory(historyData);
+    } catch (error) {
+      console.error('Error loading call history:', error);
+    }
+  };
+
+  const setupIncomingCallListener = () => {
+    const channel = supabase
+      .channel('incoming-calls')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'calls',
+          filter: `receiver_id=eq.${JSON.parse(localStorage.getItem('currentUser') || '{}').id}`
+        },
+        (payload) => {
+          const call = payload.new;
+          if (call.status === 'calling' && !activeCall) {
+            setIncomingCall(call);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
   const filteredContacts = contacts.filter(contact => {
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
@@ -78,12 +139,55 @@ const Calls = () => {
            (contact.phone && contact.phone.includes(search));
   });
 
-  const handleCall = (contact) => {
-    alert(`Calling ${contact.name} - WebRTC implementation needed`);
+  const handleCall = (contact, type = 'video') => {
+    setCallType(type);
+    setActiveCall({ contact, type });
+  };
+
+  const handleAcceptCall = async (callData) => {
+    setIncomingCall(null);
+    setActiveCall({
+      contact: { id: callData.caller_id, name: 'Caller' }, // Will be loaded in CallInterface
+      type: callData.call_type,
+      incoming: true,
+      callId: callData.id,
+      roomId: callData.room_id
+    });
+  };
+
+  const handleRejectCall = async (callId) => {
+    try {
+      if (window.WebRTCCall) {
+        const callInstance = new window.WebRTCCall();
+        await callInstance.rejectCall(callId);
+      }
+    } catch (error) {
+      console.error('Error rejecting call:', error);
+    }
+    setIncomingCall(null);
+  };
+
+  const handleCallEnd = () => {
+    setActiveCall(null);
+    // Reload call history
+    if (currentUser) {
+      loadCallHistory(currentUser);
+    }
   };
 
   const getInitials = (name) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const formatCallTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return date.toLocaleDateString();
   };
 
   if (loading) {
@@ -96,71 +200,147 @@ const Calls = () => {
   }
 
   return (
-    <div className="calls-container">
-      <header className="app-header">
-        <div className="header-left">
-          <button className="back-btn" onClick={() => window.history.back()}>
-            <i className="fas fa-arrow-left"></i>
-          </button>
-        </div>
-        <div className="header-center">
-          <h1>Calls</h1>
-        </div>
-        <div className="header-right">
-          {/* Empty for balance */}
-        </div>
-      </header>
+    <>
+      <div className="calls-container">
+        <header className="app-header">
+          <div className="header-left">
+            <button className="back-btn" onClick={() => window.history.back()}>
+              <i className="fas fa-arrow-left"></i>
+            </button>
+          </div>
+          <div className="header-center">
+            <h1>Calls</h1>
+          </div>
+          <div className="header-right">
+            {/* Empty for balance */}
+          </div>
+        </header>
 
-      {/* Search */}
-      <div className="search-container">
-        <div className="search-box">
-          <i className="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Search contacts..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {/* Search */}
+        <div className="search-container">
+          <div className="search-box">
+            <i className="fas fa-search"></i>
+            <input
+              type="text"
+              placeholder="Search contacts..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Contacts List */}
-      <div className="contacts-list">
-        {filteredContacts.length > 0 ? (
-          filteredContacts.map(contact => (
-            <div key={contact.id} className="contact-item">
-              <div className="contact-avatar">
-                <div className="avatar-circle">
-                  {contact.avatar ? (
-                    <img src={contact.avatar} alt={contact.name} />
-                  ) : (
-                    getInitials(contact.name)
-                  )}
+        {/* Call History */}
+        {callHistory.length > 0 && (
+          <div className="call-history-section">
+            <h3>Recent Calls</h3>
+            <div className="call-history-list">
+              {callHistory.map(call => (
+                <div key={call.id} className="call-history-item">
+                  <div className="contact-avatar">
+                    <div className="avatar-circle">
+                      {call.otherUser.avatar ? (
+                        <img src={call.otherUser.avatar} alt={call.otherUser.name} />
+                      ) : (
+                        getInitials(call.otherUser.name)
+                      )}
+                    </div>
+                  </div>
+                  <div className="call-info">
+                    <h4>{call.otherUser.name}</h4>
+                    <p className="call-details">
+                      <i className={`fas ${call.call_type === 'video' ? 'fa-video' : 'fa-phone'}`}></i>
+                      {call.status === 'completed' && ` • ${Math.floor(call.duration / 60)}:${(call.duration % 60).toString().padStart(2, '0')}`}
+                      {call.status === 'missed' && ' • Missed'}
+                      {call.status === 'declined' && ' • Declined'}
+                      {' • ' + formatCallTime(call.created_at)}
+                    </p>
+                  </div>
+                  <button
+                    className="call-btn"
+                    onClick={() => handleCall(call.otherUser, call.call_type)}
+                    title={`Call ${call.otherUser.name}`}
+                  >
+                    <i className="fas fa-phone"></i>
+                  </button>
                 </div>
-                <span className={`online-status ${contact.is_online ? 'online' : ''}`}></span>
-              </div>
-              <div className="contact-info">
-                <h4>{contact.name}</h4>
-                <p>{contact.phone || 'No phone'}</p>
-              </div>
-              <button
-                className="call-btn"
-                onClick={() => handleCall(contact)}
-                title={`Call ${contact.name}`}
-              >
-                <i className="fas fa-phone"></i>
-              </button>
+              ))}
             </div>
-          ))
-        ) : (
-          <div className="empty-state">
-            <i className="fas fa-user-slash"></i>
-            <h3>No contacts found</h3>
-            <p>Add contacts to start making calls</p>
           </div>
         )}
+
+        {/* Contacts List */}
+        <div className="contacts-section">
+          <h3>Contacts</h3>
+          <div className="contacts-list">
+            {filteredContacts.length > 0 ? (
+              filteredContacts.map(contact => (
+                <div key={contact.id} className="contact-item">
+                  <div className="contact-avatar">
+                    <div className="avatar-circle">
+                      {contact.avatar ? (
+                        <img src={contact.avatar} alt={contact.name} />
+                      ) : (
+                        getInitials(contact.name)
+                      )}
+                    </div>
+                    <span className={`online-status ${contact.is_online ? 'online' : ''}`}></span>
+                  </div>
+                  <div className="contact-info">
+                    <h4>{contact.name}</h4>
+                    <p>{contact.phone || 'No phone'}</p>
+                  </div>
+                  <div className="call-buttons">
+                    <button
+                      className="call-btn voice"
+                      onClick={() => handleCall(contact, 'voice')}
+                      title="Voice call"
+                    >
+                      <i className="fas fa-phone"></i>
+                    </button>
+                    <button
+                      className="call-btn video"
+                      onClick={() => handleCall(contact, 'video')}
+                      title="Video call"
+                    >
+                      <i className="fas fa-video"></i>
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <i className="fas fa-user-slash"></i>
+                <h3>No contacts found</h3>
+                <p>Add contacts to start making calls</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Active Call Interface */}
+      {activeCall && (
+        <CallInterface
+          contact={activeCall.contact}
+          callType={activeCall.type}
+          incoming={activeCall.incoming}
+          callId={activeCall.callId}
+          roomId={activeCall.roomId}
+          onClose={() => setActiveCall(null)}
+          onCallEnd={handleCallEnd}
+        />
+      )}
+
+      {/* Incoming Call */}
+      {incomingCall && (
+        <IncomingCall
+          callData={incomingCall}
+          onAccept={handleAcceptCall}
+          onReject={handleRejectCall}
+          onClose={() => setIncomingCall(null)}
+        />
+      )}
+    </>
   );
 };
 
