@@ -9,6 +9,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const { supabase } = useSupabase();
   const { theme, toggleTheme } = useTheme();
+  const baseUrl = import.meta.env.BASE_URL || '/';
   const [settings, setSettings] = useState({
     // Notifications
     messageNotifications: true,
@@ -192,7 +193,7 @@ const Settings = () => {
     }
 
     // Play new audio
-    const audio = new Audio(`/assets/audio/${file}`);
+    const audio = new Audio(`${baseUrl}assets/audio/${file}`);
     audio.volume = 0.7;
     audio.play().catch(e => {
       console.log('Could not play ringtone:', e);
