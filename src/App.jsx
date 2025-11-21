@@ -8,6 +8,7 @@ import Profile from './components/profile';
 import Settings from './components/settings';
 import News from './components/news';
 import Reminders from './components/reminders';
+import CreateReminder from './components/reminders/CreateReminder';
 import Calls from './components/calls';
 import Blocked from './components/blocked';
 import UserDetails from './components/UserDetails';
@@ -51,6 +52,7 @@ function App() {
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
             <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
+            <Route path="/create-reminder" element={<ProtectedRoute><CreateReminder /></ProtectedRoute>} />
             <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
             <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
             <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
