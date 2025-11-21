@@ -624,7 +624,7 @@ const Chat = () => {
       {/* Messages Container */}
       <div
         className="messages-container"
-        style={{ backgroundImage: wallpaper ? `url(${wallpaper})` : 'none' }}
+        style={wallpaper ? { backgroundImage: `url(${wallpaper})` } : {}}
         onScroll={handleScroll}
         ref={messagesContainerRef}
       >
