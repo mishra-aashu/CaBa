@@ -1,9 +1,25 @@
 import React, { useState, useRef } from 'react';
+import EmojiPicker from '../common/EmojiPicker';
 
 const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
   const textareaRef = useRef(null);
+
+  // Default quick reply messages
+  const quickReplies = [
+    'Hello!',
+    'How are you?',
+    'Thank you!',
+    'Sorry',
+    'Okay',
+    'Yes',
+    'No',
+    'Please',
+    'Good morning',
+    'Good night'
+  ];
 
   const handleInputChange = (e) => {
     setMessage(e.target.value);
@@ -47,6 +63,24 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
     setShowAttachmentMenu(false);
   };
 
+  const handleQuickReply = (reply) => {
+    onSendMessage(reply);
+    setShowQuickReplies(false);
+  };
+
+  const handleEmojiSelect = (emoji) => {
+    setMessage(prev => prev + emoji);
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.focus();
+    }
+  };
+
+  const toggleQuickReplies = () => {
+    setShowQuickReplies(!showQuickReplies);
+    setShowAttachmentMenu(false);
+  };
+
   return (
     <div className="chat-input-container">
       {/* Reply Preview */}
@@ -72,6 +106,16 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
         >
           <i className="fas fa-paperclip"></i>
         </button>
+
+        <button
+          className="btn-quick-reply"
+          onClick={toggleQuickReplies}
+          title="Quick Replies"
+        >
+          <i className="fas fa-comment-dots"></i>
+        </button>
+
+        <EmojiPicker onEmojiSelect={handleEmojiSelect} />
 
         <textarea
           ref={textareaRef}
@@ -132,6 +176,21 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
             <i className="fas fa-desktop"></i>
             <span>Screen Share</span>
           </button>
+        </div>
+      )}
+
+      {/* Quick Replies Menu */}
+      {showQuickReplies && (
+        <div className="quick-replies-menu">
+          {quickReplies.map((reply, index) => (
+            <button
+              key={index}
+              className="quick-reply-option"
+              onClick={() => handleQuickReply(reply)}
+            >
+              {reply}
+            </button>
+          ))}
         </div>
       )}
     </div>

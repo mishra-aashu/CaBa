@@ -389,7 +389,7 @@
   gap: 8px;
 }
 
-.btn-attach, .btn-send {
+.btn-attach, .btn-quick-reply, .btn-send {
   background: none;
   border: none;
   padding: 8px;
@@ -401,7 +401,7 @@
   transition: background-color 0.2s;
 }
 
-.btn-attach:hover, .btn-send:hover {
+.btn-attach:hover, .btn-quick-reply:hover, .btn-send:hover {
   background: var(--chat-hover);
 }
 
@@ -467,6 +467,35 @@
 .attach-option span {
   font-size: 12px;
   color: var(--chat-text);
+}
+
+/* Quick Replies Menu */
+.quick-replies-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--chat-background);
+  border-radius: 8px;
+}
+
+.quick-reply-option {
+  padding: 8px 12px;
+  background: var(--chat-surface);
+  border: 1px solid var(--chat-border);
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--chat-text);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.quick-reply-option:hover {
+  background: var(--chat-hover);
+  border-color: var(--chat-primary);
+  color: var(--chat-primary);
 }
 
 /* Reply Preview */

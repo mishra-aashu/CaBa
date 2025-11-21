@@ -120,6 +120,19 @@ const MessageItem = ({
   const handleTouchEnd = (e) => {
     const touchEndTime = Date.now();
     const touchDuration = touchEndTime - touchStartTime;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
+
+    // Check for swipe right (for reply)
+    if (absDeltaX > 50 && absDeltaX > absDeltaY && deltaX > 0 && !isSelectionMode) {
+      handleReply();
+      return;
+    }
 
     if (touchDuration > 500 && !isSelectionMode) {
       // Long press

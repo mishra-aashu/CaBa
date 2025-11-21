@@ -6,6 +6,7 @@ import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, 
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import Chat from './chat/Chat';
+import { useChatListRealtime } from '../hooks/useChatListRealtime';
 import '../styles/home.css';
 
 const Home = () => {
@@ -16,9 +17,10 @@ const Home = () => {
 
   // State
   const [currentUser, setCurrentUser] = useState(null);
-  const [chats, setChats] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
@@ -26,6 +28,9 @@ const Home = () => {
   const [contactPhone, setContactPhone] = useState('');
   const [savedContacts, setSavedContacts] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // Realtime chat list
+  const { chats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id);
 
   // DP options for avatar display
   const baseUrl = import.meta.env.BASE_URL || '/';
@@ -85,7 +90,6 @@ const Home = () => {
       const isAdminUser = localStorage.getItem('userRole') === 'admin';
       setIsAdmin(isAdminUser);
 
-      await loadChats(current);
       setLoading(false);
     } catch (error) {
       console.error('Error initializing home:', error);
@@ -93,34 +97,6 @@ const Home = () => {
     }
   };
 
-  const loadChats = async (user) => {
-    try {
-      const { data, error } = await supabase
-        .from('chats')
-        .select(`
-          *,
-          user1:users!chats_user1_id_fkey(id, name, avatar, phone, is_online),
-          user2:users!chats_user2_id_fkey(id, name, avatar, phone, is_online)
-        `)
-        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-        .order('last_message_time', { ascending: false });
-
-      if (error) throw error;
-
-      const chatsData = data.map(chat => {
-        const otherUser = chat.user1.id === user.id ? chat.user2 : chat.user1;
-        return {
-          ...chat,
-          otherUser,
-          unreadCount: 0
-        };
-      });
-
-      setChats(chatsData);
-    } catch (error) {
-      console.error('Error loading chats:', error);
-    }
-  };
 
   const loadSavedContacts = async () => {
     try {
@@ -306,7 +282,60 @@ const Home = () => {
       (chat.otherUser.phone && chat.otherUser.phone.includes(search));
   });
 
-  if (loading) {
+  const searchUsersByPhone = async (phone) => {
+    if (!phone.trim() || phone.length < 3) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name, phone, avatar, is_online')
+        .ilike('phone', `%${phone}%`)
+        .neq('id', currentUser?.id)
+        .limit(5);
+
+      if (error) throw error;
+
+      setSearchSuggestions(data || []);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error('Error searching users:', error);
+      setSearchSuggestions([]);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // If it looks like a phone number (contains digits), search users
+    if (/\d/.test(value)) {
+      searchUsersByPhone(value);
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (user) => {
+    // Check if chat already exists
+    const existingChat = chats.find(chat => chat.otherUser.id === user.id);
+    if (existingChat) {
+      handleChatClick(existingChat);
+    } else {
+      // Navigate to new chat
+      navigate(`/chat/new/${user.id}`);
+    }
+    setShowSearch(false);
+    setSearchTerm('');
+    setSearchSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  if (loading || chatsLoading) {
     return (
       <div className="home-loading">
         <div className="loading-spinner"></div>
@@ -443,17 +472,49 @@ const Home = () => {
                 type="text"
                 placeholder="Search by phone number..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
               />
               <button
                 className="close-search"
                 onClick={() => {
                   setShowSearch(false);
                   setSearchTerm('');
+                  setSearchSuggestions([]);
+                  setShowSuggestions(false);
                 }}
               >
                 ×
               </button>
+            </div>
+          )}
+
+          {/* Search Suggestions */}
+          {showSearch && showSuggestions && searchSuggestions.length > 0 && (
+            <div className="search-suggestions">
+              {searchSuggestions.map(user => (
+                <div
+                  key={user.id}
+                  className="search-suggestion-item"
+                  onClick={() => handleSuggestionClick(user)}
+                >
+                  <div className="suggestion-avatar">
+                    {user.avatar ? (
+                      parseInt(user.avatar) ? (
+                        <img src={dpOptions.find(dp => dp.id === parseInt(user.avatar))?.path || user.avatar} alt={user.name} />
+                      ) : (
+                        <img src={user.avatar} alt={user.name} />
+                      )
+                    ) : (
+                      <div>{getInitials(user.name)}</div>
+                    )}
+                    <span className={`online-status ${user.is_online ? 'online' : ''}`}></span>
+                  </div>
+                  <div className="suggestion-info">
+                    <div className="suggestion-name">{user.name}</div>
+                    <div className="suggestion-phone">{user.phone}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 

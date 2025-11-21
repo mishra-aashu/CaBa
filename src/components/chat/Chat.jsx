@@ -8,6 +8,9 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import WallpaperSelector from './WallpaperSelector';
+import { useRealtimeMessages } from '../../hooks/useRealtimeMessages';
+import { useTypingIndicator } from '../../hooks/useRealtimeTyping';
+import { useMessageStatusUpdates } from '../../hooks/useMessageStatusUpdates';
 import './Chat.css';
 
 // DP options for avatar display
@@ -52,7 +55,6 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const [isTyping, setIsTyping] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedMessages, setSelectedMessages] = useState(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -69,14 +71,34 @@ const Chat = () => {
   const [isTempChat, setIsTempChat] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
   const [showThemeModal, setShowThemeModal] = useState(false);
 
   // Refs
   const messagesEndRef = useRef(null);
-  const messagesSubscriptionRef = useRef(null);
-  const typingSubscriptionRef = useRef(null);
-  const typingTimeoutRef = useRef(null);
   const messagesContainerRef = useRef(null);
+
+  // Realtime hooks
+  const handleNewMessage = (newMessage) => {
+    setMessages(prev => [...prev, newMessage]);
+
+    // Increment unread count if not scrolled to bottom
+    if (!isScrolledToBottom) {
+      setUnreadCount(prev => prev + 1);
+    } else {
+      markMessagesAsRead();
+    }
+  };
+  useRealtimeMessages(chatId, handleNewMessage);
+
+  const { isOtherUserTyping, sendTypingStatus } = useTypingIndicator(chatId, currentUser?.id);
+
+  const handleStatusUpdate = (updatedMessage) => {
+    setMessages(prev => prev.map(msg =>
+      msg.id === updatedMessage.id ? updatedMessage : msg
+    ));
+  };
+  useMessageStatusUpdates(chatId, handleStatusUpdate);
 
   // Initialize chat
   useEffect(() => {
@@ -113,8 +135,6 @@ const Chat = () => {
 
       await loadOtherUserInfo(otherUserId);
       await loadMessages();
-      setupMessageSubscriptions();
-      setupTypingSubscriptions();
       await loadWallpaper();
       loadTheme();
     } catch (error) {
@@ -123,12 +143,6 @@ const Chat = () => {
   };
 
   const cleanup = () => {
-    if (messagesSubscriptionRef.current) {
-      messagesSubscriptionRef.current.unsubscribe();
-    }
-    if (typingSubscriptionRef.current) {
-      typingSubscriptionRef.current.unsubscribe();
-    }
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
@@ -165,52 +179,6 @@ const Chat = () => {
     }
   };
 
-  const setupMessageSubscriptions = () => {
-    messagesSubscriptionRef.current = supabase
-      .channel('messages')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `chat_id=eq.${chatId}`
-      }, async (payload) => {
-        if (payload.new.sender_id !== currentUser?.id) {
-          setMessages(prev => [...prev, payload.new]);
-          await markMessagesAsRead();
-        }
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'messages',
-        filter: `chat_id=eq.${chatId}`
-      }, (payload) => {
-        setMessages(prev => prev.map(msg =>
-          msg.id === payload.new.id ? payload.new : msg
-        ));
-      })
-      .on('postgres_changes', {
-        event: 'DELETE',
-        schema: 'public',
-        table: 'messages',
-        filter: `chat_id=eq.${chatId}`
-      }, (payload) => {
-        setMessages(prev => prev.filter(msg => msg.id !== payload.old.id));
-      })
-      .subscribe();
-  };
-
-  const setupTypingSubscriptions = () => {
-    typingSubscriptionRef.current = supabase
-      .channel(`typing_${chatId}`)
-      .on('broadcast', { event: 'typing' }, (payload) => {
-        const typingData = payload.payload;
-        if (typingData.user_id !== currentUser?.id && typingData.chat_id === chatId) {
-          setIsTyping(typingData.is_typing);
-        }
-      })
-      .subscribe();
-  };
 
   const loadWallpaper = async () => {
     try {
@@ -374,32 +342,12 @@ const Chat = () => {
         .eq('id', chatId);
 
       setReplyingTo(null);
-      sendTypingStatus(false);
+      // Typing status is automatically handled by the hook when input stops
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
 
-  const sendTypingStatus = async (isTyping) => {
-    if (!currentUser || !chatId) return;
-
-    try {
-      await supabase
-        .channel(`typing_${chatId}`)
-        .send({
-          type: 'broadcast',
-          event: 'typing',
-          payload: {
-            chat_id: chatId,
-            user_id: currentUser.id,
-            is_typing: isTyping,
-            timestamp: new Date().toISOString()
-          }
-        });
-    } catch (error) {
-      console.error('Error sending typing status:', error);
-    }
-  };
 
   const handleTyping = () => {
     sendTypingStatus(true);
@@ -415,6 +363,7 @@ const Chat = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setIsScrolledToBottom(true);
   };
 
   const markMessagesAsRead = async () => {
@@ -554,13 +503,24 @@ const Chat = () => {
   const handleScroll = (e) => {
     const container = e.target;
     const scrolledFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    const isAtBottom = scrolledFromBottom < 50; // Consider "at bottom" if within 50px
+
     setShowScrollButton(scrolledFromBottom > 300);
+    setIsScrolledToBottom(isAtBottom);
+
+    // If scrolled to bottom, mark messages as read and reset unread count
+    if (isAtBottom && unreadCount > 0) {
+      setUnreadCount(0);
+      markMessagesAsRead();
+    }
   };
 
   const scrollToBottomSmooth = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     setShowScrollButton(false);
     setUnreadCount(0);
+    setIsScrolledToBottom(true);
+    markMessagesAsRead();
   };
 
   if (!otherUser || !currentUser) {
@@ -590,7 +550,7 @@ const Chat = () => {
           <div className="user-details">
             <h3 className="user-name">{otherUser.name}</h3>
             <p className="user-status">
-              {isTyping ? 'typing...' : otherUser.is_online ? 'Online' : 'Offline'}
+              {isOtherUserTyping ? 'typing...' : otherUser.is_online ? 'Online' : 'Offline'}
             </p>
           </div>
         </div>
@@ -703,7 +663,7 @@ const Chat = () => {
           onReply={handleReply}
         />
 
-        <TypingIndicator isVisible={isTyping} />
+        <TypingIndicator isVisible={isOtherUserTyping} />
 
         <div ref={messagesEndRef} />
 

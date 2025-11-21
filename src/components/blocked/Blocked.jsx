@@ -158,6 +158,9 @@ const Blocked = ({ onBack }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Unblock User</h2>
+              <button className="close-modal" onClick={() => setUnblockModal(null)}>
+                <i className="fas fa-times"></i>
+              </button>
             </div>
             <div className="modal-body">
               <p>Are you sure you want to unblock <strong>{unblockModal.userName}</strong>?</p>
