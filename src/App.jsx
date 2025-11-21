@@ -23,6 +23,14 @@ const ProtectedRoute = ({ children }) => {
 // Home component is now imported
 
 function App() {
+  useEffect(() => {
+    const { pathname, search } = window.location;
+    if (search.startsWith('?/')) {
+      const path = search.slice(2).replace(/~and~/g, '&');
+      window.history.replaceState(null, '', pathname + path);
+    }
+  }, []);
+
   return (
     <SupabaseProvider>
       <BrowserRouter basename="/CaBa/">
