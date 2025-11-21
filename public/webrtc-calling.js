@@ -57,7 +57,7 @@ class WebRTCCall {
             this.roomId = `call_${user.id}_${receiverId}_${Date.now()}`;
 
             // Create call record
-            const { data: callData, error: callError } = await supabase
+            const { data: callData, error: callError } = await window.supabaseClient
                 .from('call_history')
                 .insert([{
                     caller_id: user.id,
@@ -135,13 +135,13 @@ class WebRTCCall {
             console.log(`📞 Answering ${callType} call...`);
 
             // Get current user
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            const { data: { user }, error: authError } = await window.supabaseClient.auth.getUser();
             if (authError || !user) throw new Error('Not authenticated');
 
             this.userId = user.id;
 
             // Update call status
-            await supabase
+            await window.supabaseClient
                 .from('call_history')
                 .update({
                     call_status: 'answered',
@@ -182,7 +182,7 @@ class WebRTCCall {
      */
     async rejectCall(callId) {
         try {
-            await supabase
+            await window.supabaseClient
                 .from('call_history')
                 .update({ call_status: 'rejected', ended_at: new Date().toISOString() })
                 .eq('call_id', callId);
@@ -216,7 +216,7 @@ class WebRTCCall {
 
             // Update call record
             if (this.callId) {
-                await supabase
+                await window.supabaseClient
                     .from('call_history')
                     .update({
                         call_status: reason === 'completed' ? 'ended' : reason,
@@ -342,7 +342,7 @@ class WebRTCCall {
                 this.updateCallState('answered');
 
                 // Update DB
-                supabase
+                window.supabaseClient
                     .from('call_history')
                     .update({
                         call_status: 'answered',
@@ -366,7 +366,7 @@ class WebRTCCall {
      * Subscribe to WebRTC signals
      */
     async subscribeToSignals() {
-        this.channel = supabase
+        this.channel = window.supabaseClient
             .channel(`call:${this.roomId}`)
             .on(
                 'postgres_changes',
@@ -476,7 +476,7 @@ class WebRTCCall {
      */
     async sendSignal(type, payload) {
         try {
-            await supabase
+            await window.supabaseClient
                 .from('call_signaling')
                 .insert([{
                     call_id: this.roomId,
