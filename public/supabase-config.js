@@ -204,17 +204,13 @@ window.addEventListener('beforeunload', () => {
 });
 
 // =============================================
-// Initialize Supabase on load
+// Initialize Supabase immediately
 // =============================================
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🔧 DOM loaded, initializing Supabase...');
-    const success = initSupabase();
-    if (success) {
-
-    } else {
-        console.error('❌ Supabase initialization failed');
-    }
-});
+console.log('🔧 Initializing Supabase...');
+const success = initSupabase();
+if (!success) {
+    console.error('❌ Supabase initialization failed');
+}
 
 // =============================================
 // Export for use in other files
