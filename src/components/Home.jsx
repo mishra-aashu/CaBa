@@ -24,6 +24,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showNewContactModal, setShowNewContactModal] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showSelectContact, setShowSelectContact] = useState(false);
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [savedContacts, setSavedContacts] = useState([]);
@@ -335,6 +336,19 @@ const Home = () => {
     setShowSuggestions(false);
   };
 
+  const handleStartChatWithContact = (contact) => {
+    // Check if chat already exists
+    const existingChat = chats.find(chat => chat.otherUser.id === contact.id);
+    if (existingChat) {
+      handleChatClick(existingChat);
+    } else {
+      // Navigate to new chat
+      navigate(`/chat/new/${contact.id}`);
+    }
+    setShowNewContactModal(false);
+    setShowSelectContact(false);
+  };
+
   if (loading || chatsLoading) {
     return (
       <div className="home-loading">
@@ -608,87 +622,156 @@ const Home = () => {
         onClose={() => {
           setShowNewContactModal(false);
           setShowContactForm(false);
+          setShowSelectContact(false);
           setContactName('');
           setContactPhone('');
         }}
-        title="New Contact"
+        title={showSelectContact ? "Select Contact" : "New Contact"}
         size="medium"
       >
         <div className="new-contact-modal">
-          {/* Add New Contact Button */}
-          <button
-            className="add-contact-btn"
-            onClick={() => setShowContactForm(!showContactForm)}
-          >
-            <Plus size={20} />
-            Add New Contact
-          </button>
+          {/* Mode Toggle */}
+          <div className="modal-mode-toggle">
+            <button
+              className={`mode-btn ${!showSelectContact ? 'active' : ''}`}
+              onClick={() => setShowSelectContact(false)}
+            >
+              Manage Contacts
+            </button>
+            <button
+              className={`mode-btn ${showSelectContact ? 'active' : ''}`}
+              onClick={() => setShowSelectContact(true)}
+            >
+              Select Contact
+            </button>
+          </div>
 
-          {/* Contact Form */}
-          {showContactForm && (
-            <div className="contact-form">
-              <input
-                type="text"
-                placeholder="Contact name"
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-                className="contact-input"
-              />
-              <input
-                type="tel"
-                placeholder="Phone number (10 digits)"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                className="contact-input"
-              />
-              <div className="contact-form-actions">
-                <button className="btn-primary" onClick={handleSaveContact}>
-                  Save Contact
-                </button>
-                <button
-                  className="btn-secondary"
-                  onClick={() => {
-                    setShowContactForm(false);
-                    setContactName('');
-                    setContactPhone('');
-                  }}
-                >
-                  Cancel
-                </button>
+          {showSelectContact ? (
+            /* Select Contact Mode */
+            <div className="select-contact-section">
+              <h3>Start Chat With</h3>
+              <div className="saved-contacts-list">
+                {savedContacts.length > 0 ? (
+                  savedContacts.map(contact => (
+                    <div key={contact.id} className="saved-contact-item">
+                      <div className="contact-info">
+                        <div className="contact-avatar">
+                          {contact.avatar ? (
+                            parseInt(contact.avatar) ? (
+                              <img src={dpOptions.find(dp => dp.id === parseInt(contact.avatar))?.path || contact.avatar} alt={contact.name} />
+                            ) : (
+                              <img src={contact.avatar} alt={contact.name} />
+                            )
+                          ) : (
+                            <div>{getInitials(contact.name)}</div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="contact-name">{contact.name}</div>
+                          <div className="contact-phone">{contact.phone}</div>
+                        </div>
+                      </div>
+                      <button
+                        className="start-chat-btn"
+                        onClick={() => handleStartChatWithContact(contact)}
+                        title="Start Chat"
+                      >
+                        💬 Chat
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-contacts">No saved contacts yet. Add contacts first.</p>
+                )}
               </div>
             </div>
-          )}
+          ) : (
+            /* Manage Contacts Mode */
+            <>
+              {/* Add New Contact Button */}
+              <button
+                className="add-contact-btn"
+                onClick={() => setShowContactForm(!showContactForm)}
+              >
+                <Plus size={20} />
+                Add New Contact
+              </button>
 
-          {/* Saved Contacts List */}
-          <div className="saved-contacts-section">
-            <h3>Saved Contacts</h3>
-            <div className="saved-contacts-list">
-              {savedContacts.length > 0 ? (
-                savedContacts.map(contact => (
-                  <div key={contact.id} className="saved-contact-item">
-                    <div className="contact-info">
-                      <div className="contact-avatar">
-                        {getInitials(contact.name)}
-                      </div>
-                      <div>
-                        <div className="contact-name">{contact.name}</div>
-                        <div className="contact-phone">{contact.phone}</div>
-                      </div>
-                    </div>
+              {/* Contact Form */}
+              {showContactForm && (
+                <div className="contact-form">
+                  <input
+                    type="text"
+                    placeholder="Contact name"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    className="contact-input"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone number (10 digits)"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    className="contact-input"
+                  />
+                  <div className="contact-form-actions">
+                    <button className="btn-primary" onClick={handleSaveContact}>
+                      Save Contact
+                    </button>
                     <button
-                      className="delete-contact-btn"
-                      onClick={() => handleDeleteContact(contact.id)}
-                      title="Delete"
+                      className="btn-secondary"
+                      onClick={() => {
+                        setShowContactForm(false);
+                        setContactName('');
+                        setContactPhone('');
+                      }}
                     >
-                      <X size={18} />
+                      Cancel
                     </button>
                   </div>
-                ))
-              ) : (
-                <p className="no-contacts">No saved contacts yet</p>
+                </div>
               )}
-            </div>
-          </div>
+
+              {/* Saved Contacts List */}
+              <div className="saved-contacts-section">
+                <h3>Saved Contacts</h3>
+                <div className="saved-contacts-list">
+                  {savedContacts.length > 0 ? (
+                    savedContacts.map(contact => (
+                      <div key={contact.id} className="saved-contact-item">
+                        <div className="contact-info">
+                          <div className="contact-avatar">
+                            {contact.avatar ? (
+                              parseInt(contact.avatar) ? (
+                                <img src={dpOptions.find(dp => dp.id === parseInt(contact.avatar))?.path || contact.avatar} alt={contact.name} />
+                              ) : (
+                                <img src={contact.avatar} alt={contact.name} />
+                              )
+                            ) : (
+                              <div>{getInitials(contact.name)}</div>
+                            )}
+                          </div>
+                          <div>
+                            <div className="contact-name">{contact.name}</div>
+                            <div className="contact-phone">{contact.phone}</div>
+                          </div>
+                        </div>
+                        <button
+                          className="delete-contact-btn"
+                          onClick={() => handleDeleteContact(contact.id)}
+                          title="Delete"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-contacts">No saved contacts yet</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
     </div>

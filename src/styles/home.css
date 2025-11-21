@@ -825,6 +825,61 @@
   font-size: 14px;
 }
 
+/* Modal Mode Toggle */
+.modal-mode-toggle {
+  display: flex;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--home-border);
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: var(--home-surface);
+  color: var(--home-text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mode-btn.active {
+  background: var(--home-primary);
+  color: white;
+}
+
+.mode-btn:hover:not(.active) {
+  background: var(--home-hover);
+}
+
+/* Select Contact Section */
+.select-contact-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--home-text);
+}
+
+.start-chat-btn {
+  background: var(--home-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.start-chat-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .desktop-layout {
