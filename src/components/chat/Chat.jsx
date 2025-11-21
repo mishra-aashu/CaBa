@@ -47,7 +47,7 @@ const dpOptionsData = [
 ];
 
 const Chat = () => {
-  const { chatId, otherUserId } = useParams();
+  const { chatId, otherUserId, userId } = useParams();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
 
@@ -73,6 +73,10 @@ const Chat = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -107,7 +111,7 @@ const Chat = () => {
     return () => {
       cleanup();
     };
-  }, [chatId, otherUserId]);
+  }, [chatId, otherUserId, userId]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -134,10 +138,15 @@ const Chat = () => {
       const user = JSON.parse(userStr);
       setCurrentUser(user);
 
-      await loadOtherUserInfo(otherUserId);
-      await loadMessages();
-      await loadWallpaper();
-      loadTheme();
+      // Handle new chat creation
+      if (userId && !chatId) {
+        await handleNewChat(user, userId);
+      } else if (chatId && otherUserId) {
+        await loadOtherUserInfo(otherUserId);
+        await loadMessages();
+        await loadWallpaper();
+        loadTheme();
+      }
     } catch (error) {
       console.error('Error initializing chat:', error);
     }
@@ -146,6 +155,43 @@ const Chat = () => {
   const cleanup = () => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
+    }
+  };
+
+  const handleNewChat = async (currentUser, targetUserId) => {
+    try {
+      // Check if chat already exists between current user and target user
+      const { data: existingChat, error: chatError } = await supabase
+        .from('chats')
+        .select('id')
+        .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${targetUserId}),and(user1_id.eq.${targetUserId},user2_id.eq.${currentUser.id})`)
+        .single();
+
+      if (existingChat && !chatError) {
+        // Chat exists, redirect to it
+        navigate(`/chat/${existingChat.id}/${targetUserId}`, { replace: true });
+        return;
+      }
+
+      // Create new chat
+      const { data: newChat, error: createError } = await supabase
+        .from('chats')
+        .insert([{
+          user1_id: currentUser.id,
+          user2_id: targetUserId,
+          last_message: null,
+          last_message_time: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (createError) throw createError;
+
+      // Redirect to the new chat
+      navigate(`/chat/${newChat.id}/${targetUserId}`, { replace: true });
+    } catch (error) {
+      console.error('Error handling new chat:', error);
+      navigate('/', { replace: true });
     }
   };
 
@@ -413,7 +459,54 @@ const Chat = () => {
   };
 
   const handleSearchMessages = () => {
-    alert('Message search feature coming soon!');
+    setShowSearchModal(true);
+  };
+
+  const performMessageSearch = async (query) => {
+    if (!query.trim() || !chatId) return;
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .ilike('content', `%${query}%`)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      setSearchResults(data || []);
+    } catch (error) {
+      console.error('Error searching messages:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchQueryChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (query.trim()) {
+      performMessageSearch(query);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const scrollToMessage = (messageId) => {
+    const messageElement = document.getElementById(`message-${messageId}`);
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      messageElement.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+      setTimeout(() => {
+        messageElement.style.backgroundColor = '';
+      }, 2000);
+    }
+    setShowSearchModal(false);
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   const handleChangeTheme = () => {
@@ -670,6 +763,56 @@ const Chat = () => {
         onClose={() => setShowWallpaperSelector(false)}
         onWallpaperSelect={handleWallpaperSelect}
       />
+
+      {/* Message Search Modal */}
+      <Modal
+        isOpen={showSearchModal}
+        onClose={() => {
+          setShowSearchModal(false);
+          setSearchQuery('');
+          setSearchResults([]);
+        }}
+        title="Search Messages"
+        size="medium"
+      >
+        <div className="search-modal-content">
+          <div className="search-input-container">
+            <input
+              type="text"
+              placeholder="Search messages..."
+              value={searchQuery}
+              onChange={handleSearchQueryChange}
+              className="search-input"
+              autoFocus
+            />
+          </div>
+
+          <div className="search-results">
+            {isSearching ? (
+              <div className="search-loading">Searching...</div>
+            ) : searchResults.length > 0 ? (
+              searchResults.map(message => (
+                <div
+                  key={message.id}
+                  className="search-result-item"
+                  onClick={() => scrollToMessage(message.id)}
+                >
+                  <div className="search-result-content">
+                    {message.content}
+                  </div>
+                  <div className="search-result-time">
+                    {new Date(message.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              ))
+            ) : searchQuery.trim() ? (
+              <div className="no-results">No messages found</div>
+            ) : (
+              <div className="search-placeholder">Type to search messages</div>
+            )}
+          </div>
+        </div>
+      </Modal>
 
       {/* Theme Selector Modal */}
       <Modal

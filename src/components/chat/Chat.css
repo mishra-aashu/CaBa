@@ -971,6 +971,71 @@
   text-align: center;
 }
 
+/* Message Search Modal */
+.search-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.search-input-container {
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--chat-border);
+  border-radius: 8px;
+  background: var(--chat-background);
+  color: var(--chat-text);
+  font-size: 14px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--chat-primary);
+}
+
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--chat-border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-result-item:hover {
+  background: var(--chat-hover);
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-content {
+  font-size: 14px;
+  color: var(--chat-text);
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.search-result-time {
+  font-size: 12px;
+  color: var(--chat-text-light);
+}
+
+.search-loading, .no-results, .search-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--chat-text-light);
+  font-size: 14px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-header {

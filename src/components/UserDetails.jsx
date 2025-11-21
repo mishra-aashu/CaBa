@@ -136,8 +136,65 @@ const UserDetails = () => {
         }
     };
 
-    const handleExportChat = () => {
-        alert('Export chat feature coming soon!');
+    const handleExportChat = async () => {
+        try {
+            if (!currentUser || !user) return;
+
+            // Find chat between current user and this user
+            const { data: chat, error: chatError } = await supabase
+                .from('chats')
+                .select('id')
+                .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${user.id}),and(user1_id.eq.${user.id},user2_id.eq.${currentUser.id})`)
+                .single();
+
+            if (chatError || !chat) {
+                alert('No chat history found with this user');
+                return;
+            }
+
+            // Get all messages
+            const { data: messages, error: messagesError } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('chat_id', chat.id)
+                .order('created_at', { ascending: true });
+
+            if (messagesError) throw messagesError;
+
+            if (!messages || messages.length === 0) {
+                alert('No messages to export');
+                return;
+            }
+
+            // Format messages for export
+            const exportData = messages.map(msg => ({
+                timestamp: new Date(msg.created_at).toLocaleString(),
+                sender: msg.sender_id === currentUser.id ? 'You' : user.name,
+                message: msg.content
+            }));
+
+            // Convert to CSV
+            const csvContent = [
+                ['Timestamp', 'Sender', 'Message'],
+                ...exportData.map(row => [row.timestamp, row.sender, row.message])
+            ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+            // Download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `chat_${user.name}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert('Chat exported successfully!');
+        } catch (error) {
+            console.error('Error exporting chat:', error);
+            alert('Failed to export chat');
+        }
     };
 
     const handleEditContact = () => {
