@@ -266,43 +266,16 @@ const Chat = () => {
     const messagesContainer = document.querySelector('.messages-container');
     if (!messagesContainer) return;
 
-    // Define theme backgrounds
-    const themeBackgrounds = {
-      light: 'none',
-      dark: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
-      ocean_depths: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 25%, #0ea5e9 50%, #0284c7 75%, #0ea5e9 100%)',
-      forest_mist: 'linear-gradient(135deg, #22c55e 0%, #16a34a 25%, #22c55e 50%, #16a34a 75%, #22c55e 100%)',
-      sunset_glow: 'linear-gradient(135deg, #fb923c 0%, #ea580c 25%, #fb923c 50%, #ea580c 75%, #fb923c 100%)',
-      cosmic_purple: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 25%, #9333ea 50%, #7c3aed 75%, #9333ea 100%)',
-      arctic_ice: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 25%, #38bdf8 50%, #0ea5e9 75%, #38bdf8 100%)',
-      golden_hour: 'linear-gradient(135deg, #f59e0b 0%, #d97706 25%, #f59e0b 50%, #d97706 75%, #f59e0b 100%)',
-      midnight_city: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 25%, #1e1b4b 50%, #312e81 75%, #1e1b4b 100%)',
-      rose_garden: 'linear-gradient(135deg, #f43f5e 0%, #db2777 25%, #f43f5e 50%, #db2777 75%, #f43f5e 100%)',
-      emerald_forest: 'linear-gradient(135deg, #10b981 0%, #059669 25%, #10b981 50%, #059669 75%, #10b981 100%)',
-      nebula: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 25%, #3b82f6 50%, #10b981 75%, #ec4899 100%)',
-      cyberpunk: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 25%, #0f0f0f 50%, #1a1a1a 75%, #0f0f0f 100%)',
-      autumn_leaves: 'linear-gradient(135deg, #ea580c 0%, #9a3412 25%, #ea580c 50%, #9a3412 75%, #ea580c 100%)',
-      galaxy: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 25%, #7c3aed 50%, #ec4899 75%, #1e1b4b 100%)',
-      telegram_blue: 'linear-gradient(135deg, #0088cc 0%, #005f99 25%, #0088cc 50%, #005f99 75%, #0088cc 100%)',
-      spring_vibes: 'linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 25%, #FFDEE9 50%, #B5FFFC 75%, #FFDEE9 100%)',
-      monsoon_mist: 'linear-gradient(135deg, #6190E8 0%, #A7BFE8 25%, #6190E8 50%, #A7BFE8 75%, #6190E8 100%)',
-      autumn_warmth: 'linear-gradient(135deg, #FF6E7F 0%, #BFE9FF 25%, #FF6E7F 50%, #BFE9FF 75%, #FF6E7F 100%)',
-      winter_calm: 'linear-gradient(135deg, #89F7FE 0%, #66A6FF 25%, #89F7FE 50%, #66A6FF 75%, #89F7FE 100%)',
-      summer_festival: 'linear-gradient(135deg, #FCE38A 0%, #8EC5FC 25%, #FCE38A 50%, #8EC5FC 75%, #FCE38A 100%)',
-      night_aurora: 'linear-gradient(135deg, #20002c 0%, #cbb4d4 25%, #20002c 50%, #cbb4d4 75%, #20002c 100%)',
-      foggy_hills: 'linear-gradient(135deg, #f8ffae 0%, #43cea2 25%, #f8ffae 50%, #43cea2 75%, #f8ffae 100%)',
-      tech_futurism: 'linear-gradient(135deg, #396afc 0%, #fbc2eb 25%, #396afc 50%, #fbc2eb 75%, #396afc 100%)',
-      dark_professional: 'linear-gradient(135deg, #1e1e2e 0%, #0f172a 25%, #1e1e2e 50%, #0f172a 75%, #1e1e2e 100%)'
-    };
+    // Remove all theme classes
+    messagesContainer.classList.forEach(className => {
+      if (className.startsWith('theme-')) {
+        messagesContainer.classList.remove(className);
+      }
+    });
 
-    const background = themeBackgrounds[themeName] || 'none';
-    if (background !== 'none') {
-      messagesContainer.style.background = background;
-      messagesContainer.style.backgroundSize = 'cover';
-      messagesContainer.style.backgroundPosition = 'center';
-      messagesContainer.style.backgroundRepeat = 'no-repeat';
-    } else {
-      messagesContainer.style.background = 'none';
+    // Add the new theme class
+    if (themeName && themeName !== 'light') {
+      messagesContainer.classList.add(`theme-${themeName}`);
     }
 
     // Set data-theme for CSS variables

@@ -690,6 +690,103 @@
   background: #c82333;
 }
 
+/* Chat Themes */
+.theme-light {
+  background: none !important;
+}
+
+.theme-dark {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%) !important;
+}
+
+.theme-ocean_depths {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 25%, #0ea5e9 50%, #0284c7 75%, #0ea5e9 100%) !important;
+}
+
+.theme-forest_mist {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 25%, #22c55e 50%, #16a34a 75%, #22c55e 100%) !important;
+}
+
+.theme-sunset_glow {
+  background: linear-gradient(135deg, #fb923c 0%, #ea580c 25%, #fb923c 50%, #ea580c 75%, #fb923c 100%) !important;
+}
+
+.theme-cosmic_purple {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 25%, #9333ea 50%, #7c3aed 75%, #9333ea 100%) !important;
+}
+
+.theme-golden_hour {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 25%, #f59e0b 50%, #d97706 75%, #f59e0b 100%) !important;
+}
+
+.theme-midnight_city {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 25%, #1e1b4b 50%, #312e81 75%, #1e1b4b 100%) !important;
+}
+
+.theme-rose_garden {
+  background: linear-gradient(135deg, #f43f5e 0%, #db2777 25%, #f43f5e 50%, #db2777 75%, #f43f5e 100%) !important;
+}
+
+.theme-emerald_forest {
+  background: linear-gradient(135deg, #10b981 0%, #059669 25%, #10b981 50%, #059669 75%, #10b981 100%) !important;
+}
+
+.theme-nebula {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 25%, #3b82f6 50%, #10b981 75%, #ec4899 100%) !important;
+}
+
+.theme-cyberpunk {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 25%, #0f0f0f 50%, #1a1a1a 75%, #0f0f0f 100%) !important;
+}
+
+.theme-autumn_leaves {
+  background: linear-gradient(135deg, #ea580c 0%, #9a3412 25%, #ea580c 50%, #9a3412 75%, #ea580c 100%) !important;
+}
+
+.theme-galaxy {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 25%, #7c3aed 50%, #ec4899 75%, #1e1b4b 100%) !important;
+}
+
+.theme-telegram_blue {
+  background: linear-gradient(135deg, #0088cc 0%, #005f99 25%, #0088cc 50%, #005f99 75%, #0088cc 100%) !important;
+}
+
+.theme-spring_vibes {
+  background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 25%, #FFDEE9 50%, #B5FFFC 75%, #FFDEE9 100%) !important;
+}
+
+.theme-monsoon_mist {
+  background: linear-gradient(135deg, #6190E8 0%, #A7BFE8 25%, #6190E8 50%, #A7BFE8 75%, #6190E8 100%) !important;
+}
+
+.theme-autumn_warmth {
+  background: linear-gradient(135deg, #FF6E7F 0%, #BFE9FF 25%, #FF6E7F 50%, #BFE9FF 75%, #FF6E7F 100%) !important;
+}
+
+.theme-winter_calm {
+  background: linear-gradient(135deg, #89F7FE 0%, #66A6FF 25%, #89F7FE 50%, #66A6FF 75%, #89F7FE 100%) !important;
+}
+
+.theme-summer_festival {
+  background: linear-gradient(135deg, #FCE38A 0%, #8EC5FC 25%, #FCE38A 50%, #8EC5FC 75%, #FCE38A 100%) !important;
+}
+
+.theme-night_aurora {
+  background: linear-gradient(135deg, #20002c 0%, #cbb4d4 25%, #20002c 50%, #cbb4d4 75%, #20002c 100%) !important;
+}
+
+.theme-foggy_hills {
+  background: linear-gradient(135deg, #f8ffae 0%, #43cea2 25%, #f8ffae 50%, #43cea2 75%, #f8ffae 100%) !important;
+}
+
+.theme-tech_futurism {
+  background: linear-gradient(135deg, #396afc 0%, #fbc2eb 25%, #396afc 50%, #fbc2eb 75%, #396afc 100%) !important;
+}
+
+.theme-dark_professional {
+  background: linear-gradient(135deg, #1e1e2e 0%, #0f172a 25%, #1e1e2e 50%, #0f172a 75%, #1e1e2e 100%) !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-header {
