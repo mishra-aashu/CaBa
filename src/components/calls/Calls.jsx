@@ -18,6 +18,7 @@ const Calls = () => {
 
   useEffect(() => {
     initializeCalls();
+    checkPendingCall();
   }, []);
 
   useEffect(() => {
@@ -109,6 +110,19 @@ const Calls = () => {
       setCallHistory(historyData);
     } catch (error) {
       console.error('Error loading call history:', error);
+    }
+  };
+
+  const checkPendingCall = () => {
+    const pendingCallStr = localStorage.getItem('pendingCall');
+    if (pendingCallStr) {
+      try {
+        const pendingCall = JSON.parse(pendingCallStr);
+        localStorage.removeItem('pendingCall');
+        handleCall(pendingCall.contact, pendingCall.type);
+      } catch (error) {
+        console.error('Error parsing pending call:', error);
+      }
     }
   };
 

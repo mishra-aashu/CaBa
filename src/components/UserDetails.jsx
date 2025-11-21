@@ -84,11 +84,21 @@ const UserDetails = () => {
     };
 
     const handleVoiceCall = () => {
-        alert('Voice call feature coming soon!');
+        // Set pending call in localStorage
+        localStorage.setItem('pendingCall', JSON.stringify({
+            contact: user,
+            type: 'voice'
+        }));
+        navigate('/calls');
     };
 
     const handleVideoCall = () => {
-        alert('Video call feature coming soon!');
+        // Set pending call in localStorage
+        localStorage.setItem('pendingCall', JSON.stringify({
+            contact: user,
+            type: 'video'
+        }));
+        navigate('/calls');
     };
 
     const handleMuteToggle = () => {

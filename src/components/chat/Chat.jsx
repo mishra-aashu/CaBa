@@ -564,11 +564,21 @@ const Chat = () => {
   };
 
   const handleVoiceCall = () => {
-    alert('Voice call feature coming soon!');
+    // Set pending call in localStorage
+    localStorage.setItem('pendingCall', JSON.stringify({
+      contact: otherUser,
+      type: 'voice'
+    }));
+    navigate('/calls');
   };
 
   const handleVideoCall = () => {
-    alert('Video call feature coming soon!');
+    // Set pending call in localStorage
+    localStorage.setItem('pendingCall', JSON.stringify({
+      contact: otherUser,
+      type: 'video'
+    }));
+    navigate('/calls');
   };
 
   const handleScroll = (e) => {
