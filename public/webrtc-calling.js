@@ -58,22 +58,22 @@ class WebRTCCall {
 
             // Create call record
             const { data: callData, error: callError } = await supabase
-                .from('calls')
+                .from('call_history')
                 .insert([{
                     caller_id: user.id,
                     receiver_id: receiverId,
                     call_type: callType === 'screen' ? 'video' : callType, // Map screen to video type
-                    status: 'calling',
-                    room_id: this.roomId,
-                    created_at: new Date().toISOString()
+                    call_status: 'initiated',
+                    call_id: this.roomId,
+                    started_at: new Date().toISOString()
                 }])
                 .select()
                 .single();
 
             if (callError) throw callError;
 
-            this.callId = callData.id;
-            this.updateCallState('calling');
+            this.callId = callData.call_id;
+            this.updateCallState('initiated');
 
             // Get local media
             await this.getLocalMedia(callType);
@@ -142,12 +142,12 @@ class WebRTCCall {
 
             // Update call status
             await supabase
-                .from('calls')
+                .from('call_history')
                 .update({
-                    status: 'ringing',
+                    call_status: 'answered',
                     answered_at: new Date().toISOString()
                 })
-                .eq('id', callId);
+                .eq('call_id', callId);
 
             this.updateCallState('ringing');
 
@@ -183,13 +183,13 @@ class WebRTCCall {
     async rejectCall(callId) {
         try {
             await supabase
-                .from('calls')
-                .update({ status: 'declined', ended_at: new Date().toISOString() })
-                .eq('id', callId);
+                .from('call_history')
+                .update({ call_status: 'rejected', ended_at: new Date().toISOString() })
+                .eq('call_id', callId);
 
             // Send hangup signal
             if (this.roomId) {
-                await this.sendSignal('hangup', { reason: 'declined' });
+                await this.sendSignal('call_end', { reason: 'rejected' });
             }
 
             console.log('📵 Call rejected');
@@ -217,18 +217,18 @@ class WebRTCCall {
             // Update call record
             if (this.callId) {
                 await supabase
-                    .from('calls')
+                    .from('call_history')
                     .update({
-                        status: reason,
+                        call_status: reason === 'completed' ? 'ended' : reason,
                         ended_at: new Date().toISOString(),
-                        duration: duration
+                        call_duration: duration
                     })
-                    .eq('id', this.callId);
+                    .eq('call_id', this.callId);
             }
 
             // Send hangup signal
             if (this.roomId) {
-                await this.sendSignal('hangup', { reason });
+                await this.sendSignal('call_end', { reason });
             }
 
             // Cleanup
@@ -325,7 +325,7 @@ class WebRTCCall {
         // ICE candidates
         this.peerConnection.onicecandidate = async (event) => {
             if (event.candidate) {
-                await this.sendSignal('ice', {
+                await this.sendSignal('ice_candidate', {
                     candidate: event.candidate.toJSON()
                 });
             }
@@ -343,12 +343,12 @@ class WebRTCCall {
 
                 // Update DB
                 supabase
-                    .from('calls')
+                    .from('call_history')
                     .update({
-                        status: 'answered',
+                        call_status: 'answered',
                         answered_at: new Date().toISOString()
                     })
-                    .eq('id', this.callId);
+                    .eq('call_id', this.callId);
             } else if (state === 'disconnected' || state === 'failed' || state === 'closed') {
                 this.endCall(state);
             }
@@ -373,8 +373,8 @@ class WebRTCCall {
                 {
                     event: 'INSERT',
                     schema: 'public',
-                    table: 'webrtc_signals',
-                    filter: `room_id=eq.${this.roomId}`
+                    table: 'call_signaling',
+                    filter: `call_id=eq.${this.roomId}`
                 },
                 async (payload) => {
                     await this.handleSignal(payload.new);
@@ -390,34 +390,26 @@ class WebRTCCall {
      */
     async handleSignal(signal) {
         // Ignore own signals
-        if (signal.sender_id === this.userId) return;
+        if (signal.from_user_id === this.userId) return;
 
         console.log(`📥 Signal received: ${signal.signal_type}`);
 
         try {
             switch (signal.signal_type) {
                 case 'offer':
-                    await this.handleOffer(signal.payload);
+                    await this.handleOffer(signal.signal_data);
                     break;
 
                 case 'answer':
-                    await this.handleAnswer(signal.payload);
+                    await this.handleAnswer(signal.signal_data);
                     break;
 
-                case 'ice':
-                    await this.handleIceCandidate(signal.payload);
+                case 'ice_candidate':
+                    await this.handleIceCandidate(signal.signal_data);
                     break;
 
-                case 'hangup':
-                    await this.endCall(signal.payload.reason || 'completed');
-                    break;
-
-                case 'ringing':
-                    this.updateCallState('ringing');
-                    break;
-
-                case 'busy':
-                    await this.endCall('busy');
+                case 'call_end':
+                    await this.endCall(signal.signal_data.reason || 'ended');
                     break;
             }
         } catch (error) {
@@ -485,13 +477,13 @@ class WebRTCCall {
     async sendSignal(type, payload) {
         try {
             await supabase
-                .from('webrtc_signals')
+                .from('call_signaling')
                 .insert([{
-                    room_id: this.roomId,
-                    sender_id: this.userId,
+                    call_id: this.roomId,
+                    from_user_id: this.userId,
+                    to_user_id: this.remoteUserId,
                     signal_type: type,
-                    purpose: 'call',
-                    payload: payload
+                    signal_data: payload
                 }]);
         } catch (error) {
             console.error('Send signal error:', error);

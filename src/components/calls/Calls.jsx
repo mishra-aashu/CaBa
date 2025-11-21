@@ -89,11 +89,11 @@ const Calls = () => {
   const loadCallHistory = async (user) => {
     try {
       const { data, error } = await supabase
-        .from('calls')
+        .from('call_history')
         .select(`
           *,
-          caller:users!calls_caller_id_fkey(name, avatar),
-          receiver:users!calls_receiver_id_fkey(name, avatar)
+          caller:users!call_history_caller_id_fkey(name, avatar),
+          receiver:users!call_history_receiver_id_fkey(name, avatar)
         `)
         .or(`caller_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
@@ -122,12 +122,12 @@ const Calls = () => {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'calls',
+          table: 'call_history',
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
           const call = payload.new;
-          if (call.status === 'calling' && !activeCall) {
+          if (call.call_status === 'initiated' && !activeCall) {
             setIncomingCall(call);
           }
         }
@@ -157,8 +157,8 @@ const Calls = () => {
       contact: { id: callData.caller_id, name: 'Caller' }, // Will be loaded in CallInterface
       type: callData.call_type,
       incoming: true,
-      callId: callData.id,
-      roomId: callData.room_id
+      callId: callData.call_id,
+      roomId: callData.call_id // Use call_id as room identifier
     });
   };
 
@@ -256,9 +256,9 @@ const Calls = () => {
                     <h4>{call.otherUser.name}</h4>
                     <p className="call-details">
                       <i className={`fas ${call.call_type === 'video' ? 'fa-video' : 'fa-phone'}`}></i>
-                      {call.status === 'completed' && ` • ${Math.floor(call.duration / 60)}:${(call.duration % 60).toString().padStart(2, '0')}`}
-                      {call.status === 'missed' && ' • Missed'}
-                      {call.status === 'declined' && ' • Declined'}
+                      {call.call_status === 'ended' && ` • ${Math.floor(call.call_duration / 60)}:${(call.call_duration % 60).toString().padStart(2, '0')}`}
+                      {call.call_status === 'missed' && ' • Missed'}
+                      {call.call_status === 'rejected' && ' • Declined'}
                       {' • ' + formatCallTime(call.created_at)}
                     </p>
                   </div>

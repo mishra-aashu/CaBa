@@ -188,7 +188,7 @@ const CallInterface = ({ contact, callType, incoming = false, callId, roomId, on
               </div>
               <h2>{contact.name}</h2>
               <p className="call-status">
-                {callState === 'calling' && 'Calling...'}
+                {callState === 'initiated' && 'Calling...'}
                 {callState === 'ringing' && 'Ringing...'}
                 {callState === 'answered' && `Connected • ${formatDuration(callDuration)}`}
                 {callState === 'ended' && 'Call ended'}
