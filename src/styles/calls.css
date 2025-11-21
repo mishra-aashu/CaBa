@@ -1,0 +1,228 @@
+/* =============================================
+    CALLS COMPONENT STYLES
+    ============================================= */
+
+:root {
+    --calls-primary: #4CAF50;
+    --calls-secondary: #2196F3;
+    --calls-text: #333333;
+    --calls-text-light: #666666;
+    --calls-background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --calls-surface: #ffffff;
+    --calls-border: #dddddd;
+    --calls-hover: #f8f9fa;
+}
+
+/* Dark theme overrides for calls */
+[data-theme="dark"] {
+    --calls-text: #ffffff;
+    --calls-text-light: #cccccc;
+    --calls-background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    --calls-surface: #2a2a2a;
+    --calls-border: #444444;
+    --calls-hover: #333333;
+}
+
+.calls-container {
+  min-height: 100vh;
+  background: var(--calls-background);
+}
+
+.search-container {
+  padding: 16px;
+  background: var(--calls-surface);
+  border-bottom: 1px solid var(--calls-border);
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box i {
+  position: absolute;
+  left: 16px;
+  color: var(--calls-text-light);
+  font-size: 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border: 1px solid var(--calls-border);
+  border-radius: 8px;
+  background: var(--calls-surface);
+  color: var(--calls-text);
+  font-size: 16px;
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--calls-primary);
+}
+
+.contacts-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--calls-surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.contact-item:hover {
+  transform: translateY(-2px);
+}
+
+.contact-avatar {
+  position: relative;
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--calls-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.online-status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--calls-surface);
+  background: #ccc;
+}
+
+.online-status.online {
+  background: var(--calls-primary);
+}
+
+.contact-info {
+  flex: 1;
+}
+
+.contact-info h4 {
+  margin: 0 0 4px 0;
+  color: var(--calls-text);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.contact-info p {
+  margin: 0;
+  color: var(--calls-text-light);
+  font-size: 14px;
+}
+
+.call-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--calls-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.call-btn:hover {
+  background: #45a049;
+  transform: scale(1.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state i {
+  font-size: 64px;
+  color: var(--calls-text-light);
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  color: var(--calls-text);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: var(--calls-text-light);
+}
+
+.calls-loading {
+  text-align: center;
+  padding: 50px;
+}
+
+.loading-spinner {
+  border: 4px solid var(--calls-border);
+  border-top: 4px solid var(--calls-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contacts-list {
+    padding: 12px;
+  }
+
+  .contact-item {
+    padding: 10px;
+  }
+
+  .avatar-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .contact-info h4 {
+    font-size: 15px;
+  }
+
+  .contact-info p {
+    font-size: 13px;
+  }
+}
