@@ -279,7 +279,7 @@
 }
 
 .message-content {
-  max-width: 70%;
+  max-width: 75%;
   position: relative;
 }
 
@@ -296,17 +296,186 @@
 }
 
 .message-bubble {
-  background: white;
-  border-radius: 18px;
-  padding: 8px 12px;
-  margin-bottom: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   position: relative;
+  padding: 10px 14px;
+  margin-bottom: 4px;
+  max-width: 100%;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
+/* Received message bubbles */
+.message.received .message-bubble {
+  background: var(--chat-surface, #ffffff);
+  color: var(--chat-text, #333333);
+  border-bottom-left-radius: 4px;
+  margin-right: 60px;
+  margin-left: 8px;
+}
+
+/* Sent message bubbles */
 .message.sent .message-bubble {
-  background: var(--primary-color, #007bff);
+  background: linear-gradient(135deg, var(--chat-primary, #4CAF50) 0%, var(--chat-primary, #4CAF50) 100%);
   color: white;
+  border-bottom-right-radius: 4px;
+  margin-left: 60px;
+  margin-right: 8px;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Tail for received messages */
+.message.received .message-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 0 0;
+  border-color: var(--chat-surface, #ffffff) transparent transparent transparent;
+}
+
+/* Tail for sent messages */
+.message.sent .message-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 8px 8px;
+  border-color: transparent transparent var(--chat-primary, #4CAF50) transparent;
+}
+
+/* Hover effects */
+.message-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.message.sent .message-bubble:hover {
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Theme-specific bubble styles */
+[data-theme="dark"] .message.received .message-bubble {
+  background: var(--chat-surface, #2a2a2a);
+  color: var(--chat-text, #ffffff);
+}
+
+[data-theme="dark"] .message.received .message-bubble::before {
+  border-color: var(--chat-surface, #2a2a2a) transparent transparent transparent;
+}
+
+/* Different bubble styles for themes */
+.theme-ocean_depths .message.sent .message-bubble {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+}
+
+.theme-ocean_depths .message.sent .message-bubble::before {
+  border-color: transparent transparent #0ea5e9 transparent;
+}
+
+.theme-forest_mist .message.sent .message-bubble {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.theme-forest_mist .message.sent .message-bubble::before {
+  border-color: transparent transparent #22c55e transparent;
+}
+
+.theme-sunset_glow .message.sent .message-bubble {
+  background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+}
+
+.theme-sunset_glow .message.sent .message-bubble::before {
+  border-color: transparent transparent #fb923c transparent;
+}
+
+.theme-cosmic_purple .message.sent .message-bubble {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+}
+
+.theme-cosmic_purple .message.sent .message-bubble::before {
+  border-color: transparent transparent #9333ea transparent;
+}
+
+.theme-golden_hour .message.sent .message-bubble {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.theme-golden_hour .message.sent .message-bubble::before {
+  border-color: transparent transparent #f59e0b transparent;
+}
+
+.theme-midnight_city .message.sent .message-bubble {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.theme-midnight_city .message.sent .message-bubble::before {
+  border-color: transparent transparent #1e1b4b transparent;
+}
+
+.theme-rose_garden .message.sent .message-bubble {
+  background: linear-gradient(135deg, #f43f5e 0%, #db2777 100%);
+}
+
+.theme-rose_garden .message.sent .message-bubble::before {
+  border-color: transparent transparent #f43f5e transparent;
+}
+
+.theme-emerald_forest .message.sent .message-bubble {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.theme-emerald_forest .message.sent .message-bubble::before {
+  border-color: transparent transparent #10b981 transparent;
+}
+
+.theme-nebula .message.sent .message-bubble {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+}
+
+.theme-nebula .message.sent .message-bubble::before {
+  border-color: transparent transparent #ec4899 transparent;
+}
+
+.theme-cyberpunk .message.sent .message-bubble {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+.theme-cyberpunk .message.sent .message-bubble::before {
+  border-color: transparent transparent #0f0f0f transparent;
+}
+
+.theme-dark_professional .message.sent .message-bubble {
+  background: linear-gradient(135deg, #1e1e2e 0%, #0f172a 100%);
+}
+
+.theme-dark_professional .message.sent .message-bubble::before {
+  border-color: transparent transparent #1e1e2e transparent;
+}
+
+.theme-telegram_blue .message.sent .message-bubble {
+  background: linear-gradient(135deg, #0088cc 0%, #005f99 100%);
+}
+
+.theme-telegram_blue .message.sent .message-bubble::before {
+  border-color: transparent transparent #0088cc transparent;
+}
+
+.theme-galaxy .message.sent .message-bubble {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.theme-galaxy .message.sent .message-bubble::before {
+  border-color: transparent transparent #1e1b4b transparent;
 }
 
 .message-text {
@@ -317,21 +486,28 @@
 
 .message-time {
   font-size: 11px;
-  color: var(--text-secondary, #666);
-  margin-top: 4px;
+  color: var(--chat-text-light, #666666);
+  margin-top: 2px;
+  opacity: 0.8;
 }
 
 .message.sent .message-time {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: right;
+}
+
+.message.received .message-time {
+  text-align: left;
 }
 
 .message-status {
   font-size: 11px;
   margin-left: 4px;
+  opacity: 0.8;
 }
 
 .message.sent .message-status {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Message Actions */
@@ -1048,6 +1224,21 @@
 
   .message-content {
     max-width: 85%;
+  }
+
+  .message.received .message-bubble {
+    margin-right: 40px;
+    margin-left: 4px;
+  }
+
+  .message.sent .message-bubble {
+    margin-left: 40px;
+    margin-right: 4px;
+  }
+
+  .message-bubble {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
   .chat-input-container {
