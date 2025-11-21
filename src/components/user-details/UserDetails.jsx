@@ -3,6 +3,39 @@ import { supabase } from '../../utils/supabase';
 import { X } from 'lucide-react';
 import './UserDetails.css';
 
+// DP options for avatar display
+const baseUrl = import.meta.env.BASE_URL || '/';
+const dpOptionsData = [
+  { id: 1, path: `${baseUrl}assets/images/dp-options/00701602b0eac0390b3107b9e2a665e0.jpg` },
+  { id: 2, path: `${baseUrl}assets/images/dp-options/1691130988954.jpg` },
+  { id: 3, path: `${baseUrl}assets/images/dp-options/aesthetic-cartoon-funny-dp-for-instagram.webp` },
+  { id: 4, path: `${baseUrl}assets/images/dp-options/boy-cartoon-dp-with-hoodie.webp` },
+  { id: 5, path: `${baseUrl}assets/images/dp-options/download (1).jpg` },
+  { id: 6, path: `${baseUrl}assets/images/dp-options/download.jpg` },
+  { id: 7, path: `${baseUrl}assets/images/dp-options/funny-profile-picture-wd195eo9rpjy7ax1.jpg` },
+  { id: 8, path: `${baseUrl}assets/images/dp-options/funny-whatsapp-dp-for-girls.webp` },
+  { id: 9, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575118_y.jpg` },
+  { id: 10, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575119_y.jpg` },
+  { id: 11, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575120_y.jpg` },
+  { id: 12, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575121_y.jpg` },
+  { id: 13, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575122_y.jpg` },
+  { id: 14, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575123_y.jpg` },
+  { id: 15, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575124_y.jpg` },
+  { id: 16, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575125_y.jpg` },
+  { id: 17, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575126_y.jpg` },
+  { id: 18, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575127_y.jpg` },
+  { id: 19, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267708_w.jpg` },
+  { id: 20, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267709_w.jpg` },
+  { id: 21, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267710_w.jpg` },
+  { id: 22, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267711_w.jpg` },
+  { id: 23, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267712_w.jpg` },
+  { id: 24, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267713_w.jpg` },
+  { id: 25, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267714_w.jpg` },
+  { id: 26, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267715_w.jpg` },
+  { id: 27, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267716_w.jpg` },
+  { id: 28, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267717_w.jpg` }
+];
+
 const UserDetails = ({ userId, onBack }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [user, setUser] = useState(null);
@@ -107,7 +140,11 @@ const UserDetails = ({ userId, onBack }) => {
       <div className="user-profile-section">
         <div className="user-avatar">
           {user.avatar ? (
-            <img src={user.avatar} alt={user.name} />
+            parseInt(user.avatar) ? (
+              <img src={dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path || user.avatar} alt={user.name} />
+            ) : (
+              <img src={user.avatar} alt={user.name} />
+            )
           ) : (
             getInitials(user.name)
           )}
