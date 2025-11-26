@@ -51,17 +51,29 @@ const Calls = () => {
 
   const loadContacts = async (user) => {
     try {
-      const { data, error } = await supabase
+      // Load contacts with explicit user fetching to handle data type issues
+      const { data: contactsList, error: contactsError } = await supabase
         .from('contacts')
-        .select(`
-          *,
-          contact_user:users!contacts_contact_user_id_fkey(*)
-        `)
+        .select('contact_user_id')
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (contactsError) throw contactsError;
 
-      const contactsData = data.map(c => c.contact_user);
+      let contactsData = [];
+      if (contactsList && contactsList.length > 0) {
+        // Fetch user details for each contact
+        const userIds = contactsList.map(c => c.contact_user_id).filter(id => id);
+        if (userIds.length > 0) {
+          const { data: users, error: usersError } = await supabase
+            .from('users')
+            .select('*')
+            .in('id', userIds);
+
+          if (!usersError && users) {
+            contactsData = users;
+          }
+        }
+      }
 
       // Also load from chats
       const { data: chats } = await supabase
@@ -75,7 +87,7 @@ const Calls = () => {
       if (chats) {
         chats.forEach(chat => {
           const otherUser = chat.user1.id === user.id ? chat.user2 : chat.user1;
-          if (!contactsData.find(c => c.id === otherUser.id)) {
+          if (otherUser && otherUser.id && !contactsData.find(c => c.id === otherUser.id)) {
             contactsData.push(otherUser);
           }
         });
