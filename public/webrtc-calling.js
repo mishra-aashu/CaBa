@@ -37,9 +37,12 @@ class WebRTCCall {
         console.log(`📞 startCall called with receiverId: ${receiverId}, callType: ${callType}`);
         try {
             // Validate receiverId
+            console.log(`🔍 Validating receiverId: ${receiverId}, type: ${typeof receiverId}`);
             if (!receiverId) {
+                console.log('❌ ReceiverId validation failed, throwing error');
                 throw new Error('Invalid receiver ID: cannot start call without a valid receiver');
             }
+            console.log('✅ ReceiverId validation passed');
 
             this.callType = callType;
             this.remoteUserId = receiverId;
