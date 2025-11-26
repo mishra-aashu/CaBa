@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
-import { IncomingCallProvider } from './components/IncomingCallProvider';
+import { CallProvider } from './context/CallContext';
 import { Login, Signup, ForgotPassword, ResetPassword } from './components/auth';
 import { Chat } from './components/chat';
 import Home from './components/Home';
@@ -23,6 +23,23 @@ const ProtectedRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" replace />;
 };
 
+const CallProviderWrapper = ({ children }) => {
+  const { user } = useSupabase();
+  const currentUser = user ? {
+    id: user.id,
+    name: user.user_metadata?.name || 'User',
+    email: user.email,
+    phone: user.user_metadata?.phone || '',
+    avatar: user.user_metadata?.avatar || null
+  } : null;
+
+  return (
+    <CallProvider currentUser={currentUser}>
+      {children}
+    </CallProvider>
+  );
+};
+
 // Home component is now imported
 
 function App() {
@@ -38,7 +55,7 @@ function App() {
 
   return (
     <SupabaseProvider>
-      <IncomingCallProvider>
+      <CallProviderWrapper>
         <BrowserRouter basename="/CaBa/">
           {showIntro ? <Intro onComplete={() => setShowIntro(false)} /> : (
             <Routes>
@@ -61,7 +78,7 @@ function App() {
             </Routes>
           )}
         </BrowserRouter>
-      </IncomingCallProvider>
+      </CallProviderWrapper>
     </SupabaseProvider>
   );
 }

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase';
 import { useTheme } from '../../contexts/ThemeContext';
-import CallInterface from './CallInterface';
-import IncomingCall from './IncomingCall';
+import { CallHistory } from '../CallHistory';
+import { CallButton } from '../CallButton';
+import { IncomingCallModal } from '../IncomingCallModal';
+import { ActiveCallScreen } from '../ActiveCallScreen';
 import '../../styles/calls.css';
 
 const Calls = () => {
@@ -262,43 +264,9 @@ const Calls = () => {
         </div>
 
         {/* Call History */}
-        {callHistory.length > 0 && (
-          <div className="call-history-section">
-            <h3>Recent Calls</h3>
-            <div className="call-history-list">
-              {callHistory.map(call => (
-                <div key={call.id} className="call-history-item">
-                  <div className="contact-avatar">
-                    <div className="avatar-circle">
-                      {call.otherUser.avatar ? (
-                        <img src={call.otherUser.avatar} alt={call.otherUser.name} />
-                      ) : (
-                        getInitials(call.otherUser.name)
-                      )}
-                    </div>
-                  </div>
-                  <div className="call-info">
-                    <h4>{call.otherUser.name}</h4>
-                    <p className="call-details">
-                      <i className={`fas ${call.call_type === 'video' ? 'fa-video' : 'fa-phone'}`}></i>
-                      {call.call_status === 'ended' && ` • ${Math.floor(call.call_duration / 60)}:${(call.call_duration % 60).toString().padStart(2, '0')}`}
-                      {call.call_status === 'missed' && ' • Missed'}
-                      {call.call_status === 'rejected' && ' • Declined'}
-                      {' • ' + formatCallTime(call.created_at)}
-                    </p>
-                  </div>
-                  <button
-                    className="call-btn"
-                    onClick={() => handleCall(call.otherUser, call.call_type)}
-                    title={`Call ${call.otherUser.name}`}
-                  >
-                    <i className="fas fa-phone"></i>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="call-history-section">
+          <CallHistory userId={currentUser?.id} />
+        </div>
 
         {/* Contacts List */}
         <div className="contacts-section">
@@ -322,20 +290,16 @@ const Calls = () => {
                     <p>{contact.phone || 'No phone'}</p>
                   </div>
                   <div className="call-buttons">
-                    <button
-                      className="call-btn voice"
-                      onClick={() => handleCall(contact, 'voice')}
-                      title="Voice call"
-                    >
-                      <i className="fas fa-phone"></i>
-                    </button>
-                    <button
-                      className="call-btn video"
-                      onClick={() => handleCall(contact, 'video')}
-                      title="Video call"
-                    >
-                      <i className="fas fa-video"></i>
-                    </button>
+                    <CallButton
+                      receiverId={contact.id}
+                      callType="voice"
+                      size="md"
+                    />
+                    <CallButton
+                      receiverId={contact.id}
+                      callType="video"
+                      size="md"
+                    />
                   </div>
                 </div>
               ))
@@ -350,28 +314,11 @@ const Calls = () => {
         </div>
       </div>
 
-      {/* Active Call Interface */}
-      {activeCall && (
-        <CallInterface
-          contact={activeCall.contact}
-          callType={activeCall.type}
-          incoming={activeCall.incoming}
-          callId={activeCall.callId}
-          roomId={activeCall.roomId}
-          onClose={() => setActiveCall(null)}
-          onCallEnd={handleCallEnd}
-        />
-      )}
+      {/* Active Call Screen */}
+      <ActiveCallScreen />
 
-      {/* Incoming Call */}
-      {incomingCall && (
-        <IncomingCall
-          callData={incomingCall}
-          onAccept={handleAcceptCall}
-          onReject={handleRejectCall}
-          onClose={() => setIncomingCall(null)}
-        />
-      )}
+      {/* Incoming Call Modal */}
+      <IncomingCallModal />
     </>
   );
 };
