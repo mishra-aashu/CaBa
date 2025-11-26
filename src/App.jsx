@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SupabaseProvider, useSupabase } from './contexts/SupabaseContext';
+import { IncomingCallProvider } from './components/IncomingCallProvider';
 import { Login, Signup, ForgotPassword, ResetPassword } from './components/auth';
 import { Chat } from './components/chat';
 import Home from './components/Home';
@@ -37,30 +38,30 @@ function App() {
 
   return (
     <SupabaseProvider>
-      <BrowserRouter basename="/CaBa/">
-        {showIntro ? <Intro onComplete={() => setShowIntro(false)} /> : (
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/home.html" element={<Navigate to="/" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/chat" element={<Navigate to="/" replace />} />
-            <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-            <Route path="/chat/new/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
-            <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
-            <Route path="/create-reminder" element={<ProtectedRoute><CreateReminder /></ProtectedRoute>} />
-            <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
-            <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
-            <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
-            <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
-          </Routes>
-        )}
-      </BrowserRouter>
+      <IncomingCallProvider>
+        <BrowserRouter basename="/CaBa/">
+          {showIntro ? <Intro onComplete={() => setShowIntro(false)} /> : (
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="/chat/new/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
+              <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
+              <Route path="/create-reminder" element={<ProtectedRoute><CreateReminder /></ProtectedRoute>} />
+              <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
+              <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
+              <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
+              <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
+            </Routes>
+          )}
+        </BrowserRouter>
+      </IncomingCallProvider>
     </SupabaseProvider>
   );
 }

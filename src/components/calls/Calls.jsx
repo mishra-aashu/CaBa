@@ -114,6 +114,7 @@ const Calls = () => {
   };
 
   const checkPendingCall = () => {
+    // Check for regular pending calls
     const pendingCallStr = localStorage.getItem('pendingCall');
     if (pendingCallStr) {
       try {
@@ -122,6 +123,18 @@ const Calls = () => {
         handleCall(pendingCall.contact, pendingCall.type);
       } catch (error) {
         console.error('Error parsing pending call:', error);
+      }
+    }
+
+    // Check for incoming calls from global handler
+    const pendingIncomingCallStr = localStorage.getItem('pendingIncomingCall');
+    if (pendingIncomingCallStr) {
+      try {
+        const callInfo = JSON.parse(pendingIncomingCallStr);
+        localStorage.removeItem('pendingIncomingCall');
+        setActiveCall(callInfo);
+      } catch (error) {
+        console.error('Error parsing pending incoming call:', error);
       }
     }
   };
