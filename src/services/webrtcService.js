@@ -13,23 +13,89 @@ class WebRTCService {
     this.onConnectionStateChange = null;
     this.iceCandidatesQueue = [];
 
-    // STUN/TURN servers configuration
-    this.rtcConfig = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun3.l.google.com:19302' },
-        { urls: 'stun:stun4.l.google.com:19302' },
-        // Add TURN server if needed for production
-        // {
-        //   urls: 'turn:your-turn-server.com:3478',
-        //   username: 'username',
-        //   credential: 'password'
-        // }
-      ],
-      iceCandidatePoolSize: 10
-    };
+    // Load TURN servers configuration
+    this.loadTurnConfig();
+  }
+
+  /**
+   * Load TURN/STUN server configuration
+   */
+  loadTurnConfig() {
+    try {
+      // Try to load from global config first (from turn-config.js)
+      if (window.FREE_TURN_SERVERS) {
+        this.rtcConfig = window.FREE_TURN_SERVERS;
+        console.log('✅ Loaded TURN servers from global config');
+        return;
+      }
+
+      // Fallback configuration with free TURN servers
+      this.rtcConfig = {
+        iceServers: [
+          // Google STUN servers
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' },
+
+          // OpenRelay TURN (FREE - no signup required)
+          {
+            urls: 'turn:openrelay.metered.ca:80',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+          },
+          {
+            urls: 'turn:openrelay.metered.ca:443',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+          },
+          {
+            urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+          },
+
+          // Metered.ca Free TURN
+          {
+            urls: 'turn:a.relay.metered.ca:80',
+            username: 'df4e050fc5de5dc26b25b85a',
+            credential: 'Pxdp2PK0b5ZXljOm'
+          },
+          {
+            urls: 'turn:a.relay.metered.ca:80?transport=tcp',
+            username: 'df4e050fc5de5dc26b25b85a',
+            credential: 'Pxdp2PK0b5ZXljOm'
+          },
+          {
+            urls: 'turn:a.relay.metered.ca:443',
+            username: 'df4e050fc5de5dc26b25b85a',
+            credential: 'Pxdp2PK0b5ZXljOm'
+          },
+          {
+            urls: 'turn:a.relay.metered.ca:443?transport=tcp',
+            username: 'df4e050fc5de5dc26b25b85a',
+            credential: 'Pxdp2PK0b5ZXljOm'
+          },
+
+          // Additional free STUN servers
+          { urls: 'stun:global.stun.twilio.com:3478' },
+          { urls: 'stun:stun.services.mozilla.com' },
+          { urls: 'stun:stun.ekiga.net' }
+        ],
+        iceCandidatePoolSize: 10
+      };
+
+      console.log('✅ Loaded fallback TURN/STUN configuration');
+    } catch (error) {
+      console.error('❌ Error loading TURN config:', error);
+      // Ultimate fallback to basic STUN
+      this.rtcConfig = {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' }
+        ]
+      };
+    }
   }
 
   /**
