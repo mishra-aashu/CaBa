@@ -118,7 +118,7 @@ export function CallProvider({ children, currentUser }) {
 
   // Handle incoming signal
   const handleSignal = useCallback(async (signal) => {
-    console.log('📨 Signal received in context:', signal.signal_type);
+    console.log('📨 Signal received in context:', signal.signal_type, 'Call ID:', signal.call_id);
 
     if (signal.signal_type === 'offer') {
       // Incoming call
@@ -137,11 +137,21 @@ export function CallProvider({ children, currentUser }) {
         console.error('Error fetching caller info:', error);
       }
     } else {
-      // Other signals handled by WebRTC service
-      const result = await webRTCService.handleSignal(signal);
+      // Handle other signals (answer, ice_candidate, call_end)
+      try {
+        const result = await webRTCService.handleSignal(signal);
 
-      // Mark signal as processed
-      await callService.markSignalProcessed(signal.id);
+        // Mark signal as processed
+        await callService.markSignalProcessed(signal.id);
+
+        // If this is an answer signal and we're the caller, update call status
+        if (signal.signal_type === 'answer' && webRTCService.callId === signal.call_id) {
+          console.log('📞 Answer received, call should connect now');
+          // The WebRTC service will handle the connection state change
+        }
+      } catch (error) {
+        console.error('Error handling signal:', error);
+      }
     }
   }, [playRingtone]);
 

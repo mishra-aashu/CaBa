@@ -134,7 +134,7 @@ class WebRTCService {
       this.remoteUserId = receiverId;
       this.callId = this.generateCallId();
 
-      console.log('📞 Starting call:', this.callId);
+      console.log('📞 Starting call:', this.callId, 'from:', callerId, 'to:', receiverId);
 
       // Get local stream
       await this.getLocalStream(callType === 'video', true);
@@ -166,7 +166,7 @@ class WebRTCService {
         }
       );
 
-      console.log('📤 Offer sent');
+      console.log('📤 Offer sent for call:', this.callId);
       return { callId: this.callId, localStream: this.localStream };
 
     } catch (error) {
@@ -185,7 +185,7 @@ class WebRTCService {
       this.currentUserId = receiverId;
       this.remoteUserId = callerId;
 
-      console.log('📞 Answering call:', callId);
+      console.log('📞 Answering call:', callId, 'from:', callerId, 'to:', receiverId);
 
       // Get local stream
       const callType = offerData.callType || 'video';
@@ -224,7 +224,7 @@ class WebRTCService {
       // Update call status
       await callService.updateCallStatus(callId, 'answered');
 
-      console.log('📤 Answer sent');
+      console.log('📤 Answer sent for call:', callId);
       return { localStream: this.localStream, remoteStream: this.remoteStream };
 
     } catch (error) {
@@ -462,7 +462,13 @@ class WebRTCService {
   async handleSignal(signal) {
     const { signal_type, signal_data, call_id, from_user_id } = signal;
 
-    console.log('📨 Handling signal:', signal_type);
+    console.log('📨 Handling signal:', signal_type, 'for call:', call_id);
+
+    // Only handle signals for the current call
+    if (call_id && this.callId && call_id !== this.callId) {
+      console.log('📨 Ignoring signal for different call:', call_id, 'current:', this.callId);
+      return;
+    }
 
     switch (signal_type) {
       case 'offer':
@@ -470,14 +476,17 @@ class WebRTCService {
         return { type: 'incoming_call', data: signal };
 
       case 'answer':
+        console.log('📞 Processing answer for call:', call_id);
         await this.handleAnswer(signal_data);
         break;
 
       case 'ice_candidate':
+        console.log('🧊 Processing ICE candidate');
         await this.handleIceCandidate(signal_data);
         break;
 
       case 'call_end':
+        console.log('📞 Call ended with reason:', signal_data.reason);
         if (this.onCallEnd) {
           this.onCallEnd(signal_data.reason);
         }
@@ -493,6 +502,7 @@ class WebRTCService {
 
       case 'ringing':
         // Update UI to show ringing state
+        console.log('🔔 Ringing signal received');
         break;
 
       default:
