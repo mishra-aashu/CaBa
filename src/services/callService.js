@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { supabase } from '../utils/supabase';
 
 class CallService {
 
