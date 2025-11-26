@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useCall } from '../context/CallContext';
 import { Phone, PhoneOff, Video } from 'lucide-react';
 
@@ -11,11 +11,76 @@ export function IncomingCallModal() {
     rejectCall
   } = useCall();
 
+  const ringtoneRef = useRef(null);
+  const hasUserInteracted = useRef(false);
+
   if (callState !== 'ringing' || !incomingCall) {
     return null;
   }
 
   const isVideoCall = incomingCall.signal_data?.callType === 'video';
+
+  // Play ringtone on user interaction
+  const playRingtone = () => {
+    if (!hasUserInteracted.current && ringtoneRef.current) {
+      hasUserInteracted.current = true;
+      // Create a simple beep sound using Web Audio API
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+
+        // Repeat the beep every 2 seconds
+        const interval = setInterval(() => {
+          if (callState === 'ringing') {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.frequency.setValueAtTime(800, audioContext.currentTime);
+            osc.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.3);
+          } else {
+            clearInterval(interval);
+          }
+        }, 2000);
+
+        // Clean up interval when component unmounts or call state changes
+        return () => clearInterval(interval);
+      } catch (error) {
+        console.warn('Could not play ringtone:', error);
+        // Fallback: try vibration if available
+        if ('vibrate' in navigator) {
+          navigator.vibrate([200, 100, 200, 100, 200]);
+        }
+      }
+    }
+  };
+
+  // Handle user interaction
+  const handleUserInteraction = (action) => {
+    playRingtone();
+    action();
+  };
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -57,7 +122,7 @@ export function IncomingCallModal() {
         <div className="flex justify-center gap-8">
           {/* Reject Button */}
           <button
-            onClick={rejectCall}
+            onClick={() => handleUserInteraction(rejectCall)}
             className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-red-500/30"
           >
             <PhoneOff className="w-7 h-7 text-white" />
@@ -65,7 +130,7 @@ export function IncomingCallModal() {
 
           {/* Answer Button */}
           <button
-            onClick={answerCall}
+            onClick={() => handleUserInteraction(answerCall)}
             className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-green-500/30 animate-bounce"
           >
             <Phone className="w-7 h-7 text-white" />

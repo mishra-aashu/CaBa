@@ -72,32 +72,7 @@ export function CallProvider({ children, currentUser }) {
   const signalChannelRef = useRef(null);
   const durationIntervalRef = useRef(null);
   const callStartTimeRef = useRef(null);
-  const ringtoneRef = useRef(null);
 
-  // Initialize ringtone
-  useEffect(() => {
-    ringtoneRef.current = new Audio('/sounds/ringtone.mp3');
-    ringtoneRef.current.loop = true;
-    return () => {
-      if (ringtoneRef.current) {
-        ringtoneRef.current.pause();
-      }
-    };
-  }, []);
-
-  // Play/Stop ringtone
-  const playRingtone = useCallback(() => {
-    if (ringtoneRef.current) {
-      ringtoneRef.current.play().catch(console.error);
-    }
-  }, []);
-
-  const stopRingtone = useCallback(() => {
-    if (ringtoneRef.current) {
-      ringtoneRef.current.pause();
-      ringtoneRef.current.currentTime = 0;
-    }
-  }, []);
 
   // Start duration timer
   const startDurationTimer = useCallback(() => {
@@ -132,7 +107,7 @@ export function CallProvider({ children, currentUser }) {
           }
         });
         dispatch({ type: ACTIONS.SET_CALLER_INFO, payload: callerInfo });
-        playRingtone();
+        // Note: Ringtone is now handled in IncomingCallModal to comply with autoplay policies
       } catch (error) {
         console.error('Error fetching caller info:', error);
       }
@@ -153,7 +128,7 @@ export function CallProvider({ children, currentUser }) {
         console.error('Error handling signal:', error);
       }
     }
-  }, [playRingtone]);
+  }, []);
 
   // Setup WebRTC callbacks
   useEffect(() => {
@@ -164,7 +139,6 @@ export function CallProvider({ children, currentUser }) {
 
     webRTCService.onCallEnd = (reason) => {
       console.log('📞 Call ended:', reason);
-      stopRingtone();
       stopDurationTimer();
       dispatch({ type: ACTIONS.RESET_CALL });
     };
@@ -178,7 +152,7 @@ export function CallProvider({ children, currentUser }) {
         });
       }
     };
-  }, [startDurationTimer, stopDurationTimer, stopRingtone]);
+  }, [startDurationTimer, stopDurationTimer]);
 
   // Subscribe to signals
   useEffect(() => {
@@ -237,7 +211,6 @@ export function CallProvider({ children, currentUser }) {
   // Answer incoming call
   const answerCall = useCallback(async () => {
     try {
-      stopRingtone();
       const { incomingCall } = state;
 
       if (!incomingCall) {
@@ -279,12 +252,11 @@ export function CallProvider({ children, currentUser }) {
       dispatch({ type: ACTIONS.RESET_CALL });
       throw error;
     }
-  }, [state, currentUser?.id, startDurationTimer, stopRingtone]);
+  }, [state, currentUser?.id, startDurationTimer]);
 
   // Reject incoming call
   const rejectCall = useCallback(async () => {
     try {
-      stopRingtone();
       const { incomingCall } = state;
 
       if (incomingCall) {
@@ -301,12 +273,11 @@ export function CallProvider({ children, currentUser }) {
       console.error('❌ Error rejecting call:', error);
       dispatch({ type: ACTIONS.RESET_CALL });
     }
-  }, [state, currentUser?.id, stopRingtone]);
+  }, [state, currentUser?.id]);
 
   // End current call
   const endCall = useCallback(async () => {
     try {
-      stopRingtone();
       stopDurationTimer();
       await webRTCService.endCall(state.callDuration);
       dispatch({ type: ACTIONS.RESET_CALL });
@@ -314,7 +285,7 @@ export function CallProvider({ children, currentUser }) {
       console.error('❌ Error ending call:', error);
       dispatch({ type: ACTIONS.RESET_CALL });
     }
-  }, [state.callDuration, stopRingtone, stopDurationTimer]);
+  }, [state.callDuration, stopDurationTimer]);
 
   // Toggle microphone
   const toggleMute = useCallback(() => {
