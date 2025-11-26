@@ -117,7 +117,7 @@ const Calls = () => {
       const historyData = data.map(call => ({
         ...call,
         otherUser: call.caller_id === user.id ? call.receiver : call.caller
-      }));
+      })).filter(call => call.otherUser && call.otherUser.id); // Filter out calls with invalid otherUser
 
       setCallHistory(historyData);
     } catch (error) {
@@ -179,17 +179,28 @@ const Calls = () => {
   };
 
   const filteredContacts = contacts.filter(contact => {
+    // First ensure contact has valid ID
+    if (!contact || !contact.id) return false;
+
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
     return contact.name.toLowerCase().includes(search) ||
-           (contact.phone && contact.phone.includes(search));
+            (contact.phone && contact.phone.includes(search));
   });
 
   const handleCall = (contact, type = 'video') => {
-    if (!contact || !contact.id) {
-      alert('Invalid contact: cannot start call');
+    console.log('handleCall called with contact:', contact, 'type:', type);
+    if (!contact) {
+      console.error('handleCall: contact is null/undefined');
+      alert('Invalid contact: contact not found');
       return;
     }
+    if (!contact.id) {
+      console.error('handleCall: contact.id is null/undefined', contact);
+      alert('Invalid contact: contact ID missing');
+      return;
+    }
+    console.log('handleCall: validation passed, proceeding with call');
     setCallType(type);
     setActiveCall({ contact, type });
   };

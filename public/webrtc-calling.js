@@ -36,13 +36,13 @@ class WebRTCCall {
     async startCall(receiverId, callType = 'video', callbacks = {}) {
         console.log(`📞 startCall called with receiverId: ${receiverId}, callType: ${callType}`);
         try {
-            // Validate receiverId
-            console.log(`🔍 Validating receiverId: ${receiverId}, type: ${typeof receiverId}`);
-            if (!receiverId) {
-                console.log('❌ ReceiverId validation failed, throwing error');
-                throw new Error('Invalid receiver ID: cannot start call without a valid receiver');
+            // Validate receiverId - be very strict
+            console.log(`🔍 Validating receiverId: ${receiverId}, type: ${typeof receiverId}, isValid: ${!!receiverId}`);
+            if (!receiverId || receiverId === 'undefined' || receiverId === 'null' || typeof receiverId !== 'string' || receiverId.trim() === '') {
+                console.error('❌ ReceiverId validation failed:', { receiverId, type: typeof receiverId });
+                throw new Error(`Invalid receiver ID: "${receiverId}" is not a valid receiver identifier`);
             }
-            console.log('✅ ReceiverId validation passed');
+            console.log('✅ ReceiverId validation passed:', receiverId);
 
             this.callType = callType;
             this.remoteUserId = receiverId;
