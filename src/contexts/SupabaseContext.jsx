@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase.js';
+import IncomingCall from '../components/calls/IncomingCall';
 
 const SupabaseContext = createContext();
 
@@ -7,6 +8,8 @@ export const SupabaseProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [incomingCallChannel, setIncomingCallChannel] = useState(null);
 
   useEffect(() => {
     // Get initial session
@@ -50,6 +53,72 @@ export const SupabaseProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Setup global incoming call listener
+  useEffect(() => {
+    if (user && !incomingCallChannel) {
+      setupGlobalIncomingCallListener();
+    }
+
+    return () => {
+      if (incomingCallChannel) {
+        supabase.removeChannel(incomingCallChannel);
+        setIncomingCallChannel(null);
+      }
+    };
+  }, [user]);
+
+  const setupGlobalIncomingCallListener = () => {
+    console.log('📡 Setting up global incoming call listener for user:', user.id);
+
+    const channel = supabase
+      .channel('global-incoming-calls')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'call_history',
+          filter: `receiver_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('📞 Global incoming call event received:', payload);
+          const call = payload.new;
+          console.log('📞 Call data:', call);
+          if (call.call_status === 'initiated') {
+            console.log('📞 Showing global incoming call popup for call:', call.id);
+            setIncomingCall(call);
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Global incoming call listener status:', status);
+        if (status === 'SUBSCRIBED') {
+          setIncomingCallChannel(channel);
+        }
+      });
+  };
+
+  const handleAcceptCall = async (callData) => {
+    console.log('📞 Accepting call:', callData.id);
+    setIncomingCall(null);
+
+    // Navigate to calls page with call data
+    window.location.href = `#/calls?incoming=true&callId=${callData.call_id}&roomId=${callData.call_id}&callType=${callData.call_type}`;
+  };
+
+  const handleRejectCall = async (callId) => {
+    console.log('📞 Rejecting call:', callId);
+    try {
+      if (window.WebRTCCall) {
+        const callInstance = new window.WebRTCCall();
+        await callInstance.rejectCall(callId);
+      }
+    } catch (error) {
+      console.error('Error rejecting call:', error);
+    }
+    setIncomingCall(null);
+  };
+
   const value = {
     supabase,
     user,
@@ -61,6 +130,16 @@ export const SupabaseProvider = ({ children }) => {
   return (
     <SupabaseContext.Provider value={value}>
       {children}
+
+      {/* Global Incoming Call Overlay */}
+      {incomingCall && (
+        <IncomingCall
+          callData={incomingCall}
+          onAccept={handleAcceptCall}
+          onReject={handleRejectCall}
+          onClose={() => setIncomingCall(null)}
+        />
+      )}
     </SupabaseContext.Provider>
   );
 };
