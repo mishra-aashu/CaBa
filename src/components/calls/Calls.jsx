@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useCall } from '../../context/CallContext';
 import { CallHistory } from '../CallHistory';
 import { CallButton } from '../CallButton';
 import { IncomingCallModal } from '../IncomingCallModal';
-import { ActiveCallScreen } from '../ActiveCallScreen';
 import '../../styles/calls.css';
 
 const Calls = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
-  const { startCall } = useCall();
+  const { startCall, answerCall } = useCall();
   const [currentUser, setCurrentUser] = useState(null);
   const [contacts, setContacts] = useState([]);
   const [callHistory, setCallHistory] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [activeCall, setActiveCall] = useState(null);
   const [incomingCall, setIncomingCall] = useState(null);
-  const [callType, setCallType] = useState('video');
 
   useEffect(() => {
     initializeCalls();
@@ -186,14 +185,14 @@ const Calls = () => {
   };
 
   const handleAcceptCall = async (callData) => {
-    setIncomingCall(null);
-    setActiveCall({
-      contact: { id: callData.caller_id, name: 'Caller' }, // Will be loaded in CallInterface
-      type: callData.call_type,
-      incoming: true,
-      callId: callData.call_id,
-      roomId: callData.call_id // Use call_id as room identifier
-    });
+    try {
+      setIncomingCall(null);
+      await answerCall();
+      navigate(`/call/${callData.call_id}`);
+    } catch (error) {
+      console.error('Error accepting call:', error);
+      alert('Failed to accept call: ' + error.message);
+    }
   };
 
   const handleRejectCall = async (callId) => {
@@ -320,9 +319,6 @@ const Calls = () => {
           </div>
         </div>
       </div>
-
-      {/* Active Call Screen */}
-      <ActiveCallScreen />
 
       {/* Incoming Call Modal */}
       <IncomingCallModal />

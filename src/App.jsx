@@ -15,7 +15,7 @@ import Blocked from './components/blocked';
 import UserDetails from './components/UserDetails';
 import SharedProfile from './components/shared-profile';
 import Intro from './components/Intro';
-import { ActiveCallScreen } from './components/ActiveCallScreen';
+import CallScreen from './components/CallScreen';
 import { IncomingCallModal } from './components/IncomingCallModal';
 
 const ProtectedRoute = ({ children }) => {
@@ -84,6 +84,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
               <Route path="/chat/new/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="/call/:callId" element={<ProtectedRoute><CallScreen /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
@@ -97,7 +98,6 @@ function App() {
           )}
 
           {/* Global Call Components */}
-          <ActiveCallScreen />
           <IncomingCallModal />
         </BrowserRouter>
       </CallProviderWrapper>

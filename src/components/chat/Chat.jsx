@@ -567,7 +567,8 @@ const Chat = () => {
 
   const handleVoiceCall = async () => {
     try {
-      await startCall(otherUser.id, 'voice');
+      const { callId } = await startCall(otherUser.id, 'voice');
+      navigate(`/call/${callId}`);
     } catch (error) {
       console.error('Failed to start voice call:', error);
       alert('Failed to start call: ' + error.message);
@@ -576,7 +577,8 @@ const Chat = () => {
 
   const handleVideoCall = async () => {
     try {
-      await startCall(otherUser.id, 'video');
+      const { callId } = await startCall(otherUser.id, 'video');
+      navigate(`/call/${callId}`);
     } catch (error) {
       console.error('Failed to start video call:', error);
       alert('Failed to start call: ' + error.message);
