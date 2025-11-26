@@ -36,6 +36,11 @@ class WebRTCCall {
     async startCall(receiverId, callType = 'video', callbacks = {}) {
         console.log(`📞 startCall called with receiverId: ${receiverId}, callType: ${callType}`);
         try {
+            // Validate receiverId
+            if (!receiverId) {
+                throw new Error('Invalid receiver ID: cannot start call without a valid receiver');
+            }
+
             this.callType = callType;
             this.remoteUserId = receiverId;
             this.isCaller = true;

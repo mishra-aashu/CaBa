@@ -186,6 +186,10 @@ const Calls = () => {
   });
 
   const handleCall = (contact, type = 'video') => {
+    if (!contact || !contact.id) {
+      alert('Invalid contact: cannot start call');
+      return;
+    }
     setCallType(type);
     setActiveCall({ contact, type });
   };
