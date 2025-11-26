@@ -15,6 +15,8 @@ import Blocked from './components/blocked';
 import UserDetails from './components/UserDetails';
 import SharedProfile from './components/shared-profile';
 import Intro from './components/Intro';
+import { ActiveCallScreen } from './components/ActiveCallScreen';
+import { IncomingCallModal } from './components/IncomingCallModal';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useSupabase();
@@ -93,6 +95,10 @@ function App() {
               <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
             </Routes>
           )}
+
+          {/* Global Call Components */}
+          <ActiveCallScreen />
+          <IncomingCallModal />
         </BrowserRouter>
       </CallProviderWrapper>
     </SupabaseProvider>

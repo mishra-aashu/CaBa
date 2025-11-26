@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { useCall } from '../../context/CallContext';
 import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown } from 'lucide-react';
 import DropdownMenu from '../common/DropdownMenu';
 import Modal from '../common/Modal';
@@ -50,6 +51,7 @@ const Chat = () => {
   const { chatId, otherUserId, userId } = useParams();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
+  const { startCall } = useCall();
 
   // State
   const [messages, setMessages] = useState([]);
@@ -563,22 +565,22 @@ const Chat = () => {
     }
   };
 
-  const handleVoiceCall = () => {
-    // Set pending call in localStorage
-    localStorage.setItem('pendingCall', JSON.stringify({
-      contact: otherUser,
-      type: 'voice'
-    }));
-    navigate('/calls');
+  const handleVoiceCall = async () => {
+    try {
+      await startCall(otherUser.id, 'voice');
+    } catch (error) {
+      console.error('Failed to start voice call:', error);
+      alert('Failed to start call: ' + error.message);
+    }
   };
 
-  const handleVideoCall = () => {
-    // Set pending call in localStorage
-    localStorage.setItem('pendingCall', JSON.stringify({
-      contact: otherUser,
-      type: 'video'
-    }));
-    navigate('/calls');
+  const handleVideoCall = async () => {
+    try {
+      await startCall(otherUser.id, 'video');
+    } catch (error) {
+      console.error('Failed to start video call:', error);
+      alert('Failed to start call: ' + error.message);
+    }
   };
 
   const handleScroll = (e) => {
