@@ -25,13 +25,29 @@ const ProtectedRoute = ({ children }) => {
 
 const CallProviderWrapper = ({ children }) => {
   const { user } = useSupabase();
-  const currentUser = user ? {
-    id: user.id,
-    name: user.user_metadata?.name || 'User',
-    email: user.email,
-    phone: user.user_metadata?.phone || '',
-    avatar: user.user_metadata?.avatar || null
-  } : null;
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser({
+        id: user.id,
+        name: user.user_metadata?.name || 'User',
+        email: user.email,
+        phone: user.user_metadata?.phone || '',
+        avatar: user.user_metadata?.avatar || null
+      });
+    } else {
+      // Load from localStorage if user not available yet
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        try {
+          setCurrentUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Error parsing stored user:', error);
+        }
+      }
+    }
+  }, [user]);
 
   return (
     <CallProvider currentUser={currentUser}>
