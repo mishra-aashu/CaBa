@@ -21,11 +21,7 @@ const Calls = () => {
     checkPendingCall();
   }, []);
 
-  useEffect(() => {
-    if (currentUser) {
-      setupIncomingCallListener();
-    }
-  }, [currentUser]);
+  // Note: Incoming call listener is now global in SupabaseContext
 
   const initializeCalls = async () => {
     try {
@@ -151,41 +147,7 @@ const Calls = () => {
     }
   };
 
-  const setupIncomingCallListener = () => {
-    if (!currentUser) return;
-
-    console.log('Setting up incoming call listener for user:', currentUser.id);
-
-    const channel = supabase
-      .channel('incoming-calls')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'call_history',
-          filter: `receiver_id=eq.${currentUser.id}`
-        },
-        (payload) => {
-          console.log('Incoming call event received:', payload);
-          const call = payload.new;
-          console.log('Call data:', call);
-          if (call.call_status === 'initiated' && !activeCall && !incomingCall) {
-            console.log('Showing incoming call popup for call:', call.id);
-            setIncomingCall(call);
-          } else {
-            console.log('Ignoring call - status:', call.call_status, 'activeCall:', !!activeCall, 'incomingCall:', !!incomingCall);
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Incoming call listener status:', status);
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
+  // Incoming call listener moved to global SupabaseContext
 
   const filteredContacts = contacts.filter(contact => {
     // First ensure contact has valid ID
