@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useCall } from '../../context/CallContext';
 import { CallHistory } from '../CallHistory';
 import { CallButton } from '../CallButton';
 import { IncomingCallModal } from '../IncomingCallModal';
@@ -9,6 +10,7 @@ import '../../styles/calls.css';
 
 const Calls = () => {
   const { theme } = useTheme();
+  const { startCall } = useCall();
   const [currentUser, setCurrentUser] = useState(null);
   const [contacts, setContacts] = useState([]);
   const [callHistory, setCallHistory] = useState([]);
@@ -123,14 +125,14 @@ const Calls = () => {
     }
   };
 
-  const checkPendingCall = () => {
+  const checkPendingCall = async () => {
     // Check for regular pending calls
     const pendingCallStr = localStorage.getItem('pendingCall');
     if (pendingCallStr) {
       try {
         const pendingCall = JSON.parse(pendingCallStr);
         localStorage.removeItem('pendingCall');
-        handleCall(pendingCall.contact, pendingCall.type);
+        await startCall(pendingCall.contact.id, pendingCall.type);
       } catch (error) {
         console.error('Error parsing pending call:', error);
       }
@@ -161,7 +163,7 @@ const Calls = () => {
             (contact.phone && contact.phone.includes(search));
   });
 
-  const handleCall = (contact, type = 'video') => {
+  const handleCall = async (contact, type = 'video') => {
     console.log('handleCall called with contact:', contact, 'type:', type);
     if (!contact) {
       console.error('handleCall: contact is null/undefined');
@@ -175,7 +177,12 @@ const Calls = () => {
     }
     console.log('handleCall: validation passed, proceeding with call');
     setCallType(type);
-    setActiveCall({ contact, type });
+    try {
+      await startCall(contact.id, type);
+    } catch (error) {
+      console.error('Error starting call:', error);
+      alert('Failed to start call: ' + error.message);
+    }
   };
 
   const handleAcceptCall = async (callData) => {
