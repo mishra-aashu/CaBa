@@ -154,6 +154,8 @@ const Calls = () => {
   const setupIncomingCallListener = () => {
     if (!currentUser) return;
 
+    console.log('Setting up incoming call listener for user:', currentUser.id);
+
     const channel = supabase
       .channel('incoming-calls')
       .on(
@@ -165,13 +167,20 @@ const Calls = () => {
           filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
+          console.log('Incoming call event received:', payload);
           const call = payload.new;
-          if (call.call_status === 'initiated' && !activeCall) {
+          console.log('Call data:', call);
+          if (call.call_status === 'initiated' && !activeCall && !incomingCall) {
+            console.log('Showing incoming call popup for call:', call.id);
             setIncomingCall(call);
+          } else {
+            console.log('Ignoring call - status:', call.call_status, 'activeCall:', !!activeCall, 'incomingCall:', !!incomingCall);
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Incoming call listener status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);

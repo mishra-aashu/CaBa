@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../utils/supabase';
+import { supabase, getValidAvatarUrl } from '../../utils/supabase';
 
 const IncomingCall = ({ callData, onAccept, onReject, onClose }) => {
   const [caller, setCaller] = useState(null);
@@ -50,8 +50,8 @@ const IncomingCall = ({ callData, onAccept, onReject, onClose }) => {
         <div className="caller-info">
           <div className="caller-avatar">
             <div className="avatar-circle-large">
-              {caller.avatar ? (
-                <img src={caller.avatar} alt={caller.name} />
+              {getValidAvatarUrl(caller.avatar) ? (
+                <img src={getValidAvatarUrl(caller.avatar)} alt={caller.name} />
               ) : (
                 caller.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
               )}
