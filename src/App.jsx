@@ -16,6 +16,7 @@ import UserDetails from './components/UserDetails';
 import SharedProfile from './components/shared-profile';
 import Intro from './components/Intro';
 import CallScreen from './components/CallScreen';
+import CallStatusIndicator from './components/CallStatusIndicator';
 import { IncomingCallModal } from './components/IncomingCallModal';
 
 const ProtectedRoute = ({ children }) => {
@@ -98,6 +99,7 @@ function App() {
           )}
 
           {/* Global Call Components */}
+          <CallStatusIndicator />
           <IncomingCallModal />
         </BrowserRouter>
       </CallProviderWrapper>

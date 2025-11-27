@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCall } from '../context/CallContext';
 import { Phone, PhoneOff, Video } from 'lucide-react';
 
 export function IncomingCallModal() {
+  const navigate = useNavigate();
   const {
     callState,
     incomingCall,
@@ -77,9 +79,20 @@ export function IncomingCallModal() {
   };
 
   // Handle user interaction
-  const handleUserInteraction = (action) => {
+  const handleUserInteraction = async (action) => {
     playRingtone();
-    action();
+    if (action === answerCall) {
+      // For answering calls, navigate to call screen after answering
+      try {
+        await action();
+        navigate(`/call/${incomingCall.call_id}`);
+      } catch (error) {
+        console.error('Error answering call:', error);
+      }
+    } else {
+      // For rejecting calls, just execute the action
+      action();
+    }
   };
 
   return (
