@@ -9,6 +9,7 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import WallpaperSelector from './WallpaperSelector';
+import MessagingLoader from '../MessagingLoader';
 import { useRealtimeMessages } from '../../hooks/useRealtimeMessages';
 import { useTypingIndicator } from '../../hooks/useRealtimeTyping';
 import { useMessageStatusUpdates } from '../../hooks/useMessageStatusUpdates';
@@ -609,7 +610,7 @@ const Chat = () => {
   };
 
   if (!otherUser || !currentUser) {
-    return <div className="chat-loading">Loading chat...</div>;
+    return <MessagingLoader />;
   }
 
   return (
@@ -803,7 +804,7 @@ const Chat = () => {
 
           <div className="search-results">
             {isSearching ? (
-              <div className="search-loading">Searching...</div>
+              <MessagingLoader />
             ) : searchResults.length > 0 ? (
               searchResults.map(message => (
                 <div

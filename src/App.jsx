@@ -18,11 +18,12 @@ import Intro from './components/Intro';
 import CallScreen from './components/CallScreen';
 import CallStatusIndicator from './components/CallStatusIndicator';
 import { IncomingCallModal } from './components/IncomingCallModal';
+import MessagingLoader from './components/MessagingLoader';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useSupabase();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <MessagingLoader />;
   return user ? children : <Navigate to="/login" replace />;
 };
 

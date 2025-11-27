@@ -6,6 +6,7 @@ import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, 
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import Chat from './chat/Chat';
+import MessagingLoader from './MessagingLoader';
 import { useChatListRealtime } from '../hooks/useChatListRealtime';
 import '../styles/home.css';
 
@@ -350,12 +351,7 @@ const Home = () => {
   };
 
   if (loading || chatsLoading) {
-    return (
-      <div className="home-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading chats...</p>
-      </div>
-    );
+    return <MessagingLoader />;
   }
 
   // Check if we are in a chat (for mobile view toggling)
