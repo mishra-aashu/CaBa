@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useChatTheme } from '../../contexts/ChatThemeContext';
 import { MoreVertical } from 'lucide-react';
 import '../../styles/settings.css';
 
@@ -9,6 +10,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const { supabase } = useSupabase();
   const { theme, toggleTheme } = useTheme();
+  const { chatTheme, chatThemes, selectTheme, currentThemeData } = useChatTheme();
   const baseUrl = import.meta.env.BASE_URL || '/';
   const [settings, setSettings] = useState({
     // Notifications
@@ -34,6 +36,7 @@ const Settings = () => {
   const [showStorageDetails, setShowStorageDetails] = useState(false);
   const [showWallpaperModal, setShowWallpaperModal] = useState(false);
   const [showRingtoneModal, setShowRingtoneModal] = useState(false);
+  const [showChatThemeModal, setShowChatThemeModal] = useState(false);
   const [wallpapers, setWallpapers] = useState([]);
   const [currentPlayingAudio, setCurrentPlayingAudio] = useState(null);
   const [selectedRingtone, setSelectedRingtone] = useState('fm-freemusic-give-me-a-smile(chosic.com).mp3');
@@ -160,6 +163,18 @@ const Settings = () => {
   const handleThemeToggle = () => {
     toggleTheme();
     alert(`${theme === 'dark' ? 'Light' : 'Dark'} mode enabled`);
+  };
+
+  // Handle chat theme selection
+  const handleChatThemeSelection = () => {
+    setShowChatThemeModal(true);
+  };
+
+  // Select chat theme
+  const selectChatTheme = async (themeKey) => {
+    await selectTheme(themeKey);
+    setShowChatThemeModal(false);
+    alert(`Chat theme "${chatThemes[themeKey].name}" applied`);
   };
 
   // Handle setting toggle
@@ -443,6 +458,17 @@ const Settings = () => {
             </div>
             <div className="item-right">
               <span className="value">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+              <span className="icon arrow">›</span>
+            </div>
+          </div>
+
+          <div className="settings-item" onClick={handleChatThemeSelection}>
+            <div className="item-left">
+              <i className="fas fa-comments"></i>
+              <span className="label">Chat Theme</span>
+            </div>
+            <div className="item-right">
+              <span className="value">{currentThemeData.name}</span>
               <span className="icon arrow">›</span>
             </div>
           </div>
@@ -773,6 +799,79 @@ const Settings = () => {
                       >
                         Confirm
                       </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chat Theme Modal */}
+      {showChatThemeModal && (
+        <div className="modal" style={{ display: 'flex' }}>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Choose Chat Theme</h2>
+              <button className="close-modal" onClick={() => setShowChatThemeModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '15px' }}>
+                {Object.entries(chatThemes).map(([key, theme]) => (
+                  <div
+                    key={key}
+                    className={`theme-item ${chatTheme === key ? 'active' : ''}`}
+                    onClick={() => selectChatTheme(key)}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      border: chatTheme === key ? '3px solid var(--primary-color)' : '1px solid #ddd',
+                      height: '80px'
+                    }}
+                  >
+                    <div style={{
+                      width: '100%',
+                      height: '60%',
+                      background: theme.background,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}></div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '4px 8px',
+                      height: '40%'
+                    }}>
+                      <div style={{
+                        width: '35px',
+                        height: '8px',
+                        borderRadius: '4px',
+                        background: theme.sentMessage.background
+                      }}></div>
+                      <div style={{
+                        width: '35px',
+                        height: '8px',
+                        borderRadius: '4px',
+                        background: theme.receivedMessage.background
+                      }}></div>
+                    </div>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '5px',
+                      left: '8px',
+                      right: '8px',
+                      fontSize: '0.7rem',
+                      fontWeight: '500',
+                      color: '#ffffff',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                      textAlign: 'center'
+                    }}>
+                      {theme.name}
                     </div>
                   </div>
                 ))}

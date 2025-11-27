@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { useChatTheme } from '../../contexts/ChatThemeContext';
 import { useCall } from '../../context/CallContext';
 import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown, ArrowLeft, ArrowRight, Copy } from 'lucide-react';
 import DropdownMenu from '../common/DropdownMenu';
@@ -52,6 +53,7 @@ const Chat = () => {
   const { chatId, otherUserId, userId } = useParams();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
+  const { chatTheme, chatThemes, selectTheme } = useChatTheme();
   const { startCall } = useCall();
 
   // State
@@ -62,25 +64,6 @@ const Chat = () => {
   const [selectedMessages, setSelectedMessages] = useState(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [wallpaper, setWallpaper] = useState(null);
-  const [theme, setTheme] = useState('light');
-
-  const changeTheme = async (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    applyTheme(newTheme);
-    if (currentUser) {
-      try {
-        const { error } = await supabase
-          .from('user_themes')
-          .upsert({ user_id: currentUser.id, theme_id: newTheme }, { onConflict: 'user_id' });
-        if (error) {
-          console.error('Error saving theme to Supabase:', error);
-        }
-      } catch (error) {
-        console.error('Error saving theme to Supabase:', error);
-      }
-    }
-  };
   const [showWallpaperSelector, setShowWallpaperSelector] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isTempChat, setIsTempChat] = useState(false);
@@ -135,9 +118,6 @@ const Chat = () => {
 
   // Load mute and temp chat preferences
   useEffect(() => {
-    if (currentUser) {
-      loadTheme();
-    }
     const mutedChats = JSON.parse(localStorage.getItem('mutedChats') || '{}');
     setIsMuted(!!mutedChats[chatId]);
 
@@ -319,64 +299,6 @@ const Chat = () => {
     }
   };
 
-  const loadTheme = async () => {
-    if (!currentUser) return;
-    try {
-      const { data, error } = await supabase
-        .from('user_themes')
-        .select('theme_id')
-        .eq('user_id', currentUser.id)
-        .single();
-      
-      let themeToApply = 'light';
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-        console.error('Error loading theme from Supabase:', error);
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-          themeToApply = savedTheme;
-        }
-      } else if (data) {
-        themeToApply = data.theme_id;
-      } else {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-          themeToApply = savedTheme;
-        }
-      }
-      setTheme(themeToApply);
-      applyTheme(themeToApply);
-
-    } catch (error) {
-      console.error('Error loading theme:', error);
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      setTheme(savedTheme);
-      applyTheme(savedTheme);
-    }
-  };
-
-  const applyTheme = (themeName) => {
-    const messagesContainer = document.querySelector('.messages-container');
-    if (!messagesContainer) return;
-
-    // Remove all theme classes
-    messagesContainer.classList.forEach(className => {
-      if (className.startsWith('theme-')) {
-        messagesContainer.classList.remove(className);
-      }
-    });
-
-    // Add the new theme class
-    if (themeName && themeName !== 'light') {
-      messagesContainer.classList.add(`theme-${themeName}`);
-    }
-
-    // Define dark themes that need dark text colors
-    const darkThemes = ['dark', 'cyberpunk', 'dark_professional', 'midnight_city', 'cosmic_purple', 'galaxy', 'night_aurora'];
-
-    // Set data-theme for CSS variables
-    const isDarkTheme = darkThemes.includes(themeName);
-    document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
-  };
 
   const sendMessage = async (content) => {
     if (!content.trim() || !currentUser) return;
@@ -557,6 +479,11 @@ const Chat = () => {
 
   const handleChangeTheme = () => {
     setShowThemeModal(true);
+  };
+
+  const handleThemeSelect = async (themeKey) => {
+    await selectTheme(themeKey);
+    setShowThemeModal(false);
   };
 
   const handleTempChatToggle = async () => {
@@ -880,352 +807,63 @@ const Chat = () => {
         size="large"
       >
         <div className="theme-selector">
-          {/* Default Themes */}
-          <div className="theme-category">
-            <h4>Default</h4>
-            <div className="theme-grid">
+          <div className="theme-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '15px' }}>
+            {Object.entries(chatThemes).map(([key, theme]) => (
               <button
-                className={`theme-item ${theme === 'light' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('light');
-                  setShowThemeModal(false);
+                key={key}
+                className={`theme-item ${chatTheme === key ? 'active' : ''}`}
+                onClick={() => handleThemeSelect(key)}
+                style={{
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  border: chatTheme === key ? '3px solid var(--primary-color)' : '1px solid #ddd',
+                  height: '80px',
+                  background: 'none',
+                  padding: 0
                 }}
               >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
+                <div style={{
+                  width: '100%',
+                  height: '60%',
+                  background: theme.background,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}></div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '4px 8px',
+                  height: '40%'
+                }}>
+                  <div style={{
+                    width: '35px',
+                    height: '8px',
+                    borderRadius: '4px',
+                    background: theme.sentMessage.background
+                  }}></div>
+                  <div style={{
+                    width: '35px',
+                    height: '8px',
+                    borderRadius: '4px',
+                    background: theme.receivedMessage.background
+                  }}></div>
                 </div>
-                <span>Light</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'dark' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('dark');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
+                <div style={{
+                  position: 'absolute',
+                  bottom: '5px',
+                  left: '8px',
+                  right: '8px',
+                  fontSize: '0.7rem',
+                  fontWeight: '500',
+                  color: '#ffffff',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  textAlign: 'center'
+                }}>
+                  {theme.name}
                 </div>
-                <span>Dark</span>
               </button>
-            </div>
-          </div>
-
-          {/* Nature Themes */}
-          <div className="theme-category">
-            <h4>Nature</h4>
-            <div className="theme-grid">
-              <button
-                className={`theme-item ${theme === 'ocean_depths' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('ocean_depths');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Ocean Depths</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'forest_mist' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('forest_mist');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Forest Mist</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'arctic_ice' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('arctic_ice');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Arctic Ice</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'emerald_forest' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('emerald_forest');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Emerald Forest</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Colorful Themes */}
-          <div className="theme-category">
-            <h4>Colorful</h4>
-            <div className="theme-grid">
-              <button
-                className={`theme-item ${theme === 'sunset_glow' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('sunset_glow');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #fb923c 0%, #ea580c 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Sunset Glow</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'cosmic_purple' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('cosmic_purple');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Cosmic Purple</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'golden_hour' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('golden_hour');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Golden Hour</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'nebula' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('nebula');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Nebula</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Elegant Themes */}
-          <div className="theme-category">
-            <h4>Elegant</h4>
-            <div className="theme-grid">
-              <button
-                className={`theme-item ${theme === 'rose_garden' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('rose_garden');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #db2777 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Rose Garden</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'midnight_city' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('midnight_city');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Midnight City</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Dark Themes */}
-          <div className="theme-category">
-            <h4>Dark</h4>
-            <div className="theme-grid">
-              <button
-                className={`theme-item ${theme === 'dark_professional' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('dark_professional');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #1e1e2e 0%, #0f172a 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Dark Professional</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'cyberpunk' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('cyberpunk');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Cyberpunk</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Seasonal Themes */}
-          <div className="theme-category">
-            <h4>Seasonal</h4>
-            <div className="theme-grid">
-              <button
-                className={`theme-item ${theme === 'spring_vibes' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('spring_vibes');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Spring Vibes</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'autumn_leaves' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('autumn_leaves');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #ea580c 0%, #9a3412 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Autumn Leaves</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'winter_calm' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('winter_calm');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #89F7FE 0%, #66A6FF 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Winter Calm</span>
-              </button>
-              <button
-                  className={`theme-item ${theme === 'desert_dunes' ? 'active' : ''}`}
-                  onClick={() => {
-                      changeTheme('desert_dunes');
-                      setShowThemeModal(false);
-                  }}
-              >
-                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)' }}>
-                      <div className="theme-sample sent"></div>
-                      <div className="theme-sample received"></div>
-                  </div>
-                  <span>Desert Dunes</span>
-              </button>
-              <button
-                  className={`theme-item ${theme === 'lavender_fields' ? 'active' : ''}`}
-                  onClick={() => {
-                      changeTheme('lavender_fields');
-                      setShowThemeModal(false);
-                  }}
-              >
-                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #c4b5fd 0%, #8b5cf6 100%)' }}>
-                      <div className="theme-sample sent"></div>
-                      <div className="theme-sample received"></div>
-                  </div>
-                  <span>Lavender Fields</span>
-              </button>
-              <button
-                  className={`theme-item ${theme === 'cherry_blossom' ? 'active' : ''}`}
-                  onClick={() => {
-                      changeTheme('cherry_blossom');
-                      setShowThemeModal(false);
-                  }}
-              >
-                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #fda4af 0%, #f43f5e 100%)' }}>
-                      <div className="theme-sample sent"></div>
-                      <div className="theme-sample received"></div>
-                  </div>
-                  <span>Cherry Blossom</span>
-              </button>
-              <button
-                  className={`theme-item ${theme === 'rainy_day' ? 'active' : ''}`}
-                  onClick={() => {
-                      changeTheme('rainy_day');
-                      setShowThemeModal(false);
-                  }}
-              >
-                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)' }}>
-                      <div className="theme-sample sent"></div>
-                      <div className="theme-sample received"></div>
-                  </div>
-                  <span>Rainy Day</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Inspired Themes */}
-          <div className="theme-category">
-            <h4>Inspired</h4>
-            <div className="theme-grid">
-              <button
-                className={`theme-item ${theme === 'telegram_blue' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('telegram_blue');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #0088cc 0%, #005f99 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Telegram Blue</span>
-              </button>
-              <button
-                className={`theme-item ${theme === 'galaxy' ? 'active' : ''}`}
-                onClick={() => {
-                  changeTheme('galaxy');
-                  setShowThemeModal(false);
-                }}
-              >
-                <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)' }}>
-                  <div className="theme-sample sent"></div>
-                  <div className="theme-sample received"></div>
-                </div>
-                <span>Galaxy</span>
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </Modal>
