@@ -166,7 +166,10 @@ const ChatThemeContext = createContext();
 // Chat Theme Provider Component
 export const ChatThemeProvider = ({ children }) => {
   const { supabase } = useSupabase();
-  const [chatTheme, setChatTheme] = useState('classic');
+  const [chatTheme, setChatTheme] = useState(() => {
+    // Initialize from localStorage immediately
+    return localStorage.getItem('digidad_chat_theme') || 'classic';
+  });
   const [loading, setLoading] = useState(true);
 
   // Load user's theme preference from Supabase
