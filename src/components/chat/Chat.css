@@ -478,6 +478,62 @@
   border-color: transparent transparent #1e1b4b transparent;
 }
 
+.theme-spring_vibes .message.sent .message-bubble {
+  background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+}
+
+.theme-spring_vibes .message.sent .message-bubble::before {
+  border-color: transparent transparent #FFDEE9 transparent;
+}
+
+.theme-autumn_leaves .message.sent .message-bubble {
+  background: linear-gradient(135deg, #ea580c 0%, #9a3412 100%);
+}
+
+.theme-autumn_leaves .message.sent .message-bubble::before {
+  border-color: transparent transparent #ea580c transparent;
+}
+
+.theme-winter_calm .message.sent .message-bubble {
+  background: linear-gradient(135deg, #89F7FE 0%, #66A6FF 100%);
+}
+
+.theme-winter_calm .message.sent .message-bubble::before {
+  border-color: transparent transparent #89F7FE transparent;
+}
+
+.theme-desert_dunes .message.sent .message-bubble {
+  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+}
+
+.theme-desert_dunes .message.sent .message-bubble::before {
+  border-color: transparent transparent #fde68a transparent;
+}
+
+.theme-lavender_fields .message.sent .message-bubble {
+  background: linear-gradient(135deg, #c4b5fd 0%, #8b5cf6 100%);
+}
+
+.theme-lavender_fields .message.sent .message-bubble::before {
+  border-color: transparent transparent #c4b5fd transparent;
+}
+
+.theme-cherry_blossom .message.sent .message-bubble {
+  background: linear-gradient(135deg, #fda4af 0%, #f43f5e 100%);
+}
+
+.theme-cherry_blossom .message.sent .message-bubble::before {
+  border-color: transparent transparent #fda4af transparent;
+}
+
+.theme-rainy_day .message.sent .message-bubble {
+  background: linear-gradient(135deg, #9ca3af 0%, #4b5563 100%);
+}
+
+.theme-rainy_day .message.sent .message-bubble::before {
+  border-color: transparent transparent #9ca3af transparent;
+}
+
 .message-text {
   margin: 0;
   word-wrap: break-word;

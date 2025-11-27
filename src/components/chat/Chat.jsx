@@ -64,10 +64,22 @@ const Chat = () => {
   const [wallpaper, setWallpaper] = useState(null);
   const [theme, setTheme] = useState('light');
 
-  const changeTheme = (newTheme) => {
+  const changeTheme = async (newTheme) => {
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     applyTheme(newTheme);
+    if (currentUser) {
+      try {
+        const { error } = await supabase
+          .from('user_themes')
+          .upsert({ user_id: currentUser.id, theme_id: newTheme }, { onConflict: 'user_id' });
+        if (error) {
+          console.error('Error saving theme to Supabase:', error);
+        }
+      } catch (error) {
+        console.error('Error saving theme to Supabase:', error);
+      }
+    }
   };
   const [showWallpaperSelector, setShowWallpaperSelector] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -123,12 +135,15 @@ const Chat = () => {
 
   // Load mute and temp chat preferences
   useEffect(() => {
+    if (currentUser) {
+      loadTheme();
+    }
     const mutedChats = JSON.parse(localStorage.getItem('mutedChats') || '{}');
     setIsMuted(!!mutedChats[chatId]);
 
     const tempChats = JSON.parse(localStorage.getItem('tempChats') || '{}');
     setIsTempChat(!!tempChats[chatId]);
-  }, [chatId]);
+  }, [chatId, currentUser]);
 
   const initializeChat = async () => {
     try {
@@ -148,7 +163,6 @@ const Chat = () => {
         await loadOtherUserInfo(otherUserId);
         await loadMessages();
         await loadWallpaper();
-        loadTheme();
       }
     } catch (error) {
       console.error('Error initializing chat:', error);
@@ -305,10 +319,39 @@ const Chat = () => {
     }
   };
 
-  const loadTheme = () => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-    applyTheme(savedTheme);
+  const loadTheme = async () => {
+    if (!currentUser) return;
+    try {
+      const { data, error } = await supabase
+        .from('user_themes')
+        .select('theme_id')
+        .eq('user_id', currentUser.id)
+        .single();
+      
+      let themeToApply = 'light';
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        console.error('Error loading theme from Supabase:', error);
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+          themeToApply = savedTheme;
+        }
+      } else if (data) {
+        themeToApply = data.theme_id;
+      } else {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+          themeToApply = savedTheme;
+        }
+      }
+      setTheme(themeToApply);
+      applyTheme(themeToApply);
+
+    } catch (error) {
+      console.error('Error loading theme:', error);
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      setTheme(savedTheme);
+      applyTheme(savedTheme);
+    }
   };
 
   const applyTheme = (themeName) => {
@@ -890,7 +933,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'forest_mist' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('forest_mist');
+                  changeTheme('forest_mist');
                   setShowThemeModal(false);
                 }}
               >
@@ -903,7 +946,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'arctic_ice' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('arctic_ice');
+                  changeTheme('arctic_ice');
                   setShowThemeModal(false);
                 }}
               >
@@ -916,7 +959,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'emerald_forest' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('emerald_forest');
+                  changeTheme('emerald_forest');
                   setShowThemeModal(false);
                 }}
               >
@@ -936,7 +979,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'sunset_glow' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('sunset_glow');
+                  changeTheme('sunset_glow');
                   setShowThemeModal(false);
                 }}
               >
@@ -949,7 +992,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'cosmic_purple' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('cosmic_purple');
+                  changeTheme('cosmic_purple');
                   setShowThemeModal(false);
                 }}
               >
@@ -962,7 +1005,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'golden_hour' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('golden_hour');
+                  changeTheme('golden_hour');
                   setShowThemeModal(false);
                 }}
               >
@@ -975,7 +1018,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'nebula' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('nebula');
+                  changeTheme('nebula');
                   setShowThemeModal(false);
                 }}
               >
@@ -995,7 +1038,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'rose_garden' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('rose_garden');
+                  changeTheme('rose_garden');
                   setShowThemeModal(false);
                 }}
               >
@@ -1008,7 +1051,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'midnight_city' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('midnight_city');
+                  changeTheme('midnight_city');
                   setShowThemeModal(false);
                 }}
               >
@@ -1028,7 +1071,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'dark_professional' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('dark_professional');
+                  changeTheme('dark_professional');
                   setShowThemeModal(false);
                 }}
               >
@@ -1041,7 +1084,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'cyberpunk' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('cyberpunk');
+                  changeTheme('cyberpunk');
                   setShowThemeModal(false);
                 }}
               >
@@ -1061,7 +1104,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'spring_vibes' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('spring_vibes');
+                  changeTheme('spring_vibes');
                   setShowThemeModal(false);
                 }}
               >
@@ -1074,7 +1117,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'autumn_leaves' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('autumn_leaves');
+                  changeTheme('autumn_leaves');
                   setShowThemeModal(false);
                 }}
               >
@@ -1087,7 +1130,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'winter_calm' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('winter_calm');
+                  changeTheme('winter_calm');
                   setShowThemeModal(false);
                 }}
               >
@@ -1096,6 +1139,58 @@ const Chat = () => {
                   <div className="theme-sample received"></div>
                 </div>
                 <span>Winter Calm</span>
+              </button>
+              <button
+                  className={`theme-item ${theme === 'desert_dunes' ? 'active' : ''}`}
+                  onClick={() => {
+                      changeTheme('desert_dunes');
+                      setShowThemeModal(false);
+                  }}
+              >
+                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)' }}>
+                      <div className="theme-sample sent"></div>
+                      <div className="theme-sample received"></div>
+                  </div>
+                  <span>Desert Dunes</span>
+              </button>
+              <button
+                  className={`theme-item ${theme === 'lavender_fields' ? 'active' : ''}`}
+                  onClick={() => {
+                      changeTheme('lavender_fields');
+                      setShowThemeModal(false);
+                  }}
+              >
+                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #c4b5fd 0%, #8b5cf6 100%)' }}>
+                      <div className="theme-sample sent"></div>
+                      <div className="theme-sample received"></div>
+                  </div>
+                  <span>Lavender Fields</span>
+              </button>
+              <button
+                  className={`theme-item ${theme === 'cherry_blossom' ? 'active' : ''}`}
+                  onClick={() => {
+                      changeTheme('cherry_blossom');
+                      setShowThemeModal(false);
+                  }}
+              >
+                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #fda4af 0%, #f43f5e 100%)' }}>
+                      <div className="theme-sample sent"></div>
+                      <div className="theme-sample received"></div>
+                  </div>
+                  <span>Cherry Blossom</span>
+              </button>
+              <button
+                  className={`theme-item ${theme === 'rainy_day' ? 'active' : ''}`}
+                  onClick={() => {
+                      changeTheme('rainy_day');
+                      setShowThemeModal(false);
+                  }}
+              >
+                  <div className="theme-preview" style={{ background: 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)' }}>
+                      <div className="theme-sample sent"></div>
+                      <div className="theme-sample received"></div>
+                  </div>
+                  <span>Rainy Day</span>
               </button>
             </div>
           </div>
@@ -1107,7 +1202,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'telegram_blue' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('telegram_blue');
+                  changeTheme('telegram_blue');
                   setShowThemeModal(false);
                 }}
               >
@@ -1120,7 +1215,7 @@ const Chat = () => {
               <button
                 className={`theme-item ${theme === 'galaxy' ? 'active' : ''}`}
                 onClick={() => {
-                  setTheme('galaxy');
+                  changeTheme('galaxy');
                   setShowThemeModal(false);
                 }}
               >
@@ -1138,5 +1233,5 @@ const Chat = () => {
     </div>
   );
 };
-
+ 
 export default Chat;
