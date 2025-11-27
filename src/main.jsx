@@ -5,13 +5,16 @@ import './styles/global.css'
 import App from './App.jsx'
 import { ThemeProvider } from './contexts/ThemeContext.jsx'
 import { ChatThemeProvider } from './contexts/ChatThemeContext.jsx'
+import { SupabaseProvider } from './contexts/SupabaseContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ThemeProvider>
-      <ChatThemeProvider>
-        <App />
-      </ChatThemeProvider>
-    </ThemeProvider>
+    <SupabaseProvider>
+      <ThemeProvider>
+        <ChatThemeProvider>
+          <App />
+        </ChatThemeProvider>
+      </ThemeProvider>
+    </SupabaseProvider>
   </StrictMode>,
 )
