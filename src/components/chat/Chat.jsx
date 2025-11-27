@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { useCall } from '../../context/CallContext';
-import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown } from 'lucide-react';
+import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown, ArrowLeft, ArrowRight, Copy } from 'lucide-react';
 import DropdownMenu from '../common/DropdownMenu';
 import Modal from '../common/Modal';
 import MessageList from './MessageList';
@@ -618,7 +618,7 @@ const Chat = () => {
       {/* Chat Header */}
       <header className="chat-header">
         <button className="back-btn" onClick={() => navigate('/')}>
-          ←
+          <ArrowLeft size={20} />
         </button>
 
         <div className="chat-user-info" onClick={handleViewContact} style={{ cursor: 'pointer' }}>
@@ -721,13 +721,13 @@ const Chat = () => {
           </div>
           <div className="selection-actions">
             <button className="selection-action-btn" title="Delete">
-              🗑️
+              <Trash2 size={16} />
             </button>
             <button className="selection-action-btn" title="Forward">
-              ➡️
+              <ArrowRight size={16} />
             </button>
             <button className="selection-action-btn" title="Copy">
-              📋
+              <Copy size={16} />
             </button>
           </div>
         </div>

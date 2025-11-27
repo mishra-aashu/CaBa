@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabase';
 import MediaMessage from './MediaMessage';
-import { Calendar, Check, CheckCheck, MoreVertical } from 'lucide-react';
+import {
+  Calendar,
+  Check,
+  CheckCheck,
+  MoreVertical,
+  Reply,
+  Copy,
+  Share2,
+  Edit,
+  Trash2,
+  Newspaper,
+  Bell,
+  Clock,
+  MapPin,
+} from 'lucide-react';
 
 const MessageItem = ({
   message,
@@ -9,7 +23,7 @@ const MessageItem = ({
   isSelected,
   isSelectionMode,
   onSelect,
-  onReply
+  onReply,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -66,7 +80,7 @@ const MessageItem = ({
           .from('messages')
           .update({
             content: editContent.trim(),
-            edited_at: new Date().toISOString()
+            edited_at: new Date().toISOString(),
           })
           .eq('id', message.id);
 
@@ -107,7 +121,7 @@ const MessageItem = ({
   const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString([], {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -129,7 +143,12 @@ const MessageItem = ({
     const absDeltaY = Math.abs(deltaY);
 
     // Check for swipe right (for reply)
-    if (absDeltaX > 50 && absDeltaX > absDeltaY && deltaX > 0 && !isSelectionMode) {
+    if (
+      absDeltaX > 50 &&
+      absDeltaX > absDeltaY &&
+      deltaX > 0 &&
+      !isSelectionMode
+    ) {
       handleReply();
       return;
     }
@@ -161,14 +180,19 @@ const MessageItem = ({
       try {
         const newsData = JSON.parse(message.content);
         messageContent = (
-          <div className="news-share-message" onClick={() => window.open(newsData.link, '_blank')}>
+          <div
+            className="news-share-message"
+            onClick={() => window.open(newsData.link, '_blank')}
+          >
             <div className="news-share-header">
-              <i className="fas fa-newspaper"></i>
+              <Newspaper size={16} />
               <span>Shared News</span>
             </div>
             <div className="news-share-content">
               <h4>{newsData.title}</h4>
-              <p><strong>{newsData.source}</strong></p>
+              <p>
+                <strong>{newsData.source}</strong>
+              </p>
               <div className="news-share-link">Read Full Article →</div>
             </div>
           </div>
@@ -184,22 +208,24 @@ const MessageItem = ({
           messageContent = (
             <div className="reminder-message-card">
               <div className="reminder-header">
-                <i className="fas fa-bell reminder-icon"></i>
+                <Bell size={16} className="reminder-icon" />
                 <span className="reminder-label">REMINDER REQUEST</span>
               </div>
               <div className="reminder-content">
                 <h4 className="reminder-title">{reminderData.title}</h4>
                 {reminderData.description && (
-                  <p className="reminder-description">{reminderData.description}</p>
+                  <p className="reminder-description">
+                    {reminderData.description}
+                  </p>
                 )}
                 <div className="reminder-details">
                   <div className="reminder-time">
-                    <i className="fas fa-clock"></i>
+                    <Clock size={16} />
                     {new Date(reminderData.reminder_time).toLocaleString()}
                   </div>
                   {reminderData.location && (
                     <div className="reminder-location">
-                      <i className="fas fa-map-marker-alt"></i>
+                      <MapPin size={16} />
                       {reminderData.location}
                     </div>
                   )}
@@ -209,9 +235,15 @@ const MessageItem = ({
           );
         }
       } catch (e) {
-        messageContent = <p><Calendar size={16} /> Reminder message</p>;
+        messageContent = (
+          <p>
+            <Calendar size={16} /> Reminder message
+          </p>
+        );
       }
-    } else if (['image', 'video', 'audio', 'document'].includes(message.message_type)) {
+    } else if (
+      ['image', 'video', 'audio', 'document'].includes(message.message_type)
+    ) {
       // Media message
       messageContent = (
         <MediaMessage
@@ -231,7 +263,11 @@ const MessageItem = ({
 
   return (
     <div
-      className={`message ${isSent ? 'sent' : 'received'} ${isSelected ? 'selected' : ''} ${isReplied ? 'replied' : ''} ${message.is_vanished ? 'vanished' : ''}`}
+      className={`message ${isSent ? 'sent' : 'received'} ${
+        isSelected ? 'selected' : ''
+      } ${isReplied ? 'replied' : ''} ${
+        message.is_vanished ? 'vanished' : ''
+      }`}
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -243,86 +279,93 @@ const MessageItem = ({
       }}
     >
       <div className="message-content">
-        {/* Reply indicator */}
-        {isReplied && (
-          <div className="replied-message-container">
-            <div className="replied-message-header">
-              <i className="fas fa-reply"></i>
-              <span className="replied-message-user">
-                {isSent ? 'You' : 'Them'}
-              </span>
+        <div className="message-bubble">
+          {/* Reply indicator */}
+          {isReplied && (
+            <div className="replied-message-container">
+              <div className="replied-message-header">
+                <Reply size={16} />
+                <span className="replied-message-user">
+                  {isSent ? 'You' : 'Them'}
+                </span>
+              </div>
+              <div className="replied-message-content">
+                {/* Would need to fetch replied message content */}
+                Replied message
+              </div>
             </div>
-            <div className="replied-message-content">
-              {/* Would need to fetch replied message content */}
-              Replied message
+          )}
+
+          {/* Message content */}
+          {isEditing ? (
+            <div className="message-edit">
+              <input
+                type="text"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') saveEdit();
+                  if (e.key === 'Escape') cancelEdit();
+                }}
+                autoFocus
+              />
+              <div className="edit-actions">
+                <button onClick={saveEdit}>Save</button>
+                <button onClick={cancelEdit}>Cancel</button>
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            renderMessageContent()
+          )}
 
-        {/* Message content */}
-        {isEditing ? (
-          <div className="message-edit">
-            <input
-              type="text"
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') saveEdit();
-                if (e.key === 'Escape') cancelEdit();
-              }}
-              autoFocus
-            />
-            <div className="edit-actions">
-              <button onClick={saveEdit}>Save</button>
-              <button onClick={cancelEdit}>Cancel</button>
-            </div>
-          </div>
-        ) : (
-          renderMessageContent()
-        )}
-
-        {/* Message time */}
-        <span className="message-time">
-          {formatTime(message.created_at)}
-          {message.edited_at && ' (edited)'}
-        </span>
-
-        {/* Vanish timer */}
-        {message.vanish_at && !message.is_vanished && (
-          <div className="vanish-timer">
-            <i className="fas fa-clock"></i>
-            <span>Timer</span>
-          </div>
-        )}
-
-        {/* Message status for sent messages */}
-        {isSent && (
-          <span className="message-status">
-            {message.is_read ? <CheckCheck size={16} /> : <Check size={16} />}
+          {/* Message time */}
+          <span className="message-time">
+            {formatTime(message.created_at)}
+            {message.edited_at && ' (edited)'}
           </span>
-        )}
 
+          {/* Vanish timer */}
+          {message.vanish_at && !message.is_vanished && (
+            <div className="vanish-timer">
+              <Clock size={16} />
+              <span>Timer</span>
+            </div>
+          )}
+
+          {/* Message status for sent messages */}
+          {isSent && (
+            <span className="message-status">
+              {message.is_read ? (
+                <CheckCheck size={16} />
+              ) : (
+                <Check size={16} />
+              )}
+            </span>
+          )}
+        </div>
         {/* Message actions dropdown */}
         {showActions && !isSelectionMode && (
           <div className="message-actions">
-            <button className="message-arrow-btn"><MoreVertical size={16} /></button>
+            <button className="message-arrow-btn">
+              <MoreVertical size={16} />
+            </button>
             <div className="message-dropdown">
               <div className="message-option" onClick={handleReply}>
-                <i className="fas fa-reply icon"></i> Reply
+                <Reply size={16} className="icon" /> Reply
               </div>
               <div className="message-option" onClick={handleCopy}>
-                <i className="fas fa-copy icon"></i> Copy
+                <Copy size={16} className="icon" /> Copy
               </div>
               <div className="message-option" onClick={handleForward}>
-                <i className="fas fa-share icon"></i> Forward
+                <Share2 size={16} className="icon" /> Forward
               </div>
               {isSent && (
                 <>
                   <div className="message-option" onClick={handleEdit}>
-                    <i className="fas fa-edit icon"></i> Edit
+                    <Edit size={16} className="icon" /> Edit
                   </div>
                   <div className="message-option danger" onClick={handleDelete}>
-                    <i className="fas fa-trash icon"></i> Delete
+                    <Trash2 size={16} className="icon" /> Delete
                   </div>
                 </>
               )}
