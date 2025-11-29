@@ -53,7 +53,7 @@ const Chat = () => {
   const { chatId, otherUserId, userId } = useParams();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
-  const { chatTheme, chatThemes, selectTheme } = useChatTheme();
+  const { chatTheme, chatThemes, selectTheme, setScrollPercentage } = useChatTheme();
   const { startCall } = useCall();
 
   // State
@@ -563,6 +563,14 @@ const Chat = () => {
 
     setShowScrollButton(scrolledFromBottom > 300);
     setIsScrolledToBottom(isAtBottom);
+
+    // Calculate scroll percentage
+    if (container.scrollHeight > container.clientHeight) {
+      const scrollPercentage = (container.scrollTop / (container.scrollHeight - container.clientHeight)) * 100;
+      setScrollPercentage(scrollPercentage);
+    } else {
+      setScrollPercentage(0);
+    }
 
     // If scrolled to bottom, mark messages as read and reset unread count
     if (isAtBottom && unreadCount > 0) {

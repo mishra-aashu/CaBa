@@ -10,7 +10,7 @@ const chatThemes = {
       radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
-      linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #667eea 0%, #764ba2 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -35,7 +35,7 @@ const chatThemes = {
     background: `
       radial-gradient(circle at 25% 25%, rgba(30, 30, 46, 0.8) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(15, 23, 42, 0.6) 0%, transparent 50%),
-      linear-gradient(135deg, #1e1e2e 0%, #0f172a 50%, #1e1e2e 100%)
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #1e1e2e 0%, #0f172a 50%, #1e1e2e 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
@@ -61,7 +61,7 @@ const chatThemes = {
       radial-gradient(circle at 30% 70%, rgba(14, 165, 233, 0.2) 0%, transparent 40%),
       radial-gradient(circle at 70% 30%, rgba(2, 132, 199, 0.25) 0%, transparent 45%),
       radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
-      linear-gradient(135deg, #0ea5e9 0%, #0284c7 25%, #0ea5e9 50%, #0284c7 75%, #0ea5e9 100%)
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0ea5e9 0%, #0284c7 25%, #0ea5e9 50%, #0284c7 75%, #0ea5e9 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #0369a1 0%, #075985 100%)',
@@ -87,7 +87,7 @@ const chatThemes = {
       radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.15) 0%, transparent 40%),
       radial-gradient(circle at 80% 20%, rgba(22, 163, 74, 0.2) 0%, transparent 45%),
       radial-gradient(circle at 60% 40%, rgba(74, 222, 128, 0.1) 0%, transparent 50%),
-      linear-gradient(135deg, #22c55e 0%, #16a34a 25%, #22c55e 50%, #16a34a 75%, #22c55e 100%)
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #22c55e 0%, #16a34a 25%, #22c55e 50%, #16a34a 75%, #22c55e 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
@@ -113,7 +113,7 @@ const chatThemes = {
       radial-gradient(circle at 25% 75%, rgba(251, 146, 60, 0.25) 0%, transparent 40%),
       radial-gradient(circle at 75% 25%, rgba(234, 88, 12, 0.3) 0%, transparent 45%),
       radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.2) 0%, transparent 50%),
-      linear-gradient(135deg, #fb923c 0%, #ea580c 25%, #fb923c 50%, #ea580c 75%, #fb923c 100%)
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fb923c 0%, #ea580c 25%, #fb923c 50%, #ea580c 75%, #fb923c 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #c2410c 0%, #9a3412 100%)',
@@ -139,7 +139,7 @@ const chatThemes = {
       radial-gradient(circle at 30% 70%, rgba(147, 51, 234, 0.25) 0%, transparent 40%),
       radial-gradient(circle at 70% 30%, rgba(124, 58, 237, 0.3) 0%, transparent 45%),
       radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.2) 0%, transparent 50%),
-      linear-gradient(135deg, #9333ea 0%, #7c3aed 25%, #9333ea 50%, #7c3aed 75%, #9333ea 100%)
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #9333ea 0%, #7c3aed 25%, #9333ea 50%, #7c3aed 75%, #9333ea 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #6b21a8 0%, #581c87 100%)',
@@ -157,6 +157,32 @@ const chatThemes = {
       background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
       text: '#581c87'
     }
+  },
+  ruby_radiance: {
+    name: 'Ruby Radiance',
+    category: 'Elegant',
+    background: `
+      radial-gradient(circle at 20% 80%, rgba(225, 29, 72, 0.2) 0%, transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(253, 29, 29, 0.25) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(255, 50, 50, 0.15) 0%, transparent 50%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #e11d48 0%, #fd1d1d 25%, #e11d48 50%, #fd1d1d 75%, #e11d48 100%)
+    `,
+    sentMessage: {
+      background: 'linear-gradient(135deg, #9f1239 0%, #881337 100%)',
+      text: '#ffffff'
+    },
+    receivedMessage: {
+      background: 'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)',
+      text: '#9f1239'
+    },
+    header: {
+      background: 'linear-gradient(135deg, #9f1239 0%, #881337 100%)',
+      text: '#ffffff'
+    },
+    input: {
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff1f2 100%)',
+      text: '#9f1239'
+    }
   }
 };
 
@@ -171,11 +197,17 @@ export const ChatThemeProvider = ({ children }) => {
     return localStorage.getItem('digidad_chat_theme') || 'classic';
   });
   const [loading, setLoading] = useState(true);
+  const [scrollPercentage, setScrollPercentage] = useState(0);
 
   // Load user's theme preference from Supabase
   useEffect(() => {
     loadUserTheme();
   }, [supabase]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--scroll-percentage', scrollPercentage);
+  }, [scrollPercentage]);
 
   const loadUserTheme = async () => {
     try {
@@ -325,7 +357,8 @@ export const ChatThemeProvider = ({ children }) => {
     chatThemes,
     selectTheme,
     loading,
-    currentThemeData: chatThemes[chatTheme] || chatThemes.classic
+    currentThemeData: chatThemes[chatTheme] || chatThemes.classic,
+    setScrollPercentage
   };
 
   return (
