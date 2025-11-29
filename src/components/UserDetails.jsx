@@ -1,10 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
-import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit } from 'lucide-react';
+import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit, MoreVertical } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import './UserDetails.css';
+
+// DP options for avatar display
+const baseUrl = import.meta.env.BASE_URL || '/';
+const dpOptionsData = [
+  { id: 1, path: `${baseUrl}assets/images/dp-options/00701602b0eac0390b3107b9e2a665e0.jpg` },
+  { id: 2, path: `${baseUrl}assets/images/dp-options/1691130988954.jpg` },
+  { id: 3, path: `${baseUrl}assets/images/dp-options/aesthetic-cartoon-funny-dp-for-instagram.webp` },
+  { id: 4, path: `${baseUrl}assets/images/dp-options/boy-cartoon-dp-with-hoodie.webp` },
+  { id: 5, path: `${baseUrl}assets/images/dp-options/download (1).jpg` },
+  { id: 6, path: `${baseUrl}assets/images/dp-options/download.jpg` },
+  { id: 7, path: `${baseUrl}assets/images/dp-options/funny-profile-picture-wd195eo9rpjy7ax1.jpg` },
+  { id: 8, path: `${baseUrl}assets/images/dp-options/funny-whatsapp-dp-for-girls.webp` },
+  { id: 9, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575118_y.jpg` },
+  { id: 10, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575119_y.jpg` },
+  { id: 11, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575120_y.jpg` },
+  { id: 12, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575121_y.jpg` },
+  { id: 13, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575122_y.jpg` },
+  { id: 14, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575123_y.jpg` },
+  { id: 15, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575124_y.jpg` },
+  { id: 16, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575125_y.jpg` },
+  { id: 17, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575126_y.jpg` },
+  { id: 18, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575127_y.jpg` },
+  { id: 19, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267708_w.jpg` },
+  { id: 20, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267709_w.jpg` },
+  { id: 21, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267710_w.jpg` },
+  { id: 22, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267711_w.jpg` },
+  { id: 23, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267712_w.jpg` },
+  { id: 24, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267713_w.jpg` },
+  { id: 25, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267714_w.jpg` },
+  { id: 26, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267715_w.jpg` },
+  { id: 27, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267716_w.jpg` },
+  { id: 28, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267717_w.jpg` }
+];
 
 const UserDetails = () => {
     const { userId } = useParams();
@@ -17,18 +50,22 @@ const UserDetails = () => {
     const [loading, setLoading] = useState(true);
     const [isMuted, setIsMuted] = useState(false);
     const [isContact, setIsContact] = useState(false);
+    const [isBlocked, setIsBlocked] = useState(false);
     const [mediaCount, setMediaCount] = useState({ images: 0, links: 0, docs: 0 });
     const [commonGroups, setCommonGroups] = useState([]);
+    const [contactName, setContactName] = useState('');
+    const [contactPhone, setContactPhone] = useState('');
+    const [contactAbout, setContactAbout] = useState('');
 
     // Modals
     const [showBlockModal, setShowBlockModal] = useState(false);
     const [showEditContactModal, setShowEditContactModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
-    const [contactName, setContactName] = useState('');
     const [reportReason, setReportReason] = useState('');
+    const [reportDetails, setReportDetails] = useState('');
 
     useEffect(() => {
-        if (!userId || userId === 'undefined') {
+        if (!userId || userId === 'undefined' || userId === 'null') {
             navigate('/');
             return;
         }
@@ -45,27 +82,50 @@ const UserDetails = () => {
             const current = JSON.parse(userStr);
             setCurrentUser(current);
 
-            // Load other user details
-            const { data: userData, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('id', userId)
-                .single();
+            // Load other user details with caching
+            const cacheKey = `digidad_user_${userId}`;
+            let cachedUser = localStorage.getItem(cacheKey);
+            let freshUserData;
 
-            if (error) throw error;
-            setUser(userData);
+            if (cachedUser) {
+                cachedUser = JSON.parse(cachedUser);
+                setUser(cachedUser);
+                await loadAdditionalData(current, userId);
+            }
 
-            // Check if muted
-            const mutedChats = JSON.parse(localStorage.getItem('mutedChats') || '{}');
-            const chatId = [current.id, userId].sort().join('_');
-            setIsMuted(!!mutedChats[chatId]);
+            // Always try to fetch fresh data
+            try {
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
 
-            // Check if contact
-            const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-            setIsContact(contacts.some(c => c.id === userId));
+                if (error) throw error;
+                freshUserData = userData;
 
-            // Load media count (placeholder)
-            setMediaCount({ images: 0, links: 0, docs: 0 });
+                // Cache the fresh data
+                localStorage.setItem(cacheKey, JSON.stringify(freshUserData));
+
+                // Update UI if data changed
+                if (!cachedUser || JSON.stringify(cachedUser) !== JSON.stringify(freshUserData)) {
+                    setUser(freshUserData);
+                    await loadAdditionalData(current, userId);
+                }
+            } catch (networkError) {
+                console.warn('Network error loading user details:', networkError);
+                if (!cachedUser) {
+                    // Set fallback data
+                    const fallbackUser = {
+                        id: userId,
+                        name: 'Unknown User',
+                        phone: 'N/A',
+                        avatar: null,
+                        about: 'User information not available'
+                    };
+                    setUser(fallbackUser);
+                }
+            }
 
             setLoading(false);
         } catch (error) {
@@ -74,13 +134,121 @@ const UserDetails = () => {
         }
     };
 
+    const loadAdditionalData = async (currentUser, userId) => {
+        try {
+            // Check if muted
+            const mutedChats = JSON.parse(localStorage.getItem('mutedChats') || '{}');
+            const chatId = [currentUser.id, userId].sort().join('_');
+            setIsMuted(!!mutedChats[chatId]);
+
+            // Check contact status
+            await checkContactStatus(currentUser.id, userId);
+
+            // Check block status
+            await checkBlockStatus(currentUser.id, userId);
+
+            // Load media count
+            await loadMediaCount(currentUser.id, userId);
+        } catch (error) {
+            console.error('Error loading additional data:', error);
+        }
+    };
+
+    const checkContactStatus = async (currentUserId, targetUserId) => {
+        try {
+            const { data, error } = await supabase
+                .from('contacts')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .eq('contact_user_id', targetUserId);
+
+            setIsContact(data && data.length > 0);
+        } catch (error) {
+            console.error('Error checking contact status:', error);
+        }
+    };
+
+    const checkBlockStatus = async (currentUserId, targetUserId) => {
+        try {
+            const { data, error } = await supabase
+                .from('blocked_users')
+                .select('*')
+                .eq('blocker_id', currentUserId)
+                .eq('blocked_id', targetUserId);
+
+            setIsBlocked(data && data.length > 0);
+        } catch (error) {
+            console.error('Error checking block status:', error);
+        }
+    };
+
+    const loadMediaCount = async (currentUserId, targetUserId) => {
+        try {
+            // Get chat ID
+            const { data: chat } = await supabase
+                .from('chats')
+                .select('id')
+                .or(`and(user1_id.eq.${currentUserId},user2_id.eq.${targetUserId}),and(user1_id.eq.${targetUserId},user2_id.eq.${currentUserId})`)
+                .single();
+
+            if (!chat) {
+                setMediaCount({ images: 0, links: 0, docs: 0 });
+                return;
+            }
+
+            // For now, set placeholder counts
+            // In a real app, you would count actual media, links, and docs
+            setMediaCount({ images: 0, links: 0, docs: 0 });
+        } catch (error) {
+            console.error('Error loading media count:', error);
+            setMediaCount({ images: 0, links: 0, docs: 0 });
+        }
+    };
+
     const getInitials = (name) => {
         return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
     };
 
-    const handleMessage = () => {
-        // Find or create chat
-        navigate(`/chat/new/${userId}`);
+    const handleMessage = async () => {
+        try {
+            if (!currentUser || !user) return;
+
+            // Check if chat exists
+            const { data: chat } = await supabase
+                .from('chats')
+                .select('*')
+                .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${user.id}),and(user1_id.eq.${user.id},user2_id.eq.${currentUser.id})`)
+                .single();
+
+            if (chat) {
+                navigate(`/chat/${chat.id}/${user.id}`);
+            } else {
+                // Create new chat
+                const newChat = {
+                    user1_id: currentUser.id,
+                    user2_id: user.id,
+                    last_message: null,
+                    last_message_time: new Date().toISOString(),
+                    unread_count: 0
+                };
+
+                const { data, error } = await supabase
+                    .from('chats')
+                    .insert([newChat])
+                    .select();
+
+                if (error) throw error;
+
+                if (data && data[0]) {
+                    navigate(`/chat/${data[0].id}/${user.id}`);
+                } else {
+                    throw new Error('Failed to create chat');
+                }
+            }
+        } catch (error) {
+            console.error('Error navigating to chat:', error);
+            alert('Failed to open chat');
+        }
     };
 
     const handleVoiceCall = () => {
@@ -115,34 +283,53 @@ const UserDetails = () => {
         setIsMuted(!isMuted);
     };
 
-    const handleAddToContacts = () => {
-        if (isContact) {
-            alert('User is already in your contacts');
-            return;
-        }
+    const handleAddToContacts = async () => {
+        try {
+            if (!currentUser || !user) return;
 
-        const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-        contacts.push({
-            id: user.id,
-            name: user.name,
-            phone: user.phone,
-            addedAt: new Date().toISOString()
-        });
-        localStorage.setItem('contacts', JSON.stringify(contacts));
-        setIsContact(true);
-        alert('Contact added successfully!');
+            // Check if contact already exists
+            const { data: existingContact } = await supabase
+                .from('contacts')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .eq('contact_user_id', user.id)
+                .single();
+
+            if (existingContact) {
+                alert('Contact already exists');
+                return;
+            }
+
+            // Add to contacts
+            const { error } = await supabase
+                .from('contacts')
+                .insert([{
+                    user_id: currentUser.id,
+                    contact_user_id: user.id,
+                    contact_name: user.name
+                }]);
+
+            if (error) throw error;
+
+            setIsContact(true);
+            alert('Contact added successfully');
+        } catch (error) {
+            console.error('Error adding contact:', error);
+            alert('Failed to add contact');
+        }
     };
 
     const handleShareContact = () => {
-        const shareText = `Contact: ${user.name}\nPhone: ${user.phone}`;
+        const shareText = `${user.name}\n${user.phone || ''}`;
         if (navigator.share) {
             navigator.share({
                 title: 'Share Contact',
                 text: shareText
             });
         } else {
-            navigator.clipboard.writeText(shareText);
-            alert('Contact details copied to clipboard!');
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('Contact info copied');
+            });
         }
     };
 
@@ -208,31 +395,107 @@ const UserDetails = () => {
     };
 
     const handleEditContact = () => {
-        setContactName(user.name);
-        setShowEditContactModal(true);
-    };
-
-    const saveContactEdit = () => {
-        if (!contactName.trim()) {
-            alert('Please enter a name');
+        // Check if user is in contacts
+        if (!isContact) {
+            alert('Please add this user to contacts first');
             return;
         }
 
-        const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-        const index = contacts.findIndex(c => c.id === userId);
-        if (index !== -1) {
-            contacts[index].name = contactName.trim();
-            localStorage.setItem('contacts', JSON.stringify(contacts));
+        // Get contact info from database
+        supabase
+            .from('contacts')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .eq('contact_user_id', userId)
+            .single()
+            .then(({ data: contact, error }) => {
+                if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+                    console.error('Error fetching contact:', error);
+                    alert('Failed to load contact info');
+                    return;
+                }
 
-            // Update local state
-            setUser({ ...user, displayName: contactName.trim() });
-            alert('Contact updated successfully!');
-        }
-        setShowEditContactModal(false);
+                // Populate modal with current data
+                setContactName(contact?.contact_name || user.name);
+                setContactPhone(user.phone || '');
+                // Only show about field if editing own profile
+                if (currentUser.id === userId) {
+                    setContactAbout(user.about || '');
+                }
+
+                setShowEditContactModal(true);
+            });
     };
 
-    const handleBlockUser = async () => {
-        setShowBlockModal(true);
+    const saveContactEdit = async () => {
+        try {
+            if (!contactName.trim()) {
+                alert('Name is required');
+                return;
+            }
+
+            // Update or insert contact in database
+            const contactData = {
+                user_id: currentUser.id,
+                contact_user_id: userId,
+                contact_name: contactName.trim(),
+                updated_at: new Date().toISOString()
+            };
+
+            // First check if contact exists
+            const { data: existingContact } = await supabase
+                .from('contacts')
+                .select('id')
+                .eq('user_id', currentUser.id)
+                .eq('contact_user_id', userId)
+                .single();
+
+            if (existingContact) {
+                // Update existing contact
+                await supabase
+                    .from('contacts')
+                    .update(contactData)
+                    .eq('id', existingContact.id);
+            } else {
+                // Insert new contact
+                await supabase
+                    .from('contacts')
+                    .insert([contactData]);
+            }
+
+            // Update user profile if it's the current user's own profile
+            if (currentUser.id === userId) {
+                const updateData = {
+                    name: contactName.trim(),
+                    phone: contactPhone.trim(),
+                    updated_at: new Date().toISOString()
+                };
+                if (contactAbout.trim()) {
+                    updateData.about = contactAbout.trim();
+                }
+                await supabase
+                    .from('users')
+                    .update(updateData)
+                    .eq('id', currentUser.id);
+            }
+
+            // Update UI
+            setUser({ ...user, name: contactName.trim(), phone: contactPhone.trim(), about: contactAbout.trim() });
+            setShowEditContactModal(false);
+            alert('Contact updated successfully');
+        } catch (error) {
+            console.error('Error saving contact:', error);
+            alert('Failed to update contact');
+        }
+    };
+
+    const handleBlockUser = () => {
+        if (isBlocked) {
+            // Unblock user
+            unblockContact();
+        } else {
+            setShowBlockModal(true);
+        }
     };
 
     const confirmBlock = async () => {
@@ -246,12 +509,30 @@ const UserDetails = () => {
 
             if (error) throw error;
 
-            alert('User blocked successfully');
+            setIsBlocked(true);
             setShowBlockModal(false);
-            navigate('/');
+            alert('Contact blocked');
         } catch (error) {
-            console.error('Error blocking user:', error);
-            alert('Failed to block user');
+            console.error('Error blocking contact:', error);
+            alert('Failed to block contact');
+        }
+    };
+
+    const unblockContact = async () => {
+        try {
+            const { error } = await supabase
+                .from('blocked_users')
+                .delete()
+                .eq('blocker_id', currentUser.id)
+                .eq('blocked_id', userId);
+
+            if (error) throw error;
+
+            setIsBlocked(false);
+            alert('Contact unblocked');
+        } catch (error) {
+            console.error('Error unblocking contact:', error);
+            alert('Failed to unblock contact');
         }
     };
 
@@ -259,38 +540,63 @@ const UserDetails = () => {
         setShowReportModal(true);
     };
 
-    const submitReport = () => {
-        if (!reportReason.trim()) {
-            alert('Please select a reason');
-            return;
-        }
+    const submitReport = async () => {
+        try {
+            if (!reportReason.trim()) {
+                alert('Please select a reason');
+                return;
+            }
 
-        // In a real app, this would send to backend
-        alert('Report submitted successfully. We will review it shortly.');
-        setShowReportModal(false);
-        setReportReason('');
+            // Submit to reports table
+            const { error } = await supabase
+                .from('reports')
+                .insert([{
+                    reporter_id: currentUser.id,
+                    reported_id: userId,
+                    reason: reportReason,
+                    details: reportDetails
+                }]);
+
+            if (error) throw error;
+
+            setShowReportModal(false);
+            setReportReason('');
+            setReportDetails('');
+            alert('Report submitted');
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            alert('Failed to submit report');
+        }
     };
 
     const handleDeleteContact = async () => {
-        const confirmed = window.confirm('Delete this contact? This will also delete the chat.');
+        const confirmed = confirm(`Delete chat with ${user.name}? This will delete all messages.`);
+
         if (!confirmed) return;
 
         try {
-            // Remove from contacts
-            const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-            const updatedContacts = contacts.filter(c => c.id !== userId);
-            localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-
-            // Delete chat if exists
-            const { error } = await supabase
+            // Get chat
+            const { data: chat } = await supabase
                 .from('chats')
-                .delete()
-                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
-                .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+                .select('id')
+                .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${user.id}),and(user1_id.eq.${user.id},user2_id.eq.${currentUser.id})`)
+                .single();
 
-            if (error) console.error('Error deleting chat:', error);
+            if (chat) {
+                // Delete messages
+                await supabase
+                    .from('messages')
+                    .delete()
+                    .eq('chat_id', chat.id);
 
-            alert('Contact deleted successfully');
+                // Delete chat
+                await supabase
+                    .from('chats')
+                    .delete()
+                    .eq('id', chat.id);
+            }
+
+            alert('Contact deleted');
             navigate('/');
         } catch (error) {
             console.error('Error deleting contact:', error);
@@ -325,6 +631,7 @@ const UserDetails = () => {
                 </button>
                 <h1>Contact Info</h1>
                 <DropdownMenu
+                    trigger={<MoreVertical size={24} />}
                     items={[
                         {
                             icon: <Edit size={16} />,
@@ -338,114 +645,130 @@ const UserDetails = () => {
 
             {/* User Profile Section */}
             <div className="user-profile-section">
-                <div className="user-avatar-large">
+                <div className="user-details-avatar" id="userDetailAvatar">
                     {user.avatar ? (
-                        <img src={user.avatar} alt={user.name} />
+                        parseInt(user.avatar) ? (
+                            <img id="userDetailImg" src={dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path} alt={user.name} />
+                        ) : (
+                            <img id="userDetailImg" src={user.avatar} alt={user.name} />
+                        )
                     ) : (
-                        <div className="avatar-initials">{getInitials(user.name)}</div>
+                        <div className="dp-preview-initials" id="userDetailInitials">{getInitials(user.name)}</div>
                     )}
                 </div>
-                <h2 className="user-name">{user.name}</h2>
-                <p className="user-phone">{user.phone}</p>
+                <h2 className="user-detail-name" id="userDetailName">{user.name}</h2>
+                <p className="user-detail-phone" id="userDetailPhone">{user.phone || '+91 0000000000'}</p>
             </div>
 
             {/* Action Buttons */}
-            <div className="action-buttons">
-                <button className="action-btn" onClick={handleMessage}>
-                    <MessageCircle size={24} />
-                    <span>Message</span>
+            <div className="user-actions">
+                <button className="action-btn" id="messageUserBtn" onClick={handleMessage}>
+                    <span className="icon">chat</span>
+                    <span className="label">Message</span>
                 </button>
-                <button className="action-btn" onClick={handleVoiceCall}>
-                    <Phone size={24} />
-                    <span>Call</span>
+                <button className="action-btn" id="voiceCallUserBtn" onClick={handleVoiceCall}>
+                    <Phone className="icon" size={24} />
+                    <span className="label">Call</span>
                 </button>
-                <button className="action-btn" onClick={handleVideoCall}>
-                    <Video size={24} />
-                    <span>Video</span>
+                <button className="action-btn" id="videoCallUserBtn" onClick={handleVideoCall}>
+                    <Video className="icon" size={24} />
+                    <span className="label">Video</span>
                 </button>
             </div>
 
-            {/* Media Section */}
-            <div className="media-section">
-                <div className="section-header">
-                    <h3>Media, Links and Docs</h3>
-                </div>
-                <div className="media-counts">
-                    <div className="media-count-item">
-                        <Image size={20} />
-                        <span>{mediaCount.images} Photos</span>
-                    </div>
-                    <div className="media-count-item">
-                        <LinkIcon size={20} />
-                        <span>{mediaCount.links} Links</span>
-                    </div>
-                    <div className="media-count-item">
-                        <FileText size={20} />
-                        <span>{mediaCount.docs} Docs</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Mute Notifications */}
-            <div className="settings-section">
-                <div className="setting-item" onClick={handleMuteToggle}>
-                    <div className="setting-label">
-                        {isMuted ? <Bell size={20} /> : <BellOff size={20} />}
-                        <span>Mute Notifications</span>
-                    </div>
-                    <div className={`toggle ${isMuted ? 'active' : ''}`}>
-                        <div className="toggle-thumb"></div>
+            {/* User Information */}
+            <div className="user-info-sections">
+                {/* Media Section */}
+                <div className="info-section">
+                    <h3 className="section-header">Media, Links, and Docs</h3>
+                    <div className="media-preview">
+                        <div className="media-item">
+                            <Image className="icon" size={20} />
+                            <span className="count" id="mediaCount">{mediaCount.images}</span>
+                        </div>
+                        <div className="media-item">
+                            <LinkIcon className="icon" size={20} />
+                            <span className="count" id="linksCount">{mediaCount.links}</span>
+                        </div>
+                        <div className="media-item">
+                            <FileText className="icon" size={20} />
+                            <span className="count" id="docsCount">{mediaCount.docs}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Contact Actions */}
-            <div className="contact-actions-section">
-                {!isContact && (
-                    <button className="contact-action-btn" onClick={handleAddToContacts}>
-                        <UserPlus size={20} />
-                        <span>Add to Contacts</span>
-                    </button>
-                )}
-                <button className="contact-action-btn" onClick={handleShareContact}>
-                    <Share2 size={20} />
-                    <span>Share Contact</span>
-                </button>
-                <button className="contact-action-btn" onClick={handleExportChat}>
-                    <Download size={20} />
-                    <span>Export Chat</span>
-                </button>
-            </div>
+                {/* Notifications Section */}
+                <div className="info-section">
+                    <div className="settings-item toggle-item">
+                        <div className="item-left">
+                            <BellOff className="icon" size={20} />
+                            <span className="label">Mute Notifications</span>
+                        </div>
+                        <label className="toggle-switch">
+                            <input type="checkbox" id="muteUserToggle" checked={isMuted} onChange={handleMuteToggle} />
+                            <span className="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
 
-            {/* Groups in Common */}
-            {commonGroups.length > 0 && (
-                <div className="groups-section">
-                    <h3>Groups in Common</h3>
-                    <div className="groups-list">
-                        {commonGroups.map(group => (
-                            <div key={group.id} className="group-item">
-                                <div className="group-avatar">{getInitials(group.name)}</div>
-                                <span>{group.name}</span>
+                {/* Contact Actions */}
+                <div className="info-section">
+                    {!isContact && (
+                        <div className="settings-item" id="addToContactsBtn" onClick={handleAddToContacts}>
+                            <div className="item-left">
+                                <UserPlus className="icon" size={20} />
+                                <span className="label">Add to Contacts</span>
                             </div>
-                        ))}
+                        </div>
+                    )}
+
+                    <div className="settings-item" id="shareContactBtn" onClick={handleShareContact}>
+                        <div className="item-left">
+                            <Share2 className="icon" size={20} />
+                            <span className="label">Share Contact</span>
+                        </div>
+                    </div>
+
+                    <div className="settings-item" id="exportChatBtn" onClick={handleExportChat}>
+                        <div className="item-left">
+                            <Download className="icon" size={20} />
+                            <span className="label">Export Chat</span>
+                        </div>
                     </div>
                 </div>
-            )}
 
-            {/* Danger Zone */}
-            <div className="danger-zone">
-                <button className="danger-btn" onClick={handleBlockUser}>
-                    <Ban size={20} />
-                    <span>Block Contact</span>
-                </button>
-                <button className="danger-btn" onClick={handleReportUser}>
-                    <Flag size={20} />
-                    <span>Report Contact</span>
-                </button>
-                <button className="danger-btn" onClick={handleDeleteContact}>
-                    <Trash2 size={20} />
-                    <span>Delete Contact</span>
-                </button>
+                {/* Groups in Common */}
+                <div className="info-section" id="groupsSection">
+                    <h3 className="section-header">Groups in Common</h3>
+                    <div id="commonGroups">
+                        <p className="no-data">No groups in common</p>
+                    </div>
+                </div>
+
+                {/* Danger Zone */}
+                <div className="info-section danger-section">
+                    <div className="settings-item danger" id="blockContactBtn" onClick={handleBlockUser}>
+                        <div className="item-left">
+                            <Ban className="icon" size={20} />
+                            <span className="label">{isBlocked ? 'Unblock Contact' : 'Block Contact'}</span>
+                        </div>
+                    </div>
+
+                    <div className="settings-item danger" id="reportContactBtn" onClick={handleReportUser}>
+                        <div className="item-left">
+                            <Flag className="icon" size={20} />
+                            <span className="label">Report Contact</span>
+                        </div>
+                    </div>
+
+                    <div className="settings-item danger" id="deleteContactBtn" onClick={handleDeleteContact}>
+                        <div className="item-left">
+                            <Trash2 className="icon" size={20} />
+                            <span className="label">Delete Contact</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             {/* Block Confirmation Modal */}

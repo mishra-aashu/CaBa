@@ -93,8 +93,15 @@ a {
 
 /* Theme variables */
 :root {
-  --primary-color: #4CAF50;
-  --secondary-color: #2196F3;
+  --primary-color: #075E54;
+  --secondary-color: #128C7E;
+  --accent-color: #25D366;
+  --background-color: #ECE5DD;
+  --text-color: #000000;
+  --header-background: #005E54;
+  --chat-background: #E5DDD5;
+  --message-background: #FFFFFF;
+  --sent-message-background: #DCF8C6;
   --text-primary: #333333;
   --text-secondary: #666666;
   --background: #ffffff;
@@ -121,6 +128,15 @@ a {
 
 /* Dark theme */
 [data-theme="dark"] {
+  --primary-color: #128C7E;
+  --secondary-color: #25D366;
+  --accent-color: #075E54;
+  --background-color: #131C21;
+  --text-color: #FFFFFF;
+  --header-background: #2A2F32;
+  --chat-background: #0D1418;
+  --message-background: #2A2F32;
+  --sent-message-background: #056162;
   --text-primary: #ffffff;
   --text-secondary: #cccccc;
   --background: #1a1a1a;
