@@ -164,29 +164,20 @@ const CallInterface = ({ contact, callType, incoming = false, callId, roomId, on
   };
 
   return (
-    <div className="call-interface-overlay">
-      <div className="call-interface">
-        {/* Remote Video */}
-        <div className="remote-video-container">
-          {remoteStream ? (
-            <video
-              ref={remoteVideoRef}
-              autoPlay
-              playsInline
-              className="remote-video"
-            />
-          ) : (
-            <div className="remote-placeholder">
-              <div className="contact-avatar-large">
-                <div className="avatar-circle-large">
-                  {contact.avatar ? (
-                    <img src={contact.avatar} alt={contact.name} />
-                  ) : (
-                    contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-                  )}
-                </div>
-              </div>
-              <h2>{contact.name}</h2>
+    <div className="video-call-overlay">
+      <div className="video-call-container">
+        {/* Call Header */}
+        <div className="call-header">
+          <div className="call-info">
+            <div className="caller-avatar">
+              {contact.avatar ? (
+                <img src={contact.avatar} alt={contact.name} />
+              ) : (
+                contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+              )}
+            </div>
+            <div className="caller-details">
+              <h3>{contact.name}</h3>
               <p className="call-status">
                 {callState === 'initiated' && 'Calling...'}
                 {callState === 'ringing' && 'Ringing...'}
@@ -194,59 +185,102 @@ const CallInterface = ({ contact, callType, incoming = false, callId, roomId, on
                 {callState === 'ended' && 'Call ended'}
               </p>
             </div>
+          </div>
+          <button className="minimize-btn" onClick={onClose} title="Minimize">
+            <i className="fas fa-chevron-down"></i>
+          </button>
+        </div>
+
+        {/* Main Video Area - Remote User */}
+        <div className="main-video-area">
+          {remoteStream ? (
+            <video
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+              className="main-video"
+            />
+          ) : (
+            <div className="connecting-screen">
+              <div className="connecting-avatar">
+                <div className="avatar-circle-xl">
+                  {contact.avatar ? (
+                    <img src={contact.avatar} alt={contact.name} />
+                  ) : (
+                    contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                  )}
+                </div>
+              </div>
+              <h2 className="connecting-name">{contact.name}</h2>
+              <div className="connecting-status">
+                <div className="status-indicator">
+                  <div className="pulse-ring"></div>
+                  <div className="pulse-ring pulse-ring-delay"></div>
+                </div>
+                <p>
+                  {callState === 'initiated' && 'Calling...'}
+                  {callState === 'ringing' && 'Ringing...'}
+                  {callState === 'answered' && 'Connected'}
+                  {callState === 'ended' && 'Call ended'}
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Local Video (Picture-in-Picture) */}
+        {/* Picture-in-Picture - Local Video */}
         {localStream && callType === 'video' && !isVideoOff && (
-          <div className="local-video-pip">
+          <div className="pip-container">
             <video
               ref={localVideoRef}
               autoPlay
               playsInline
               muted
-              className="local-video"
+              className="pip-video"
             />
+            <div className="pip-label">You</div>
           </div>
         )}
 
         {/* Call Controls */}
-        <div className="call-controls">
-          <button
-            className={`control-btn ${isMuted ? 'active' : ''}`}
-            onClick={handleToggleMute}
-            title={isMuted ? 'Unmute' : 'Mute'}
-          >
-            <i className={`fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}`}></i>
-          </button>
+        <div className="call-controls-bar">
+          <div className="controls-wrapper">
+            <button
+              className={`control-btn ${isMuted ? 'muted' : ''}`}
+              onClick={handleToggleMute}
+            >
+              <i className={`fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}`}></i>
+              <span className="control-label">{isMuted ? 'Unmute' : 'Mute'}</span>
+            </button>
 
-          {callType === 'video' && (
-            <>
-              <button
-                className={`control-btn ${isVideoOff ? 'active' : ''}`}
-                onClick={handleToggleVideo}
-                title={isVideoOff ? 'Turn on video' : 'Turn off video'}
-              >
-                <i className={`fas ${isVideoOff ? 'fa-video-slash' : 'fa-video'}`}></i>
-              </button>
+            {callType === 'video' && (
+              <>
+                <button
+                  className={`control-btn ${isVideoOff ? 'video-off' : ''}`}
+                  onClick={handleToggleVideo}
+                >
+                  <i className={`fas ${isVideoOff ? 'fa-video-slash' : 'fa-video'}`}></i>
+                  <span className="control-label">{isVideoOff ? 'Start Video' : 'Stop Video'}</span>
+                </button>
 
-              <button
-                className="control-btn"
-                onClick={handleSwitchCamera}
-                title="Switch camera"
-              >
-                <i className="fas fa-sync-alt"></i>
-              </button>
-            </>
-          )}
+                <button
+                  className="control-btn"
+                  onClick={handleSwitchCamera}
+                >
+                  <i className="fas fa-sync-alt"></i>
+                  <span className="control-label">Switch</span>
+                </button>
+              </>
+            )}
 
-          <button
-            className="control-btn end-call"
-            onClick={handleEndCall}
-            title="End call"
-          >
-            <i className="fas fa-phone-slash"></i>
-          </button>
+            <button
+              className="control-btn end-call-btn"
+              onClick={handleEndCall}
+            >
+              <i className="fas fa-phone-slash"></i>
+              <span className="control-label">End</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
