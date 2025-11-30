@@ -43,13 +43,42 @@
 }
 
 .back-btn {
-  background: none;
-  border: none;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.3);
   font-size: 18px;
-  color: var(--chat-primary);
+  color: #22c55e !important;
   cursor: pointer;
-  padding: 8px;
+  padding: 10px;
   margin-right: 12px;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.back-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.back-btn:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+  border-color: #22c55e;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .chat-user-info {
@@ -98,18 +127,41 @@
 }
 
 .icon-btn {
-  background: none;
-  border: none;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.3);
   font-size: 18px;
-  color: var(--chat-text);
+  color: #22c55e !important;
   cursor: pointer;
-  padding: 8px;
+  padding: 10px;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.icon-btn:hover::before {
+  width: 100%;
+  height: 100%;
 }
 
 .icon-btn:hover {
-  background: var(--chat-hover);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+  border-color: #22c55e;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 /* Selection Toolbar */
@@ -382,6 +434,7 @@
   background: var(--chat-surface);
   border-top: 1px solid var(--chat-border);
   padding: 8px 16px;
+  position: relative;
 }
 
 .input-row {
@@ -391,19 +444,48 @@
 }
 
 .btn-attach, .btn-quick-reply, .btn-send {
-  background: none;
-  border: none;
-  padding: 8px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  padding: 10px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-attach::before, .btn-quick-reply::before, .btn-send::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.btn-attach:hover::before, .btn-quick-reply:hover::before, .btn-send:hover::before {
+  width: 100%;
+  height: 100%;
 }
 
 .btn-attach:hover, .btn-quick-reply:hover, .btn-send:hover {
-  background: var(--chat-hover);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+  border-color: #22c55e;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.btn-attach i, .btn-quick-reply i, .btn-send i {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
 }
 
 .btn-send:disabled {
@@ -430,44 +512,96 @@
   border-color: var(--chat-primary);
 }
 
-/* Attachment Menu */
+/* Attachment Menu - Professional popup from top */
 .attachment-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-  padding: 8px;
-  background: var(--chat-background);
-  border-radius: 8px;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .attach-option {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px;
-  background: var(--chat-surface);
-  border: 1px solid var(--chat-border);
-  border-radius: 8px;
+  gap: 6px;
+  padding: 16px 12px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.1) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.2);
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
-  min-width: 60px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 70px;
+  position: relative;
+  overflow: hidden;
+}
+
+.attach-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.attach-option:hover::before {
+  left: 100%;
 }
 
 .attach-option:hover {
-  background: var(--chat-hover);
-  border-color: var(--chat-primary);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+  border-color: #22c55e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
+}
+
+.attach-option:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.15);
 }
 
 .attach-option i {
-  font-size: 20px;
-  color: var(--chat-primary);
+  font-size: 24px;
+  color: #22c55e !important;
+  filter: drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3));
+  z-index: 1;
+  position: relative;
 }
 
 .attach-option span {
-  font-size: 12px;
-  color: var(--chat-text);
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 1;
+  position: relative;
 }
 
 /* Quick Replies Menu */

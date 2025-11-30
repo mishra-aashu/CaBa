@@ -42,6 +42,19 @@ button {
   cursor: pointer;
 }
 
+/* Global icon styling - make all FontAwesome icons green and unique */
+.fas, .far, .fab, .fa {
+  color: #22c55e !important;
+  font-weight: 900 !important;
+  text-shadow: 0 1px 2px rgba(34, 197, 94, 0.3);
+}
+
+.fas:hover, .far:hover, .fab:hover, .fa:hover {
+  color: #16a34a !important;
+  transform: scale(1.1);
+  transition: all 0.2s ease;
+}
+
 input, textarea, select {
   font-family: inherit;
   font-size: 16px; /* Prevent zoom on iOS */
