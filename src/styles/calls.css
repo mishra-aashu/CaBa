@@ -288,7 +288,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #000;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   position: relative;
 }
 
@@ -299,6 +299,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  padding-bottom: 100px; /* Space for footer controls */
 }
 
 .remote-video {
@@ -347,23 +348,26 @@
 }
 
 .call-controls {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 20px;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 16px 24px;
-  border-radius: 50px;
+  background: rgba(33, 33, 33, 0.95);
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  z-index: 10;
 }
 
 .control-btn {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -371,28 +375,35 @@
   font-size: 20px;
   transition: all 0.3s;
   color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .control-btn:not(.end-call) {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .control-btn:not(.end-call):hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .control-btn.active {
-  background: rgba(255, 0, 0, 0.8);
+  background: rgba(255, 0, 0, 0.9);
+  border-color: #ff6666;
 }
 
 .control-btn.end-call {
   background: #ff4444;
+  border-color: #ff6666;
 }
 
 .control-btn.end-call:hover {
   background: #cc0000;
+  border-color: #ff6666;
   transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
 }
 
 /* Incoming Call */
@@ -518,15 +529,18 @@
   }
 
   .call-controls {
-    bottom: 20px;
     gap: 16px;
-    padding: 12px 20px;
+    padding: 16px 20px;
   }
 
   .control-btn {
     width: 48px;
     height: 48px;
     font-size: 18px;
+  }
+
+  .remote-video-container {
+    padding-bottom: 80px; /* Adjusted for mobile footer */
   }
 
   .incoming-call {
