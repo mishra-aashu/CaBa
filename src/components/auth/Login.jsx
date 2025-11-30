@@ -25,7 +25,7 @@ const Login = () => {
           avatar: session.user.user_metadata?.avatar || null
         };
         localStorage.setItem('currentUser', JSON.stringify(userData));
-        window.location.href = '/home.html';
+        window.location.href = '/CaBa/';
       }
     };
 
@@ -181,7 +181,7 @@ const Login = () => {
       setMessage({ text: 'Login successful! Redirecting...', type: 'success' });
 
       setTimeout(() => {
-        window.location.href = '/home.html';
+        window.location.href = '/CaBa/';
       }, 1000);
 
     } catch (error) {
