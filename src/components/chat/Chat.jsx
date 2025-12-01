@@ -799,6 +799,7 @@ const Chat = () => {
           isSelectionMode={isSelectionMode}
           onMessageSelect={handleMessageSelect}
           onReply={handleReply}
+          onDelete={(messageId) => setMessages(prev => prev.filter(m => m.id !== messageId))}
         />
 
         <TypingIndicator isVisible={isOtherUserTyping} />

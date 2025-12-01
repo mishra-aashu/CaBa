@@ -24,6 +24,7 @@ const MessageItem = ({
   isSelectionMode,
   onSelect,
   onReply,
+  onDelete,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -124,7 +125,10 @@ const MessageItem = ({
 
           if (error) throw error;
 
-          // The message will be removed from the list via real-time subscription
+          // Remove the message from the UI
+          if (onDelete) {
+            onDelete(message.id);
+          }
         } catch (error) {
           console.error('Error deleting message:', error);
         }
