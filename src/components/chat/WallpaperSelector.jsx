@@ -19,7 +19,15 @@ const WallpaperSelector = ({ isVisible, onClose, onWallpaperSelect }) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setWallpapers(data || []);
+
+      // Add default gradient as first option
+      const defaultGradient = {
+        id: 'default-gradient',
+        name: 'Default Gradient',
+        url: 'default-gradient' // Special identifier
+      };
+
+      setWallpapers([defaultGradient, ...(data || [])]);
     } catch (error) {
       console.error('Error loading wallpapers:', error);
     }
@@ -50,9 +58,9 @@ const WallpaperSelector = ({ isVisible, onClose, onWallpaperSelect }) => {
           {wallpapers.map(wallpaper => (
             <div
               key={wallpaper.id}
-              className="wallpaper-item"
-              style={{ backgroundImage: `url(${wallpaper.url})` }}
-              onClick={() => handleWallpaperSelect(wallpaper)}
+              className={`wallpaper-item ${wallpaper.id === 'default-gradient' ? 'default-gradient-bg' : ''}`}
+              style={wallpaper.id !== 'default-gradient' ? { backgroundImage: `url(${wallpaper.url})` } : {}}
+              onClick={() => handleWallpaperSelect(wallpaper.id === 'default-gradient' ? 'default-gradient' : wallpaper)}
               title={wallpaper.name}
             />
           ))}

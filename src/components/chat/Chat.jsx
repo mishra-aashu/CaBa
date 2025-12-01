@@ -63,7 +63,7 @@ const Chat = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedMessages, setSelectedMessages] = useState(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
-  const [wallpaper, setWallpaper] = useState(null);
+  const [wallpaper, setWallpaper] = useState('default-gradient');
   const [showWallpaperSelector, setShowWallpaperSelector] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isTempChat, setIsTempChat] = useState(false);
@@ -238,24 +238,44 @@ const Chat = () => {
       }
 
       if (chatWallpaper && chatWallpaper.wallpaper_id) {
-        const { data: wallpaper, error: wallpaperError } = await supabase
-          .from('wallpapers')
-          .select('url')
-          .eq('id', chatWallpaper.wallpaper_id)
-          .single();
+        if (chatWallpaper.wallpaper_id === 'default-gradient') {
+          setWallpaper('default-gradient');
+        } else {
+          const { data: wallpaper, error: wallpaperError } = await supabase
+            .from('wallpapers')
+            .select('url')
+            .eq('id', chatWallpaper.wallpaper_id)
+            .single();
 
-        if (!wallpaperError && wallpaper) {
-          setWallpaper(wallpaper.url);
+          if (!wallpaperError && wallpaper) {
+            setWallpaper(wallpaper.url);
+          }
         }
+      } else {
+        // No wallpaper set, use default
+        setWallpaper('default-gradient');
       }
     } catch (error) {
       console.warn('Error loading wallpaper:', error);
+      setWallpaper('default-gradient');
     }
   };
 
   const handleWallpaperSelect = async (selectedWallpaper) => {
     try {
-      if (selectedWallpaper) {
+      if (selectedWallpaper === 'default-gradient') {
+        // For default gradient, save with special wallpaper_id
+        const { error } = await supabase
+          .from('chat_wallpapers')
+          .upsert([{
+            chat_id: chatId,
+            wallpaper_id: 'default-gradient',
+            set_by: currentUser.id
+          }], { onConflict: 'chat_id' });
+
+        if (error) throw error;
+        setWallpaper('default-gradient');
+      } else if (selectedWallpaper) {
         const { error } = await supabase
           .from('chat_wallpapers')
           .upsert([{
@@ -273,7 +293,7 @@ const Chat = () => {
           .eq('chat_id', chatId);
 
         if (error) throw error;
-        setWallpaper(null);
+        setWallpaper('default-gradient'); // Set to default
       }
     } catch (error) {
       console.error('Error setting wallpaper:', error);
@@ -713,8 +733,8 @@ const Chat = () => {
 
       {/* Messages Container */}
       <div
-        className="messages-container"
-        style={wallpaper ? { backgroundImage: `url(${wallpaper})` } : {}}
+        className={`messages-container ${wallpaper === 'default-gradient' ? 'default-gradient-bg' : ''}`}
+        style={wallpaper && wallpaper !== 'default-gradient' ? { backgroundImage: `url(${wallpaper})` } : {}}
         onScroll={handleScroll}
         ref={messagesContainerRef}
       >
