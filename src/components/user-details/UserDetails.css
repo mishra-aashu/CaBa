@@ -7,15 +7,16 @@
   background: none;
   border: none;
   font-size: 20px;
-  color: var(--text-primary);
+  color: #4CAF50;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .back-btn:hover {
-  background: var(--hover-color);
+  background: rgba(76, 175, 80, 0.1);
+  color: #45a049;
 }
 
 .user-profile-section {
