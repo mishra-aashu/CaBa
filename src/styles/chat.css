@@ -331,20 +331,21 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 2000;
 }
 
 .delete-modal {
-  background: var(--background);
+  background: var(--surface);
   border-radius: 12px;
-  padding: 20px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  max-width: 450px;
+  width: 95%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--primary-color);
 }
 
 .delete-modal-header h3 {
@@ -423,7 +424,7 @@
 }
 
 .message.vaporizing .message-bubble {
-  animation: vaporize 0.8s ease-out forwards;
+  animation: vaporize 1.5s ease-out forwards;
 }
 
 /* Message Actions */

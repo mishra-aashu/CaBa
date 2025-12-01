@@ -33,6 +33,7 @@ const MessageItem = ({
   const [touchStartY, setTouchStartY] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const bubbleRef = useRef(null);
+  const messageRef = useRef(null);
 
   const isSent = message.sender_id === currentUser.id;
   const isReplied = message.reply_to;
@@ -111,9 +112,8 @@ const MessageItem = ({
     setShowDeleteModal(false);
 
     // Add vaporizing class for animation
-    const messageElement = bubbleRef.current?.parentElement?.parentElement;
-    if (messageElement) {
-      messageElement.classList.add('vaporizing');
+    if (messageRef.current) {
+      messageRef.current.classList.add('vaporizing');
 
       setTimeout(async () => {
         try {
@@ -128,7 +128,7 @@ const MessageItem = ({
         } catch (error) {
           console.error('Error deleting message:', error);
         }
-      }, 800); // Match animation duration
+      }, 1500); // Match animation duration
     }
   };
 
@@ -281,6 +281,7 @@ const MessageItem = ({
 
   return (
     <div
+      ref={messageRef}
       className={`message ${isSent ? 'sent' : 'received'} ${
         isSelected ? 'selected' : ''
       } ${isReplied ? 'replied' : ''} ${
