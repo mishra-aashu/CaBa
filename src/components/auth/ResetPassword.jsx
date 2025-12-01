@@ -13,30 +13,58 @@ const ResetPassword = () => {
   const [isValidRecovery, setIsValidRecovery] = useState(false);
 
   useEffect(() => {
-    // Check for Supabase auth recovery parameters in URL hash
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
-    const refreshToken = hashParams.get('refresh_token');
-    const type = hashParams.get('type');
+    // Check for Supabase auth recovery parameters in URL hash or query params
+    const hash = window.location.hash;
+    const searchParams = new URLSearchParams(window.location.search);
+    const recoveryParam = searchParams.get('recovery');
 
-    if (type === 'recovery' && accessToken && refreshToken) {
-      // Set the session with the recovery tokens
-      supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken
-      }).then(({ data, error }) => {
-        if (error) {
-          console.error('Error setting recovery session:', error);
-          setMessage({ text: 'Invalid or expired reset link', type: 'error' });
-        } else {
-          console.log('Recovery session set successfully');
-          setIsValidRecovery(true);
-          setMessage({ text: 'Please enter your new password', type: 'success' });
-          // Clear the hash from URL for security
-          window.history.replaceState(null, '', window.location.pathname);
-        }
-      });
+    console.log('ResetPassword: Current hash:', hash);
+    console.log('ResetPassword: Recovery param:', recoveryParam);
+
+    let hashParams;
+    let source = '';
+
+    if (hash && hash.includes('access_token')) {
+      // Parameters are in hash
+      hashParams = new URLSearchParams(hash.substring(1));
+      source = 'hash';
+    } else if (recoveryParam) {
+      // Parameters are encoded in query param
+      hashParams = new URLSearchParams(decodeURIComponent(recoveryParam));
+      source = 'query';
+    }
+
+    if (hashParams) {
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type');
+
+      console.log(`ResetPassword: Extracted params from ${source}:`, { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+
+      if (type === 'recovery' && accessToken && refreshToken) {
+        console.log('ResetPassword: Setting recovery session...');
+        // Set the session with the recovery tokens
+        supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        }).then(({ data, error }) => {
+          if (error) {
+            console.error('Error setting recovery session:', error);
+            setMessage({ text: 'Invalid or expired reset link', type: 'error' });
+          } else {
+            console.log('Recovery session set successfully');
+            setIsValidRecovery(true);
+            setMessage({ text: 'Please enter your new password', type: 'success' });
+            // Clear the query params and hash from URL for security
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        });
+      } else {
+        console.log('ResetPassword: Invalid recovery parameters');
+        setMessage({ text: 'Invalid reset link. Please request a new password reset.', type: 'error' });
+      }
     } else {
+      console.log('ResetPassword: No recovery parameters found');
       setMessage({ text: 'Invalid reset link. Please request a new password reset.', type: 'error' });
     }
   }, [supabase.auth]);
