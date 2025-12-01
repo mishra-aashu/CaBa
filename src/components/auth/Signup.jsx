@@ -75,7 +75,7 @@ const Signup = () => {
             name: name,
             phone: phone
           },
-          emailRedirectTo: `${window.location.origin}/login.html?verified=true`
+          emailRedirectTo: `${window.location.origin}/login?verified=true`
         }
       });
 
@@ -153,7 +153,7 @@ const Signup = () => {
             </p>
           </div>
           <button
-            onClick={() => window.location.href = '/login.html'}
+            onClick={() => window.location.href = '/login'}
             className="btn btn-primary"
             style={{
               width: '100%',
@@ -303,7 +303,7 @@ const Signup = () => {
 
         {/* Login Link */}
         <div className="auth-footer">
-          <p>Already have an account? <a href="/login.html">Login</a></p>
+          <p>Already have an account? <a href="/login">Login</a></p>
         </div>
       </form>
 
