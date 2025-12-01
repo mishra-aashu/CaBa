@@ -433,6 +433,9 @@ const Chat = () => {
 
       if (error) throw error;
 
+      // Remove deleted messages from UI
+      setMessages(prev => prev.filter(m => !selectedMessages.has(m.id)));
+
       exitSelectionMode();
     } catch (error) {
       console.error('Error deleting messages:', error);
