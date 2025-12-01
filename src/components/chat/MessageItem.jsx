@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../utils/supabase';
 import MediaMessage from './MediaMessage';
 import {
@@ -17,6 +17,121 @@ import {
   MapPin,
 } from 'lucide-react';
 
+/**
+ * UTILITY: Load html2canvas from CDN dynamically
+ */
+const loadHtml2Canvas = () => {
+  return new Promise((resolve, reject) => {
+    if (window.html2canvas) {
+      resolve(window.html2canvas);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = () => resolve(window.html2canvas);
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+};
+
+/**
+ * EFFECT: The Vaporize Logic
+ */
+const vaporize = async (element, onComplete) => {
+  if (!element) return;
+
+  // 1. Ensure library is loaded
+  const html2canvas = await loadHtml2Canvas();
+
+  // 2. Capture the element
+  const canvas = await html2canvas(element, {
+    scale: 1,
+    backgroundColor: null,
+    logging: false,
+    useCORS: true,
+  });
+
+  const ctx = canvas.getContext('2d');
+  const { width, height } = canvas;
+  const imgData = ctx.getImageData(0, 0, width, height);
+  const data = imgData.data;
+
+  // 3. Get positioning relative to viewport
+  const rect = element.getBoundingClientRect();
+
+  // 4. Create the animation canvas (FULL SCREEN now)
+  const animCanvas = document.createElement('canvas');
+  animCanvas.width = window.innerWidth;
+  animCanvas.height = window.innerHeight;
+  animCanvas.style.position = 'fixed';
+  animCanvas.style.top = '0px';
+  animCanvas.style.left = '0px';
+  animCanvas.style.pointerEvents = 'none';
+  animCanvas.style.zIndex = '9999';
+  document.body.appendChild(animCanvas);
+
+  const animCtx = animCanvas.getContext('2d');
+
+  // 5. Create Particles (Finer settings)
+  const reductionFactor = 2;
+  const particles = [];
+
+  for (let x = 0; x < width; x += reductionFactor) {
+    for (let y = 0; y < height; y += reductionFactor) {
+      const index = (y * width + x) * 4;
+      const alpha = data[index + 3];
+
+      if (alpha > 0) {
+        const r = data[index];
+        const g = data[index + 1];
+        const b = data[index + 2];
+        const color = `rgba(${r},${g},${b},${alpha / 255})`;
+
+        particles.push({
+          x: rect.left + x,
+          y: rect.top + y,
+          color: color,
+          vx: (Math.random() - 0.5) * 3,
+          vy: (Math.random() * -2) - 0.5,
+          size: Math.random() * 1.5 + 0.5,
+          life: 1,
+          decay: Math.random() * 0.015 + 0.005
+        });
+      }
+    }
+  }
+
+  // 6. Hide the original element immediately
+  element.style.opacity = '0';
+
+  // 7. Animation Loop
+  const animate = () => {
+    animCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    let activeParticles = false;
+
+    particles.forEach(p => {
+      if (p.life > 0) {
+        activeParticles = true;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= p.decay;
+        animCtx.fillStyle = p.color;
+        animCtx.globalAlpha = p.life;
+        animCtx.fillRect(p.x, p.y, p.size, p.size);
+      }
+    });
+
+    if (activeParticles) {
+      requestAnimationFrame(animate);
+    } else {
+      document.body.removeChild(animCanvas);
+      if (onComplete) onComplete();
+    }
+  };
+
+  animate();
+};
+
 const MessageItem = ({
   message,
   currentUser,
@@ -31,6 +146,13 @@ const MessageItem = ({
   const [touchStartTime, setTouchStartTime] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const bubbleRef = useRef(null);
+
+  // Load html2canvas on mount
+  useEffect(() => {
+    loadHtml2Canvas().catch(console.error);
+  }, []);
 
   const isSent = message.sender_id === currentUser.id;
   const isReplied = message.reply_to;
@@ -101,20 +223,25 @@ const MessageItem = ({
   };
 
   const handleDelete = async () => {
-    if (!confirm('Delete this message?')) return;
+    if (isDeleting) return;
+    setIsDeleting(true);
 
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .delete()
-        .eq('id', message.id);
+    // Run vaporize effect
+    vaporize(bubbleRef.current, async () => {
+      try {
+        const { error } = await supabase
+          .from('messages')
+          .delete()
+          .eq('id', message.id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // The message will be removed from the list via real-time subscription
-    } catch (error) {
-      console.error('Error deleting message:', error);
-    }
+        // The message will be removed from the list via real-time subscription
+      } catch (error) {
+        console.error('Error deleting message:', error);
+      }
+    });
+
     setShowActions(false);
   };
 
@@ -279,7 +406,7 @@ const MessageItem = ({
       }}
     >
       <div className="message-content">
-        <div className="message-bubble">
+        <div className="message-bubble" ref={bubbleRef}>
           {/* Reply indicator */}
           {isReplied && (
             <div className="replied-message-container">
