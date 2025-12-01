@@ -405,6 +405,12 @@ const MessageItem = ({
         }
       }}
     >
+      {/* Selection indicator */}
+      {isSelectionMode && (
+        <div className={`selection-indicator ${isSelected ? 'selected' : ''}`}>
+          {isSelected && <span>✓</span>}
+        </div>
+      )}
       <div className="message-content">
         <div className="message-bubble" ref={bubbleRef}>
           {/* Reply indicator */}

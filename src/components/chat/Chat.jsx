@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { useChatTheme } from '../../contexts/ChatThemeContext';
 import { useCall } from '../../context/CallContext';
-import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown, ArrowLeft, ArrowRight, Copy } from 'lucide-react';
+import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown, ArrowLeft, ArrowRight, Copy, Edit } from 'lucide-react';
 import DropdownMenu from '../common/DropdownMenu';
 import Modal from '../common/Modal';
 import MessageList from './MessageList';
@@ -409,6 +409,10 @@ const Chat = () => {
       } else {
         newSet.add(messageId);
       }
+
+      // Set selection mode if any messages selected
+      setIsSelectionMode(newSet.size > 0);
+
       return newSet;
     });
   };
@@ -416,6 +420,59 @@ const Chat = () => {
   const exitSelectionMode = () => {
     setSelectedMessages(new Set());
     setIsSelectionMode(false);
+  };
+
+  const handleSelectionDelete = async () => {
+    if (selectedMessages.size === 0) return;
+
+    const confirmed = window.confirm(`Delete ${selectedMessages.size} message(s)?`);
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .in('id', Array.from(selectedMessages));
+
+      if (error) throw error;
+
+      exitSelectionMode();
+    } catch (error) {
+      console.error('Error deleting messages:', error);
+      alert('Failed to delete messages');
+    }
+  };
+
+  const handleSelectionForward = () => {
+    // Copy selected messages to clipboard for forwarding
+    const selectedMsgs = messages.filter(msg => selectedMessages.has(msg.id));
+    const forwardText = selectedMsgs.map(msg => `${msg.sender_id === currentUser.id ? 'You' : otherUser.name}: ${msg.content}`).join('\n\n');
+    navigator.clipboard.writeText(`Forwarded messages:\n\n${forwardText}`);
+    exitSelectionMode();
+    alert('Messages copied to clipboard for forwarding');
+  };
+
+  const handleSelectionCopy = () => {
+    const selectedMsgs = messages.filter(msg => selectedMessages.has(msg.id));
+    const copyText = selectedMsgs.map(msg => msg.content).join('\n\n');
+    navigator.clipboard.writeText(copyText);
+    exitSelectionMode();
+    alert('Messages copied to clipboard');
+  };
+
+  const handleSelectionEdit = () => {
+    // Only allow edit if single message and it's user's message
+    if (selectedMessages.size !== 1) return;
+
+    const messageId = Array.from(selectedMessages)[0];
+    const message = messages.find(msg => msg.id === messageId);
+
+    if (message && message.sender_id === currentUser.id) {
+      // Trigger edit mode for that message
+      setReplyingTo(null); // Clear reply if any
+      // We'll pass onEdit to MessageList
+      exitSelectionMode();
+    }
   };
 
   const handleViewContact = () => {
@@ -718,14 +775,14 @@ const Chat = () => {
             {selectedMessages.size} selected
           </div>
           <div className="selection-actions">
-            <button className="selection-action-btn" title="Delete">
-              <Trash2 size={16} />
+            <button className="selection-action-btn" title="Copy" onClick={handleSelectionCopy}>
+              <Copy size={16} />
             </button>
-            <button className="selection-action-btn" title="Forward">
+            <button className="selection-action-btn" title="Forward" onClick={handleSelectionForward}>
               <ArrowRight size={16} />
             </button>
-            <button className="selection-action-btn" title="Copy">
-              <Copy size={16} />
+            <button className="selection-action-btn" title="Delete" onClick={handleSelectionDelete}>
+              <Trash2 size={16} />
             </button>
           </div>
         </div>
