@@ -6,15 +6,16 @@
 .user-profile-section {
   text-align: center;
   padding: 30px 20px;
-  background: white;
+  background: var(--background);
   margin-bottom: 20px;
+  color: var(--text-primary);
 }
 
 .user-details-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #4CAF50;
+  background: var(--primary-color);
   color: white;
   display: flex;
   align-items: center;
@@ -31,23 +32,23 @@
   object-fit: cover;
 }
 
-.user-name {
+.user-name, .user-detail-name {
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
-.user-phone {
+.user-phone, .user-detail-phone {
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .user-actions {
   display: flex;
   justify-content: space-around;
   padding: 20px;
-  background: white;
+  background: var(--background);
   margin-bottom: 20px;
 }
 
@@ -85,16 +86,17 @@
 }
 
 .info-section {
-  background: white;
+  background: var(--background);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
+  border: 1px solid var(--border-color);
 }
 
 .section-header {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -110,20 +112,21 @@
   align-items: center;
   gap: 8px;
   padding: 16px;
-  background: #f5f5f5;
+  background: var(--surface);
   border-radius: 8px;
   min-width: 60px;
+  border: 1px solid var(--border-color);
 }
 
 .media-item .icon {
   font-size: 20px;
-  color: #666;
+  color: var(--icon-secondary);
 }
 
 .media-item .count {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .settings-item {
@@ -131,13 +134,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .settings-item:hover {
-  background: rgba(76, 175, 80, 0.02);
+  background: var(--hover-color);
 }
 
 .settings-item:last-child {
@@ -153,13 +156,13 @@
 
 .item-left .icon {
   font-size: 18px;
-  color: #4CAF50;
+  color: var(--icon-primary);
   width: 20px;
 }
 
 .item-left .label {
   font-size: 15px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .toggle {

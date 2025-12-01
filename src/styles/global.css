@@ -42,17 +42,25 @@ button {
   cursor: pointer;
 }
 
-/* Global icon styling - make all FontAwesome icons green and unique */
-.fas, .far, .fab, .fa {
-  color: #22c55e !important;
+/* Global icon styling */
+.fas, .far, .fab, .fa, .lucide {
+  color: var(--icon-primary) !important;
   font-weight: 900 !important;
-  text-shadow: 0 1px 2px rgba(34, 197, 94, 0.3);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
 }
 
-.fas:hover, .far:hover, .fab:hover, .fa:hover {
-  color: #16a34a !important;
-  transform: scale(1.1);
-  transition: all 0.2s ease;
+.fas:hover, .far:hover, .fab:hover, .fa:hover, .lucide:hover {
+  color: var(--icon-accent) !important;
+  transform: scale(1.05);
+}
+
+[data-theme="dark"] .fas,
+[data-theme="dark"] .far,
+[data-theme="dark"] .fab,
+[data-theme="dark"] .fa,
+[data-theme="dark"] .lucide {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 input, textarea, select {
@@ -106,6 +114,7 @@ a {
 
 /* Theme variables */
 :root {
+  /* Light Theme */
   --primary-color: #075E54;
   --secondary-color: #128C7E;
   --accent-color: #25D366;
@@ -115,6 +124,7 @@ a {
   --chat-background: #E5DDD5;
   --message-background: #FFFFFF;
   --sent-message-background: #DCF8C6;
+  --received-message-background: #FFFFFF;
   --text-primary: #333333;
   --text-secondary: #666666;
   --background: #ffffff;
@@ -124,6 +134,7 @@ a {
   --success-color: #4CAF50;
   --error-color: #f44336;
   --warning-color: #ff9800;
+  --info-color: #2196F3;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
@@ -137,25 +148,52 @@ a {
   --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
+
+  /* Icon colors */
+  --icon-primary: #075E54;
+  --icon-secondary: #666666;
+  --icon-accent: #25D366;
+
+  /* Button colors */
+  --btn-primary-bg: #075E54;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: #f8f9fa;
+  --btn-secondary-text: #333333;
+  --btn-danger-bg: #f44336;
+  --btn-danger-text: #ffffff;
 }
 
 /* Dark theme */
 [data-theme="dark"] {
-  --primary-color: #128C7E;
-  --secondary-color: #25D366;
+  --primary-color: #25D366;
+  --secondary-color: #128C7E;
   --accent-color: #075E54;
-  --background-color: #131C21;
-  --text-color: #FFFFFF;
-  --header-background: #2A2F32;
-  --chat-background: #0D1418;
-  --message-background: #2A2F32;
-  --sent-message-background: #056162;
-  --text-primary: #ffffff;
-  --text-secondary: #cccccc;
-  --background: #1a1a1a;
-  --surface: #2a2a2a;
-  --border-color: #444444;
-  --hover-color: #333333;
+  --background-color: #0d1117;
+  --text-color: #f0f6fc;
+  --header-background: #161b22;
+  --chat-background: #0d1117;
+  --message-background: #161b22;
+  --sent-message-background: #1f2937;
+  --received-message-background: #21262d;
+  --text-primary: #f0f6fc;
+  --text-secondary: #c9d1d9;
+  --background: #0d1117;
+  --surface: #161b22;
+  --border-color: #30363d;
+  --hover-color: #21262d;
+
+  /* Icon colors for dark theme */
+  --icon-primary: #58a6ff;
+  --icon-secondary: #8b949e;
+  --icon-accent: #79c0ff;
+
+  /* Button colors for dark theme */
+  --btn-primary-bg: #238636;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: #30363d;
+  --btn-secondary-text: #f0f6fc;
+  --btn-danger-bg: #da3633;
+  --btn-danger-text: #ffffff;
 }
 
 /* Responsive breakpoints */
@@ -261,26 +299,30 @@ a {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
+  border: none;
+  outline: none;
 }
 
 .btn-primary {
-  background: var(--primary-color);
-  color: white;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
 }
 
 .btn-primary:hover {
-  background: #45a049;
+  background: var(--primary-color);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-  background: var(--surface);
-  color: var(--text-primary);
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
   border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
   background: var(--hover-color);
+  border-color: var(--primary-color);
 }
 
 .btn-success {
@@ -288,15 +330,26 @@ a {
   color: white;
 }
 
+.btn-success:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+
 .btn-danger {
-  background: var(--error-color);
-  color: white;
+  background: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
+}
+
+.btn-danger:hover {
+  background: #d32f2f;
+  transform: translateY(-1px);
 }
 
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Card styles */
