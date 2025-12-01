@@ -263,7 +263,7 @@ const Chat = () => {
 
   const handleWallpaperSelect = async (selectedWallpaper) => {
     try {
-      if (selectedWallpaper === 'default-gradient') {
+      if (selectedWallpaper === 'default-gradient' || (selectedWallpaper && selectedWallpaper.id === 'default-gradient')) {
         // For default gradient, delete any existing wallpaper setting
         const { error } = await supabase
           .from('chat_wallpapers')
