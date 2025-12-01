@@ -84,7 +84,7 @@ const ForgotPassword = () => {
 
       // Send password reset email to REAL EMAIL
       const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-        redirectTo: `${window.location.origin}/reset-password.html`
+        redirectTo: `${window.location.origin}/CaBa/reset-password`
       });
 
       if (error) throw error;

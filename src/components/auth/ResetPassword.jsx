@@ -1,72 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/auth.css';
 
 const ResetPassword = () => {
   const { supabase } = useSupabase();
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
-  const [tokenValid, setTokenValid] = useState(false);
-  const [token, setToken] = useState('');
+  const [isValidRecovery, setIsValidRecovery] = useState(false);
 
   useEffect(() => {
-    // Get token from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenFromUrl = urlParams.get('token');
-    setToken(tokenFromUrl);
+    // Check for Supabase auth recovery parameters in URL hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    const type = hashParams.get('type');
 
-    if (!tokenFromUrl) {
-      setMessage({ text: 'Invalid reset link', type: 'error' });
-      return;
+    if (type === 'recovery' && accessToken && refreshToken) {
+      // Set the session with the recovery tokens
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }).then(({ data, error }) => {
+        if (error) {
+          console.error('Error setting recovery session:', error);
+          setMessage({ text: 'Invalid or expired reset link', type: 'error' });
+        } else {
+          console.log('Recovery session set successfully');
+          setIsValidRecovery(true);
+          setMessage({ text: 'Please enter your new password', type: 'success' });
+          // Clear the hash from URL for security
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      });
+    } else {
+      setMessage({ text: 'Invalid reset link. Please request a new password reset.', type: 'error' });
     }
-
-    verifyToken(tokenFromUrl);
-  }, []);
-
-  const verifyToken = async (token) => {
-    try {
-      const { data, error } = await supabase
-        .from('password_reset_tokens')
-        .select('id, user_id, expires_at, is_used')
-        .eq('token', token)
-        .single();
-
-      if (error || !data) {
-        setMessage({ text: 'Invalid or expired reset link', type: 'error' });
-        return;
-      }
-
-      if (data.is_used) {
-        setMessage({ text: 'This reset link has already been used', type: 'error' });
-        return;
-      }
-
-      if (new Date(data.expires_at) < new Date()) {
-        setMessage({ text: 'This reset link has expired', type: 'error' });
-        return;
-      }
-
-      // Token is valid
-      setTokenValid(true);
-      setMessage({ text: 'Please enter your new password', type: 'success' });
-
-    } catch (error) {
-      console.error('Error:', error);
-      setMessage({ text: 'Error verifying reset link', type: 'error' });
-    }
-  };
-
-  const hashPassword = async (password) => {
-    // Simple hash function (USE BCRYPT IN PRODUCTION!)
-    // This is just for demo - USE PROPER HASHING IN PRODUCTION
-    // You should hash on server-side using bcrypt
-    const msgBuffer = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  };
+  }, [supabase.auth]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,43 +56,26 @@ const ResetPassword = () => {
     }
 
     setLoading(true);
+    setMessage({ text: '', type: '' });
 
     try {
-      // Get token details
-      const { data: tokenData, error: tokenError } = await supabase
-        .from('password_reset_tokens')
-        .select('user_id')
-        .eq('token', token)
-        .single();
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
 
-      if (tokenError) throw tokenError;
+      if (error) throw error;
 
-      // Hash password
-      const hashedPassword = await hashPassword(password);
+      setMessage({ text: 'Password updated successfully! Redirecting to login...', type: 'success' });
 
-      // Update user password
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ password: hashedPassword })
-        .eq('id', tokenData.user_id);
-
-      if (updateError) throw updateError;
-
-      // Mark token as used
-      await supabase
-        .from('password_reset_tokens')
-        .update({ is_used: true })
-        .eq('token', token);
-
-      setMessage({ text: 'Password reset successful! Redirecting to login...', type: 'success' });
-
-      setTimeout(() => {
-        window.location.href = '/index.html';
+      // Sign out and redirect to login
+      setTimeout(async () => {
+        await supabase.auth.signOut();
+        navigate('/login');
       }, 2000);
 
     } catch (error) {
-      console.error('Error:', error);
-      setMessage({ text: 'Failed to reset password. Please try again.', type: 'error' });
+      console.error('Error updating password:', error);
+      setMessage({ text: error.message || 'Failed to update password. Please try again.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -150,7 +106,7 @@ const ResetPassword = () => {
             </svg>
           </div>
           <h1 className="app-name">DigiDad</h1>
-          <p className="app-tagline">Enter your new password</p>
+          <p className="app-tagline">Reset your password</p>
         </div>
 
         {/* Reset Password Form */}
@@ -169,13 +125,13 @@ const ResetPassword = () => {
                 minLength="6"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={!tokenValid}
+                disabled={!isValidRecovery}
               />
               <button
                 type="button"
                 className="toggle-password"
                 onClick={() => togglePassword('password')}
-                disabled={!tokenValid}
+                disabled={!isValidRecovery}
               >
                 <span className="eye-icon"><i className="fas fa-eye"></i></span>
               </button>
@@ -194,13 +150,13 @@ const ResetPassword = () => {
                 minLength="6"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={!tokenValid}
+                disabled={!isValidRecovery}
               />
               <button
                 type="button"
                 className="toggle-password"
                 onClick={() => togglePassword('confirmPassword')}
-                disabled={!tokenValid}
+                disabled={!isValidRecovery}
               >
                 <span className="eye-icon"><i className="fas fa-eye"></i></span>
               </button>
@@ -210,9 +166,9 @@ const ResetPassword = () => {
           <button
             type="submit"
             className="btn-primary"
-            disabled={loading || !tokenValid}
+            disabled={loading || !isValidRecovery}
           >
-            <span className="btn-text">{loading ? 'Resetting...' : 'Reset Password'}</span>
+            <span className="btn-text">{loading ? 'Updating...' : 'Update Password'}</span>
             {loading && <span className="btn-loader" style={{ display: 'inline-block' }}>
               <div className="spinner"></div>
             </span>}
@@ -224,7 +180,7 @@ const ResetPassword = () => {
         </form>
 
         <div className="auth-switch">
-          Remember your password? <a href="/login">Login</a>
+          Remember your password? <a href="/CaBa/login">Login</a>
         </div>
       </div>
     </div>
