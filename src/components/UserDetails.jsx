@@ -4,7 +4,7 @@ import { useSupabase } from '../contexts/SupabaseContext';
 import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit, MoreVertical } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
-import './UserDetails.css';
+import './user-details/UserDetails.css';
 
 // DP options for avatar display
 const baseUrl = import.meta.env.BASE_URL || '/';
