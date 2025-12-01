@@ -6,7 +6,7 @@ const MessagingLoader = () => {
   const darkMode = isDark;
 
   return (
-    <div className={`fixed inset-0 w-full h-full flex flex-col items-center justify-center transition-colors duration-300 z-50 ${darkMode ? 'bg-slate-900' : 'bg-gray-100'}`}>
+    <div className={`messaging-loader-overlay transition-colors duration-300 ${darkMode ? 'bg-slate-900' : 'bg-gray-100'}`}>
 
       <style>{`
         @keyframes simpleBounce {

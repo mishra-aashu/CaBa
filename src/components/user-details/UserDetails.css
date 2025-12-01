@@ -10,21 +10,21 @@
   margin-bottom: 20px;
 }
 
-.user-avatar {
-  width: 120px;
-  height: 120px;
+.user-details-avatar {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: #4CAF50;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 600;
   margin: 0 auto 20px;
 }
 
-.user-avatar img {
+.user-details-avatar img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
