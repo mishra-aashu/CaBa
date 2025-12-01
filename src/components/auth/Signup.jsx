@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { User, Phone, Mail, Lock, Shield } from 'lucide-react';
 import '../../styles/auth.css';
 
 const Signup = () => {
@@ -137,7 +138,9 @@ const Signup = () => {
     return (
       <div className="auth-container">
         <div className="verification-container" style={{ textAlign: 'center', padding: '40px 20px' }}>
-          <div style={{ fontSize: '64px', marginBottom: '20px' }}>📧</div>
+          <div style={{ fontSize: '64px', marginBottom: '20px', color: 'var(--primary-color)' }}>
+            <Mail size={64} />
+          </div>
           <h2 style={{ color: 'var(--primary-color)', marginBottom: '16px' }}>
             Verify Your Email
           </h2>
@@ -203,7 +206,7 @@ const Signup = () => {
         {/* Name */}
         <div className="input-group">
           <label htmlFor="name">
-            <span className="icon">👤</span>
+            <User size={16} className="icon" />
             Full Name
           </label>
           <input
@@ -221,7 +224,7 @@ const Signup = () => {
         {/* Phone */}
         <div className="input-group">
           <label htmlFor="phone">
-            <span className="icon">📱</span>
+            <Phone size={16} className="icon" />
             Phone Number
           </label>
           <input
@@ -242,7 +245,7 @@ const Signup = () => {
         {/* Email */}
         <div className="input-group">
           <label htmlFor="email">
-            <span className="icon">✉️</span>
+            <Mail size={16} className="icon" />
             Email Address
           </label>
           <input
@@ -261,7 +264,7 @@ const Signup = () => {
         {/* Password */}
         <div className="input-group">
           <label htmlFor="password">
-            <span className="icon">🔒</span>
+            <Lock size={16} className="icon" />
             Password
           </label>
           <input
@@ -280,7 +283,7 @@ const Signup = () => {
         {/* Confirm Password */}
         <div className="input-group">
           <label htmlFor="confirmPassword">
-            <span className="icon">🔐</span>
+            <Shield size={16} className="icon" />
             Confirm Password
           </label>
           <input

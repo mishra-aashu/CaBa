@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { Phone, Lock } from 'lucide-react';
 import '../../styles/auth.css';
 
 const Login = () => {
@@ -208,7 +209,7 @@ const Login = () => {
         {/* Phone */}
         <div className="input-group">
           <label htmlFor="phone">
-            <span className="icon">📱</span>
+            <Phone size={16} className="icon" />
             Phone Number
           </label>
           <input
@@ -229,7 +230,7 @@ const Login = () => {
         {/* Password */}
         <div className="input-group">
           <label htmlFor="password">
-            <span className="icon">🔒</span>
+            <Lock size={16} className="icon" />
             Password
           </label>
           <input
