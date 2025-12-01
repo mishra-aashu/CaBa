@@ -224,7 +224,7 @@ const ResetPassword = () => {
         </form>
 
         <div className="auth-switch">
-          Remember your password? <a href="/login">Login</a>
+          Remember your password? <a href="/login.html">Login</a>
         </div>
       </div>
     </div>

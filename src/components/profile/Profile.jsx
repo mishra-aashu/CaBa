@@ -73,7 +73,7 @@ const Profile = () => {
     try {
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
       if (authError || !authUser) {
-        window.location.href = '/login';
+        window.location.href = '/login.html';
         return;
       }
 

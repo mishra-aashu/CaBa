@@ -144,7 +144,7 @@ const ForgotPassword = () => {
         </form>
 
         <div className="footer">
-          <a href="/login">← Back to Login</a>
+          <a href="/login.html">← Back to Login</a>
         </div>
       </div>
     </div>
