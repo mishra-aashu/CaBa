@@ -29,7 +29,7 @@ const Intro = ({ onComplete }) => {
   }, [navigate, onComplete]);
 
   return (
-    <div className={`min-h-screen w-full flex flex-col items-center justify-center transition-colors duration-500 overflow-hidden
+    <div className={`fixed inset-0 w-full h-full flex flex-col items-center justify-center transition-colors duration-500 overflow-hidden z-50
       ${darkMode ? 'bg-[#111b21]' : 'bg-white'}`}>
 
       <style>{`

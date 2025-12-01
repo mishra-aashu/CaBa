@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const MessagingLoader = () => {
-  const [darkMode, setDarkMode] = useState(true);
+  const { isDark } = useTheme();
+  const darkMode = isDark;
 
   return (
-    <div className={`fixed inset-0 w-full h-full transition-colors duration-300 z-50 ${darkMode ? 'bg-slate-900' : 'bg-gray-100'}`}>
+    <div className={`fixed inset-0 w-full h-full flex flex-col items-center justify-center transition-colors duration-300 z-50 ${darkMode ? 'bg-slate-900' : 'bg-gray-100'}`}>
 
       <style>{`
         /* 1. Dots Bouncing inside cloud */
@@ -29,10 +31,8 @@ const MessagingLoader = () => {
         }
       `}</style>
 
-      {/* Centered Loader Container */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-        {/* --- ENHANCED CLOUD LOADER START --- */}
-        <div className="relative flex flex-col items-center">
+      {/* --- ENHANCED CLOUD LOADER START --- */}
+      <div className="relative flex flex-col items-center">
 
           {/* Main SVG Container */}
           <svg
@@ -91,19 +91,12 @@ const MessagingLoader = () => {
         {/* --- ENHANCED CLOUD LOADER END --- */}
 
         {/* Dynamic Status Text */}
-        <div className="mt-2 flex flex-col items-center">
-           <p className={`text-xs font-bold tracking-[0.2em] ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+        <div className="mt-6 flex flex-col items-center">
+           <p className={`text-sm font-bold tracking-[0.2em] ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
             CONNECTING
-          </p>
+           </p>
         </div>
       </div>
-
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        className="absolute bottom-10 text-xs text-gray-500 hover:text-gray-700 underline"
-      >
-        {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      </button>
 
     </div>
   );
