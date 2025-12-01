@@ -27,6 +27,21 @@
   color: var(--text-primary, #333);
 }
 
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-primary, #333);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--hover-color, #f0f0f0);
+}
+
 .settings-content {
   padding: 20px;
   max-width: 600px;
