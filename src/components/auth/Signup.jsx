@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { User, Phone, Mail, Lock, Shield } from 'lucide-react';
 import '../../styles/auth.css';
@@ -155,8 +156,8 @@ const Signup = () => {
               ✅ Then login to your account
             </p>
           </div>
-          <button
-            onClick={() => window.location.href = '/login'}
+          <Link
+            to="/login"
             className="btn btn-primary"
             style={{
               width: '100%',
@@ -169,10 +170,13 @@ const Signup = () => {
               fontWeight: '500',
               cursor: 'pointer',
               marginBottom: '12px',
+              display: 'inline-block',
+              textAlign: 'center',
+              textDecoration: 'none',
             }}
           >
             Go to Login
-          </button>
+          </Link>
           <button
             onClick={() => resendVerification(formData.email)}
             className="btn btn-secondary"
@@ -306,7 +310,7 @@ const Signup = () => {
 
         {/* Login Link */}
         <div className="auth-footer">
-          <p>Already have an account? <a href="/login">Login</a></p>
+          <p>Already have an account? <Link to="/login">Login</Link></p>
         </div>
       </form>
 

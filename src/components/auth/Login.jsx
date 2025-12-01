@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { Phone, Lock } from 'lucide-react';
 import '../../styles/auth.css';
@@ -247,9 +248,9 @@ const Login = () => {
 
         {/* Forgot Password */}
         <div className="input-group" style={{ textAlign: 'right', background: 'transparent', border: 'none', boxShadow: 'none', padding: '10px 0' }}>
-          <a href="/forgot-password" style={{ color: 'var(--primary-color)', fontSize: '14px', textDecoration: 'none' }}>
+          <Link to="/forgot-password" style={{ color: 'var(--primary-color)', fontSize: '14px', textDecoration: 'none' }}>
             Forgot Password?
-          </a>
+          </Link>
         </div>
 
         {/* Submit Button */}
@@ -259,7 +260,7 @@ const Login = () => {
 
         {/* Signup Link */}
         <div className="auth-footer">
-          <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+          <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
         </div>
       </form>
 
