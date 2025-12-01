@@ -31,6 +31,7 @@ const MessageItem = ({
   const [touchStartTime, setTouchStartTime] = useState(0);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const bubbleRef = useRef(null);
 
   const isSent = message.sender_id === currentUser.id;
@@ -101,22 +102,38 @@ const MessageItem = ({
     setIsEditing(false);
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Delete this message?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .delete()
-        .eq('id', message.id);
-
-      if (error) throw error;
-
-      // The message will be removed from the list via real-time subscription
-    } catch (error) {
-      console.error('Error deleting message:', error);
-    }
+  const handleDelete = () => {
+    setShowDeleteModal(true);
     setShowActions(false);
+  };
+
+  const confirmDelete = async () => {
+    setShowDeleteModal(false);
+
+    // Add vaporizing class for animation
+    const messageElement = bubbleRef.current?.parentElement?.parentElement;
+    if (messageElement) {
+      messageElement.classList.add('vaporizing');
+
+      setTimeout(async () => {
+        try {
+          const { error } = await supabase
+            .from('messages')
+            .delete()
+            .eq('id', message.id);
+
+          if (error) throw error;
+
+          // The message will be removed from the list via real-time subscription
+        } catch (error) {
+          console.error('Error deleting message:', error);
+        }
+      }, 800); // Match animation duration
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   const formatTime = (timestamp) => {
@@ -380,6 +397,28 @@ const MessageItem = ({
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="delete-modal-overlay" onClick={cancelDelete}>
+          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-modal-header">
+              <h3>Delete Message</h3>
+            </div>
+            <div className="delete-modal-body">
+              <p>Are you sure you want to delete this message? This action cannot be undone.</p>
+            </div>
+            <div className="delete-modal-actions">
+              <button className="delete-cancel-btn" onClick={cancelDelete}>
+                Cancel
+              </button>
+              <button className="delete-confirm-btn" onClick={confirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

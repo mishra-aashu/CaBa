@@ -319,9 +319,111 @@
 }
 
 .selection-indicator.selected {
-  background: var(--chat-primary);
+  background: var(--primary-color);
   color: white;
-  border-color: var(--chat-primary);
+  border-color: var(--primary-color);
+}
+
+/* Delete Modal */
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-modal {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.delete-modal-header h3 {
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.delete-modal-body p {
+  margin: 0 0 20px 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.delete-cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.delete-cancel-btn:hover {
+  background: var(--hover-color);
+}
+
+.delete-confirm-btn {
+  padding: 8px 16px;
+  border: none;
+  background: var(--error-color);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.delete-confirm-btn:hover {
+  background: #d32f2f;
+  transform: translateY(-1px);
+}
+
+/* Vaporize Animation */
+@keyframes vaporize {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(5deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9) rotate(-5deg);
+  }
+  75% {
+    opacity: 0.3;
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(180deg);
+  }
+}
+
+.message.vaporizing .message-bubble {
+  animation: vaporize 0.8s ease-out forwards;
 }
 
 /* Message Actions */
