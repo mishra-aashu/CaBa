@@ -137,7 +137,8 @@ const Signup = () => {
 
   if (showVerification) {
     return (
-      <div className="auth-container">
+      <div className="auth-page">
+        <div className="auth-container">
         <div className="verification-container" style={{ textAlign: 'center', padding: '40px 20px' }}>
           <div style={{ fontSize: '64px', marginBottom: '20px', color: 'var(--primary-color)' }}>
             <Mail size={64} />
@@ -195,12 +196,14 @@ const Signup = () => {
             Resend Verification Email
           </button>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="auth-container">
+    <div className="auth-page">
+      <div className="auth-container">
       <div className="auth-header">
         <h1>Create Account</h1>
         <p>Join CaBa messaging platform</p>
@@ -329,6 +332,8 @@ const Signup = () => {
           {error}
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };
