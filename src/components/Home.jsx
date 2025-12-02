@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -421,12 +421,14 @@ const Home = () => {
     return `${days}d`;
   };
 
-  const filteredChats = chats.filter(chat => {
-    if (!searchTerm) return true;
-    const search = searchTerm.toLowerCase();
-    return chat.otherUser.name.toLowerCase().includes(search) ||
-      (chat.otherUser.phone && chat.otherUser.phone.includes(search));
-  });
+  const filteredChats = useMemo(() => {
+    return chats.filter(chat => {
+      if (!searchTerm) return true;
+      const search = searchTerm.toLowerCase();
+      return chat.otherUser.name.toLowerCase().includes(search) ||
+        (chat.otherUser.phone && chat.otherUser.phone.includes(search));
+    });
+  }, [chats, searchTerm]);
 
   const searchUsersByPhone = async (phone) => {
     try {
@@ -704,7 +706,7 @@ const Home = () => {
                   </div>
                 ))
               ) : (
-                <div className="empty-state">
+                <div key="empty-state" className="empty-state">
                   <MessageCircle size={64} />
                   <h3>No chats yet</h3>
                   <p>Start a conversation with your contacts</p>
