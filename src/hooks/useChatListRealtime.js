@@ -5,12 +5,6 @@ export const useChatListRealtime = (currentUserId) => {
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // If no user ID, don't load chats
-    if (!currentUserId) {
-        setLoading(false);
-        return { chats: [], setChats, loading: false };
-    }
-
     const loadChats = useCallback(async (userId) => {
         if (!userId) return;
 
