@@ -5,6 +5,12 @@ export const useChatListRealtime = (currentUserId) => {
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // If no user ID, don't load chats
+    if (!currentUserId) {
+        setLoading(false);
+        return { chats: [], setChats, loading: false };
+    }
+
     const loadChats = useCallback(async (userId) => {
         if (!userId) return;
 
@@ -78,6 +84,9 @@ export const useChatListRealtime = (currentUserId) => {
     useEffect(() => {
         if (currentUserId) {
             loadChats(currentUserId);
+        } else {
+            setChats([]);
+            setLoading(false);
         }
     }, [currentUserId, loadChats]);
 
@@ -109,13 +118,16 @@ export const useChatListRealtime = (currentUserId) => {
                 schema: 'public',
                 table: 'chats'
             }, (payload) => {
-                updateChatInList(payload.new.id);
+                if (payload.new.user1_id === currentUserId || payload.new.user2_id === currentUserId) {
+                    updateChatInList(payload.new.id);
+                }
             })
             .subscribe();
 
+        // Cleanup function
         return () => {
-            messagesChannel.unsubscribe();
-            chatsChannel.unsubscribe();
+            if (messagesChannel) messagesChannel.unsubscribe();
+            if (chatsChannel) chatsChannel.unsubscribe();
         };
     }, [currentUserId, updateChatInList]);
 
