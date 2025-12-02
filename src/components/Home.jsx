@@ -434,7 +434,7 @@ const Home = () => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('id, name, phone, avatar, is_online, email_confirmed_at')
+        .select('id, name, phone, avatar, is_online')
         .eq('phone', phone)
         .neq('id', currentUser?.id)
         .limit(1); // Since phone should be unique
@@ -661,10 +661,7 @@ const Home = () => {
                     <span className={`online-status ${user.is_online ? 'online' : ''}`}></span>
                   </div>
                   <div className="suggestion-info">
-                    <div className="suggestion-name">
-                      {user.name}
-                      {user.email_confirmed_at && <ShieldCheck size={14} className="verified-icon" />}
-                    </div>
+                    <div className="suggestion-name">{user.name}</div>
                     <div className="suggestion-phone">{user.phone}</div>
                   </div>
                 </div>
