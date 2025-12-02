@@ -267,11 +267,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
   color: var(--text-primary);
+  opacity: 0.85;
 }
 
 .message.sent .message-bubble {
   background: var(--sent-message-background);
   color: var(--text-primary);
+  opacity: 0.85;
 }
 
 .message-text {
