@@ -332,15 +332,10 @@
   cursor: pointer;
   transition: background 0.2s ease;
   border: none;
-  border-bottom: 1px solid var(--home-border);
 }
 
 .chat-item:hover {
   background: var(--home-hover);
-}
-
-.chat-item:last-child {
-  border-bottom: none;
 }
 
 .chat-avatar {
