@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
-import { Phone, Lock } from 'lucide-react';
+import { Phone, Lock, Eye, EyeOff } from 'lucide-react';
 import '../../styles/auth.css';
 
 const Login = () => {
@@ -12,6 +12,7 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -54,6 +55,10 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const formatPhone = (phone) => {
@@ -235,16 +240,25 @@ const Login = () => {
             <Lock size={16} className="icon" />
             Password
           </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            required
-            autoComplete="current-password"
-            value={formData.password}
-            onChange={handleInputChange}
-          />
+          <div className="password-input">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleInputChange}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Forgot Password */}

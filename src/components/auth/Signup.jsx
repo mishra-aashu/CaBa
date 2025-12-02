@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
-import { User, Phone, Mail, Lock, Shield } from 'lucide-react';
+import { User, Phone, Mail, Lock, Shield, Eye, EyeOff } from 'lucide-react';
 import '../../styles/auth.css';
 
 const Signup = () => {
@@ -16,6 +16,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showVerification, setShowVerification] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +27,14 @@ const Signup = () => {
     }));
     // Clear error when user starts typing
     if (error) setError('');
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -274,17 +284,26 @@ const Signup = () => {
             <Lock size={16} className="icon" />
             Password
           </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Minimum 6 characters"
-            minLength="6"
-            required
-            autoComplete="new-password"
-            value={formData.password}
-            onChange={handleInputChange}
-          />
+          <div className="password-input">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              placeholder="Minimum 6 characters"
+              minLength="6"
+              required
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={handleInputChange}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Confirm Password */}
@@ -293,17 +312,26 @@ const Signup = () => {
             <Shield size={16} className="icon" />
             Confirm Password
           </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Re-enter your password"
-            minLength="6"
-            required
-            autoComplete="new-password"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-          />
+          <div className="password-input">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Re-enter your password"
+              minLength="6"
+              required
+              autoComplete="new-password"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={toggleConfirmPasswordVisibility}
+            >
+              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
 
         {/* Submit Button */}
