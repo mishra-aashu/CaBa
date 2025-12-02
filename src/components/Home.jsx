@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X } from 'lucide-react';
+import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import Chat from './chat/Chat';
@@ -918,9 +918,8 @@ const Home = () => {
       >
         <div className="phone-completion-modal">
           <div className="phone-modal-header">
-            <div className="phone-icon">📱</div>
             <h3>Complete Your Profile</h3>
-            <p>To use CaBa messaging, we need your phone number and password for security.</p>
+            <p>Please provide your phone number and create a password to complete your account setup.</p>
           </div>
 
           <form onSubmit={handlePhoneSubmit} className="phone-form">
@@ -959,7 +958,7 @@ const Home = () => {
                   className="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <small>Required: Create password for backup login</small>
@@ -983,7 +982,7 @@ const Home = () => {
                   className="toggle-password"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
@@ -999,8 +998,8 @@ const Home = () => {
 
           <div className="phone-modal-footer">
             <p className="phone-note">
-              <strong>Note:</strong> Your phone number will be visible to other users so they can find you.
-              Password is required for backup access.
+              <strong>Note:</strong> Your phone number will be visible to other users for contact purposes.
+              The password enables backup login access.
             </p>
           </div>
         </div>
