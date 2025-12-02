@@ -32,6 +32,10 @@ const Home = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [phoneLoading, setPhoneLoading] = useState(false);
 
   // Realtime chat list
@@ -209,6 +213,18 @@ const Home = () => {
       return;
     }
 
+    // Password validation for Google OAuth users
+    if (password && password.length > 0) {
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long');
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+    }
+
     try {
       setPhoneLoading(true);
 
@@ -219,30 +235,38 @@ const Home = () => {
         .eq('id', user.id)
         .single();
 
+      // Prepare user data
+      const userData = {
+        id: user.id,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
+        email: user.email,
+        phone: phone,
+        avatar: user.user_metadata?.avatar_url || null,
+        created_at: new Date().toISOString()
+      };
+
+      // Add password to user data if provided (for Google OAuth users)
+      if (password && password.length > 0) {
+        userData.password = password; // This will be stored in the users table
+      }
+
       if (existingUser) {
         // Update existing user
         const { error: dbError } = await supabase
           .from('users')
-          .update({ phone: phone })
+          .update(userData)
           .eq('id', user.id);
 
         if (dbError) {
           console.error('Database error:', dbError);
-          alert('Failed to save phone number. Please try again.');
+          alert('Failed to save phone number and password. Please try again.');
           return;
         }
       } else {
         // Create new user record
         const { error: dbError } = await supabase
           .from('users')
-          .insert([{
-            id: user.id,
-            name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
-            email: user.email,
-            phone: phone,
-            avatar: user.user_metadata?.avatar_url || null,
-            created_at: new Date().toISOString()
-          }]);
+          .insert([userData]);
 
         if (dbError) {
           console.error('Database error:', dbError);
@@ -265,6 +289,8 @@ const Home = () => {
       // Close modal
       setShowPhoneModal(false);
       setPhoneNumber('');
+      setPassword('');
+      setConfirmPassword('');
 
     } catch (error) {
       console.error('Phone submission error:', error);
@@ -405,27 +431,22 @@ const Home = () => {
   });
 
   const searchUsersByPhone = async (phone) => {
-    if (!phone.trim() || phone.length < 3) {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-
     try {
       const { data, error } = await supabase
         .from('users')
         .select('id, name, phone, avatar, is_online')
-        .ilike('phone', `%${phone}%`)
+        .eq('phone', phone)
         .neq('id', currentUser?.id)
-        .limit(5);
+        .limit(1); // Since phone should be unique
 
       if (error) throw error;
 
       setSearchSuggestions(data || []);
-      setShowSuggestions(true);
+      setShowSuggestions(data && data.length > 0);
     } catch (error) {
       console.error('Error searching users:', error);
       setSearchSuggestions([]);
+      setShowSuggestions(false);
     }
   };
 
@@ -433,8 +454,8 @@ const Home = () => {
     const value = e.target.value;
     setSearchTerm(value);
 
-    // If it looks like a phone number (contains digits), search users
-    if (/\d/.test(value)) {
+    // Only search if exactly 10 digits
+    if (/^\d{10}$/.test(value)) {
       searchUsersByPhone(value);
     } else {
       setSearchSuggestions([]);
@@ -938,6 +959,100 @@ const Home = () => {
             </p>
           </div>
         </div>
+      {/* Phone Number Completion Modal */}
+      <Modal
+        isOpen={showPhoneModal}
+        onClose={() => {}}
+        title="Complete Your Profile"
+        size="medium"
+      >
+        <div className="phone-completion-modal">
+          <div className="phone-modal-header">
+            <div className="phone-icon">📱</div>
+            <h3>Complete Your Profile</h3>
+            <p>To use CaBa messaging, we need your phone number and password for security.</p>
+          </div>
+
+          <form onSubmit={handlePhoneSubmit} className="phone-form">
+            <div className="input-group">
+              <label htmlFor="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                placeholder="10 digit mobile number"
+                pattern="[0-9]{10}"
+                maxLength="10"
+                required
+                autoComplete="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                disabled={phoneLoading}
+              />
+              <small>10 digits without country code</small>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Password (Optional for Google users)</label>
+              <div className="password-input">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="Create a password (min 6 characters)"
+                  minLength="6"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={phoneLoading}
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+              <small>Optional: Create password for backup login</small>
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <div className="password-input">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  placeholder="Confirm your password"
+                  minLength="6"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={phoneLoading}
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={phoneLoading || phoneNumber.length !== 10}
+            >
+              {phoneLoading ? 'Saving...' : 'Save Profile'}
+            </button>
+          </form>
+
+          <div className="phone-modal-footer">
+            <p className="phone-note">
+              <strong>Note:</strong> Your phone number will be visible to other users so they can find you.
+              Password is optional but recommended for backup access.
+            </p>
+          </div>
+        </div>
+      </Modal>
       </Modal>
     </div>
   );
