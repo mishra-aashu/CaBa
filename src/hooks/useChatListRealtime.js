@@ -31,7 +31,7 @@ export const useChatListRealtime = (currentUserId) => {
             });
 
             setChats(chatsData);
-        } catch (error) {
+        } catch (error) {up m e
             console.error('Error loading chats:', error);
         } finally {
             setLoading(false);

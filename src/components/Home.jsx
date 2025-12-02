@@ -213,16 +213,14 @@ const Home = () => {
       return;
     }
 
-    // Password validation for Google OAuth users
-    if (password && password.length > 0) {
-      if (password.length < 6) {
-        alert('Password must be at least 6 characters long');
-        return;
-      }
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
+    // Password validation (required for Google OAuth users)
+    if (!password || password.length < 6) {
+      alert('Password is required and must be at least 6 characters long');
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
     }
 
     try {
@@ -912,54 +910,6 @@ const Home = () => {
         </div>
       </Modal>
 
-      {/* Phone Number Completion Modal */}
-      <Modal
-        isOpen={showPhoneModal}
-        onClose={() => {}} // Prevent closing
-        title="Complete Your Profile"
-        size="small"
-      >
-        <div className="phone-completion-modal">
-          <div className="phone-modal-header">
-            <div className="phone-icon">📱</div>
-            <h3>Add Phone Number</h3>
-            <p>To use CaBa messaging, we need your phone number so other users can find and contact you.</p>
-          </div>
-
-          <form onSubmit={handlePhoneSubmit} className="phone-form">
-            <div className="input-group">
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="tel"
-                id="phone"
-                placeholder="10 digit mobile number"
-                pattern="[0-9]{10}"
-                maxLength="10"
-                required
-                autoComplete="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                disabled={phoneLoading}
-              />
-              <small>10 digits without country code</small>
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={phoneLoading || phoneNumber.length !== 10}
-            >
-              {phoneLoading ? 'Saving...' : 'Save Phone Number'}
-            </button>
-          </form>
-
-          <div className="phone-modal-footer">
-            <p className="phone-note">
-              <strong>Note:</strong> Your phone number will be visible to other users so they can find you.
-            </p>
-          </div>
-        </div>
-      {/* Phone Number Completion Modal */}
       <Modal
         isOpen={showPhoneModal}
         onClose={() => {}}
@@ -992,13 +942,14 @@ const Home = () => {
             </div>
 
             <div className="input-group">
-              <label htmlFor="password">Password (Optional for Google users)</label>
+              <label htmlFor="password">Password (Required for backup login)</label>
               <div className="password-input">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="Create a password (min 6 characters)"
                   minLength="6"
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={phoneLoading}
@@ -1011,7 +962,7 @@ const Home = () => {
                   {showPassword ? '👁️' : '👁️‍🗨️'}
                 </button>
               </div>
-              <small>Optional: Create password for backup login</small>
+              <small>Required: Create password for backup login</small>
             </div>
 
             <div className="input-group">
@@ -1022,6 +973,7 @@ const Home = () => {
                   id="confirmPassword"
                   placeholder="Confirm your password"
                   minLength="6"
+                  required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={phoneLoading}
@@ -1048,11 +1000,10 @@ const Home = () => {
           <div className="phone-modal-footer">
             <p className="phone-note">
               <strong>Note:</strong> Your phone number will be visible to other users so they can find you.
-              Password is optional but recommended for backup access.
+              Password is required for backup access.
             </p>
           </div>
         </div>
-      </Modal>
       </Modal>
     </div>
   );
