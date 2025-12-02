@@ -112,27 +112,20 @@ const MessageItem = ({
   const confirmDelete = async () => {
     setShowDeleteModal(false);
 
-    // Add vaporizing class for animation
-    if (messageRef.current) {
-      messageRef.current.classList.add('vaporizing');
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('id', message.id);
 
-      setTimeout(async () => {
-        try {
-          const { error } = await supabase
-            .from('messages')
-            .delete()
-            .eq('id', message.id);
+      if (error) throw error;
 
-          if (error) throw error;
-
-          // Remove the message from the UI
-          if (onDelete) {
-            onDelete(message.id);
-          }
-        } catch (error) {
-          console.error('Error deleting message:', error);
-        }
-      }, 1500); // Match animation duration
+      // Remove the message from the UI
+      if (onDelete) {
+        onDelete(message.id);
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
     }
   };
 

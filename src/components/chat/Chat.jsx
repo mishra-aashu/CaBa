@@ -72,6 +72,7 @@ const Chat = () => {
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -419,11 +420,13 @@ const Chat = () => {
     setIsSelectionMode(false);
   };
 
-  const handleSelectionDelete = async () => {
+  const handleSelectionDelete = () => {
     if (selectedMessages.size === 0) return;
+    setShowDeleteModal(true);
+  };
 
-    const confirmed = window.confirm(`Delete ${selectedMessages.size} message(s)?`);
-    if (!confirmed) return;
+  const confirmSelectionDelete = async () => {
+    setShowDeleteModal(false);
 
     try {
       const { error } = await supabase
@@ -441,6 +444,10 @@ const Chat = () => {
       console.error('Error deleting messages:', error);
       alert('Failed to delete messages');
     }
+  };
+
+  const cancelSelectionDelete = () => {
+    setShowDeleteModal(false);
   };
 
   const handleSelectionForward = () => {
@@ -881,6 +888,26 @@ const Chat = () => {
             ) : (
               <div className="search-placeholder">Type to search messages</div>
             )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={cancelSelectionDelete}
+        title={`Delete ${selectedMessages.size} message(s)?`}
+        size="small"
+      >
+        <div className="delete-confirmation-content">
+          <p>Are you sure you want to delete the selected messages? This action cannot be undone.</p>
+          <div className="delete-modal-actions">
+            <button className="delete-cancel-btn" onClick={cancelSelectionDelete}>
+              Cancel
+            </button>
+            <button className="delete-confirm-btn" onClick={confirmSelectionDelete}>
+              Delete
+            </button>
           </div>
         </div>
       </Modal>
