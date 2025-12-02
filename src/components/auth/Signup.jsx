@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { User, Phone, Mail, Lock, Shield, Eye, EyeOff } from 'lucide-react';
