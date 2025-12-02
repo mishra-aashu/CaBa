@@ -708,8 +708,8 @@ const Home = () => {
               ) : (
                 <div key="empty-state" className="empty-state">
                   <MessageCircle size={64} />
-                  <h3>No chats yet</h3>
-                  <p>Start a conversation with your contacts</p>
+                  <h3>No conversations yet</h3>
+                  <p>Start messaging your contacts</p>
                 </div>
               )}
             </div>
