@@ -11,7 +11,7 @@ import { useChatListRealtime } from '../hooks/useChatListRealtime';
 import '../styles/home.css';
 
 const Home = () => {
-  const { supabase } = useSupabase();
+  const { supabase, user, loading: authLoading } = useSupabase();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { chatId, otherUserId } = useParams();
@@ -71,8 +71,10 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    initializeHome();
-  }, []);
+    if (!authLoading) {
+      initializeHome();
+    }
+  }, [authLoading, user]);
 
   // Reload saved contacts when modal opens
   useEffect(() => {
@@ -83,20 +85,46 @@ const Home = () => {
 
   const initializeHome = async () => {
     try {
-      const userStr = localStorage.getItem('currentUser');
-      if (!userStr) {
+      if (!user) {
         navigate('/login');
         return;
       }
-      const current = JSON.parse(userStr);
-      setCurrentUser(current);
+
+      // Check if user exists in database
+      const { data: dbUser, error: dbError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (dbError || !dbUser) {
+        console.error('User not found in database:', dbError);
+        // User authenticated but not in database - needs phone collection
+        setShowPhoneModal(true);
+        setLoading(false);
+        return;
+      }
+
+      // User exists in database
+      const currentUserData = {
+        id: dbUser.id,
+        name: dbUser.name,
+        email: dbUser.email,
+        phone: dbUser.phone,
+        avatar: dbUser.avatar
+      };
+
+      setCurrentUser(currentUserData);
+
+      // Update localStorage for compatibility
+      localStorage.setItem('currentUser', JSON.stringify(currentUserData));
 
       // Check if user is admin from localStorage (role column doesn't exist in users table)
       const isAdminUser = localStorage.getItem('userRole') === 'admin';
       setIsAdmin(isAdminUser);
 
-      // Check if user needs to complete phone number (Google OAuth users)
-      if (!current.phone) {
+      // Check if user needs to complete phone number (shouldn't happen for existing users, but just in case)
+      if (!dbUser.phone) {
         setShowPhoneModal(true);
       }
 
@@ -177,20 +205,53 @@ const Home = () => {
     try {
       setPhoneLoading(true);
 
-      // Update user record in database
-      const { error: dbError } = await supabase
+      // Check if user already exists in database
+      const { data: existingUser } = await supabase
         .from('users')
-        .update({ phone: phone })
-        .eq('id', currentUser.id);
+        .select('id')
+        .eq('id', user.id)
+        .single();
 
-      if (dbError) {
-        console.error('Database error:', dbError);
-        alert('Failed to save phone number. Please try again.');
-        return;
+      if (existingUser) {
+        // Update existing user
+        const { error: dbError } = await supabase
+          .from('users')
+          .update({ phone: phone })
+          .eq('id', user.id);
+
+        if (dbError) {
+          console.error('Database error:', dbError);
+          alert('Failed to save phone number. Please try again.');
+          return;
+        }
+      } else {
+        // Create new user record
+        const { error: dbError } = await supabase
+          .from('users')
+          .insert([{
+            id: user.id,
+            name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
+            email: user.email,
+            phone: phone,
+            avatar: user.user_metadata?.avatar_url || null,
+            created_at: new Date().toISOString()
+          }]);
+
+        if (dbError) {
+          console.error('Database error:', dbError);
+          alert('Failed to create account. Please try again.');
+          return;
+        }
       }
 
       // Update localStorage
-      const updatedUser = { ...currentUser, phone: phone };
+      const updatedUser = {
+        id: user.id,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
+        email: user.email,
+        phone: phone,
+        avatar: user.user_metadata?.avatar_url || null
+      };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setCurrentUser(updatedUser);
 
@@ -402,7 +463,7 @@ const Home = () => {
     setShowSelectContact(false);
   };
 
-  if (loading || chatsLoading) {
+  if (authLoading || loading || chatsLoading) {
     return <MessagingLoader />;
   }
 

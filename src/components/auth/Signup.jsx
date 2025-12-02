@@ -29,52 +29,6 @@ const Signup = () => {
   const [showVerification, setShowVerification] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [googleUserData, setGoogleUserData] = useState(null);
-  const [showPhoneCollection, setShowPhoneCollection] = useState(false);
-
-  // Check for Google OAuth completion
-  useEffect(() => {
-    const checkGoogleCompletion = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const googleComplete = urlParams.get('google_complete');
-
-      if (googleComplete === 'true') {
-        // Get current user data
-        const { data: { user }, error } = await supabase.auth.getUser();
-
-        if (user && !error) {
-          // Check if user already exists in database
-          const { data: existingUser } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', user.id)
-            .single();
-
-          if (existingUser) {
-            // User already exists, redirect to main app
-            window.location.href = '/CaBa/';
-            return;
-          }
-
-          // User needs to complete phone number
-          setGoogleUserData({
-            id: user.id,
-            name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
-            email: user.email,
-            avatar: user.user_metadata?.avatar_url || null
-          });
-          setShowPhoneCollection(true);
-
-          // Clean up URL
-          const url = new URL(window.location);
-          url.searchParams.delete('google_complete');
-          window.history.replaceState({}, '', url);
-        }
-      }
-    };
-
-    checkGoogleCompletion();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -185,53 +139,6 @@ const Signup = () => {
     }
   };
 
-  const handlePhoneSubmit = async (e) => {
-    e.preventDefault();
-
-    const phone = formData.phone.trim();
-
-    // Phone validation (10 digits)
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone)) {
-      setError('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError('');
-
-      // Create user record in database with Google data + phone
-      const { error: dbError } = await supabase
-        .from('users')
-        .insert([{
-          id: googleUserData.id,
-          name: googleUserData.name,
-          email: googleUserData.email,
-          phone: phone,
-          avatar: googleUserData.avatar,
-          created_at: new Date().toISOString()
-        }]);
-
-      if (dbError) {
-        console.error('Database error:', dbError);
-        setError('Failed to complete signup. Please try again.');
-        return;
-      }
-
-      // Success - redirect to main app
-      setMessage({ text: 'Account created successfully! Redirecting...', type: 'success' });
-      setTimeout(() => {
-        window.location.href = '/CaBa/';
-      }, 1000);
-
-    } catch (error) {
-      console.error('Phone submission error:', error);
-      setError('An error occurred. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     try {
@@ -241,7 +148,7 @@ const Signup = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/CaBa/signup?google_complete=true`,
+          redirectTo: `${window.location.origin}/CaBa/`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent'
@@ -281,89 +188,6 @@ const Signup = () => {
     }
   };
 
-  // Phone Collection for Google OAuth users
-  if (showPhoneCollection && googleUserData) {
-    return (
-      <div className="auth-page">
-        <div className="auth-container">
-          <div className="auth-header">
-            <h1>Complete Your Profile</h1>
-            <p>Just need your phone number to finish setting up your account</p>
-          </div>
-
-          <div className="google-user-info">
-            <div className="user-avatar">
-              {googleUserData.avatar ? (
-                <img src={googleUserData.avatar} alt={googleUserData.name} />
-              ) : (
-                googleUserData.name.charAt(0).toUpperCase()
-              )}
-            </div>
-            <div className="user-details">
-              <h3>{googleUserData.name}</h3>
-              <p>{googleUserData.email}</p>
-            </div>
-          </div>
-
-          <form id="phoneForm" className="auth-form" onSubmit={handlePhoneSubmit}>
-            <div className="input-group">
-              <label htmlFor="phone">
-                <Phone size={16} className="icon" />
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                placeholder="10 digit mobile number"
-                pattern="[0-9]{10}"
-                maxLength="10"
-                required
-                autoComplete="tel"
-                value={formData.phone}
-                onChange={handleInputChange}
-              />
-              <small>10 digits without country code</small>
-            </div>
-
-            <button type="submit" id="phoneSubmitBtn" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Complete Signup'}
-            </button>
-          </form>
-
-          {/* Message Display */}
-          {message.text && (
-            <div className={`message ${message.type}`} style={{
-              marginTop: '20px',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              textAlign: 'center',
-              fontSize: '14px',
-              display: 'block'
-            }}>
-              {message.text}
-            </div>
-          )}
-
-          {/* Error Display */}
-          {error && (
-            <div className="error-message" style={{
-              background: '#fee',
-              color: '#c33',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              marginTop: '16px',
-              fontSize: '14px',
-              borderLeft: '4px solid #c33',
-              animation: 'shake 0.3s'
-            }}>
-              {error}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   if (showVerification) {
     return (
