@@ -91,19 +91,26 @@ const Home = () => {
       }
 
       // Check if user exists in database
-      const { data: dbUser, error: dbError } = await supabase
+      const { data: dbUsers, error: dbError } = await supabase
         .from('users')
         .select('*')
-        .eq('id', user.id)
-        .single();
+        .eq('id', user.id);
 
-      if (dbError || !dbUser) {
-        console.error('User not found in database:', dbError);
+      if (dbError) {
+        console.error('Database error checking user:', dbError);
+        setLoading(false);
+        return;
+      }
+
+      if (!dbUsers || dbUsers.length === 0) {
+        console.log('User authenticated but not in database - showing phone modal');
         // User authenticated but not in database - needs phone collection
         setShowPhoneModal(true);
         setLoading(false);
         return;
       }
+
+      const dbUser = dbUsers[0];
 
       // User exists in database
       const currentUserData = {
