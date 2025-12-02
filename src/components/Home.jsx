@@ -30,6 +30,9 @@ const Home = () => {
   const [contactPhone, setContactPhone] = useState('');
   const [savedContacts, setSavedContacts] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneLoading, setPhoneLoading] = useState(false);
 
   // Realtime chat list
   const { chats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id);
@@ -92,6 +95,11 @@ const Home = () => {
       const isAdminUser = localStorage.getItem('userRole') === 'admin';
       setIsAdmin(isAdminUser);
 
+      // Check if user needs to complete phone number (Google OAuth users)
+      if (!current.phone) {
+        setShowPhoneModal(true);
+      }
+
       setLoading(false);
     } catch (error) {
       console.error('Error initializing home:', error);
@@ -152,6 +160,50 @@ const Home = () => {
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
+  };
+
+  const handlePhoneSubmit = async (e) => {
+    e.preventDefault();
+
+    const phone = phoneNumber.trim();
+
+    // Phone validation (10 digits)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone)) {
+      alert('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    try {
+      setPhoneLoading(true);
+
+      // Update user record in database
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({ phone: phone })
+        .eq('id', currentUser.id);
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        alert('Failed to save phone number. Please try again.');
+        return;
+      }
+
+      // Update localStorage
+      const updatedUser = { ...currentUser, phone: phone };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+
+      // Close modal
+      setShowPhoneModal(false);
+      setPhoneNumber('');
+
+    } catch (error) {
+      console.error('Phone submission error:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setPhoneLoading(false);
+    }
   };
 
   const handleAboutApp = () => {
@@ -768,6 +820,55 @@ const Home = () => {
               </div>
             </>
           )}
+        </div>
+      </Modal>
+
+      {/* Phone Number Completion Modal */}
+      <Modal
+        isOpen={showPhoneModal}
+        onClose={() => {}} // Prevent closing
+        title="Complete Your Profile"
+        size="small"
+      >
+        <div className="phone-completion-modal">
+          <div className="phone-modal-header">
+            <div className="phone-icon">📱</div>
+            <h3>Add Phone Number</h3>
+            <p>To use CaBa messaging, we need your phone number so other users can find and contact you.</p>
+          </div>
+
+          <form onSubmit={handlePhoneSubmit} className="phone-form">
+            <div className="input-group">
+              <label htmlFor="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                placeholder="10 digit mobile number"
+                pattern="[0-9]{10}"
+                maxLength="10"
+                required
+                autoComplete="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                disabled={phoneLoading}
+              />
+              <small>10 digits without country code</small>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={phoneLoading || phoneNumber.length !== 10}
+            >
+              {phoneLoading ? 'Saving...' : 'Save Phone Number'}
+            </button>
+          </form>
+
+          <div className="phone-modal-footer">
+            <p className="phone-note">
+              <strong>Note:</strong> Your phone number will be visible to other users so they can find you.
+            </p>
+          </div>
         </div>
       </Modal>
     </div>

@@ -1047,3 +1047,90 @@
     right: 10px;
   }
 }
+
+/* Phone Completion Modal */
+.phone-completion-modal {
+  text-align: center;
+  padding: 20px;
+}
+
+.phone-modal-header {
+  margin-bottom: 24px;
+}
+
+.phone-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.phone-modal-header h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--home-text);
+}
+
+.phone-modal-header p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--home-text-light);
+  line-height: 1.5;
+}
+
+.phone-form {
+  margin-bottom: 24px;
+}
+
+.phone-form .input-group {
+  margin-bottom: 16px;
+}
+
+.phone-form .input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--home-text);
+  text-align: left;
+}
+
+.phone-form .input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--home-border);
+  border-radius: 8px;
+  background: var(--home-surface);
+  color: var(--home-text);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.phone-form .input-group input:focus {
+  border-color: var(--home-primary);
+}
+
+.phone-form .input-group small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--home-text-light);
+  text-align: left;
+}
+
+.phone-modal-footer {
+  padding-top: 16px;
+  border-top: 1px solid var(--home-border);
+}
+
+.phone-note {
+  font-size: 13px;
+  color: var(--home-text-light);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.phone-note strong {
+  color: var(--home-text);
+}
