@@ -407,10 +407,18 @@ const MessageItem = ({
               <p>Are you sure you want to delete this message? This action cannot be undone.</p>
             </div>
             <div className="delete-modal-actions">
-              <button className="delete-cancel-btn" onClick={cancelDelete}>
+              <button
+                className="delete-cancel-btn"
+                onClick={cancelDelete}
+                style={{ padding: '10px 20px', marginRight: '10px' }}
+              >
                 Cancel
               </button>
-              <button className="delete-confirm-btn" onClick={confirmDelete}>
+              <button
+                className="delete-confirm-btn"
+                onClick={confirmDelete}
+                style={{ padding: '10px 20px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}
+              >
                 Delete
               </button>
             </div>
