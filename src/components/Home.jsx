@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff } from 'lucide-react';
+import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import Chat from './chat/Chat';
@@ -434,7 +434,7 @@ const Home = () => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('id, name, phone, avatar, is_online')
+        .select('id, name, phone, avatar, is_online, email_confirmed_at')
         .eq('phone', phone)
         .neq('id', currentUser?.id)
         .limit(1); // Since phone should be unique
@@ -661,7 +661,10 @@ const Home = () => {
                     <span className={`online-status ${user.is_online ? 'online' : ''}`}></span>
                   </div>
                   <div className="suggestion-info">
-                    <div className="suggestion-name">{user.name}</div>
+                    <div className="suggestion-name">
+                      {user.name}
+                      {user.email_confirmed_at && <ShieldCheck size={14} className="verified-icon" />}
+                    </div>
                     <div className="suggestion-phone">{user.phone}</div>
                   </div>
                 </div>
