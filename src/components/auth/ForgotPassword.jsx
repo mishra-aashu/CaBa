@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import '../../styles/auth.css';
 
@@ -144,7 +145,7 @@ const ForgotPassword = () => {
         </form>
 
         <div className="footer">
-          <a href="/login">← Back to Login</a>
+          <Link to="/login">← Back to Login</Link>
         </div>
       </div>
     </div>
