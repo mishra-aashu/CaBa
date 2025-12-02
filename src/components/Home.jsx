@@ -436,7 +436,6 @@ const Home = () => {
         .from('users')
         .select('id, name, phone, avatar, is_online')
         .eq('phone', phone)
-        .neq('id', currentUser?.id)
         .limit(1); // Since phone should be unique
 
       if (error) throw error;
@@ -661,7 +660,7 @@ const Home = () => {
                     <span className={`online-status ${user.is_online ? 'online' : ''}`}></span>
                   </div>
                   <div className="suggestion-info">
-                    <div className="suggestion-name">{user.name}</div>
+                    <div className="suggestion-name">{user.id === currentUser?.id ? "Myself" : user.name}</div>
                     <div className="suggestion-phone">{user.phone}</div>
                   </div>
                 </div>
