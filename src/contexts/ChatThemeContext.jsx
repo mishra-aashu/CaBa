@@ -223,17 +223,16 @@ export const ChatThemeProvider = ({ children }) => {
       const { data, error } = await supabase
         .from('user_themes')
         .select('theme_id')
-        .eq('user_id', currentUser.id)
-        .single();
+        .eq('user_id', currentUser.id);
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+      if (error) {
         console.error('Error loading theme:', error);
         // Fall back to cached theme
         const cachedTheme = localStorage.getItem('digidad_chat_theme') || 'classic';
         setChatTheme(cachedTheme);
-      } else if (data) {
-        setChatTheme(data.theme_id);
-        localStorage.setItem('digidad_chat_theme', data.theme_id);
+      } else if (data && data.length > 0) {
+        setChatTheme(data[0].theme_id);
+        localStorage.setItem('digidad_chat_theme', data[0].theme_id);
       } else {
         // No theme set, use default
         setChatTheme('classic');
