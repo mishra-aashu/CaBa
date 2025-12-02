@@ -332,7 +332,6 @@ const Signup = () => {
           {error}
         </div>
       )}
-        </div>
       </div>
     </div>
   );
