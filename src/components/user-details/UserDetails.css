@@ -118,7 +118,7 @@
   align-items: center;
   gap: 6px;
   padding: 12px;
-  background: #c9c9c9;
+  background: #25d366;
   border: none;
   border-radius: 50%;
   width: 56px;
@@ -130,7 +130,7 @@
 }
 
 .action-btn:hover {
-  background: #b7b9b9;
+  background: #128c7e;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

@@ -228,15 +228,12 @@ const UserDetails = () => {
       <div className="user-actions">
         <button className="action-btn" onClick={handleMessage}>
           <i className="fas fa-comment icon"></i>
-          <span className="label">Message</span>
         </button>
         <button className="action-btn" onClick={handleCall}>
           <i className="fas fa-phone icon"></i>
-          <span className="label">Call</span>
         </button>
         <button className="action-btn" onClick={handleVideoCall}>
           <i className="fas fa-video icon"></i>
-          <span className="label">Video</span>
         </button>
       </div>
 
