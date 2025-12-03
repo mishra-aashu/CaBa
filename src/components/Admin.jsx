@@ -193,8 +193,8 @@ const Admin = () => {
                 >
                   <div className="message-header">
                     <div className="user-info">
-                      <span className="user-name">{message.userName}</span>
-                      <span className="user-phone">({message.userPhone})</span>
+                      <span className="user-name">CaBa Support</span>
+                      <span className="user-phone">(1234)</span>
                     </div>
                     <div className="message-meta">
                       <span className="message-time">{formatTime(message.timestamp)}</span>

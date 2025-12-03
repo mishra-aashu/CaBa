@@ -39,7 +39,13 @@ const Home = () => {
   const [phoneLoading, setPhoneLoading] = useState(false);
 
   // Realtime chat list
-  const { chats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id);
+  const { chats: allChats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id);
+
+  // Filter out support chats for admin (if any exist)
+  const chats = allChats.filter(chat =>
+    !chat.otherUser?.phone?.includes('1234') &&
+    chat.otherUser?.id !== 'support-account'
+  );
 
   // DP options for avatar display
   const baseUrl = import.meta.env.BASE_URL || '/';
@@ -450,6 +456,7 @@ const Home = () => {
         .select('id, name, phone, avatar, is_online')
         .eq('phone', phone)
         .neq('id', currentUser?.id)
+        .neq('phone', '8002122966') // Hide admin phone from search results
         .limit(1); // Since phone should be unique
 
       if (error) throw error;
