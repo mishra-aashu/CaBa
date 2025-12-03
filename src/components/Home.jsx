@@ -303,7 +303,7 @@ const Home = () => {
   };
 
   const handleHelp = () => {
-    alert('Help Center\n\nFor support, please contact: support@caba.com');
+    navigate('/support');
   };
 
   const handleSaveContact = async () => {
