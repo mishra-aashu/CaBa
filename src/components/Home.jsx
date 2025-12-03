@@ -432,6 +432,20 @@ const Home = () => {
 
   const searchUsersByPhone = async (phone) => {
     try {
+      // Special case for support account
+      if (phone === '1234') {
+        const supportUser = {
+          id: 'support-account',
+          name: 'CaBa Support',
+          phone: '1234',
+          avatar: null,
+          is_online: true
+        };
+        setSearchSuggestions([supportUser]);
+        setShowSuggestions(true);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('users')
         .select('id, name, phone, avatar, is_online')
@@ -464,6 +478,16 @@ const Home = () => {
   };
 
   const handleSuggestionClick = (user) => {
+    // Special handling for support account
+    if (user.id === 'support-account') {
+      alert('Welcome to CaBa Support!\n\nFor help and support, please describe your issue and we\'ll assist you.\n\nYou can also visit our About page for more information about the app.');
+      setShowSearch(false);
+      setSearchTerm('');
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
     // Check if chat already exists
     const existingChat = chats.find(chat => chat.otherUser.id === user.id);
     if (existingChat) {
