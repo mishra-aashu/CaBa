@@ -182,7 +182,7 @@ const Admin = () => {
 
         {/* Support Messages Section */}
         <div className="admin-section">
-          <h2>Support Messages</h2>
+          <h2>Support Messages (1234 - CaBa)</h2>
           <div className="support-messages-list">
             {supportMessages.length > 0 ? (
               supportMessages.map(message => (
