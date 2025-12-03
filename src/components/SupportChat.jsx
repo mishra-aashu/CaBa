@@ -42,21 +42,32 @@ const SupportChat = () => {
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
 
+    // Get current user info
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
     const userMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: newMessage,
       sender: 'user',
       timestamp: new Date(),
-      status: 'sent'
+      status: 'sent',
+      userName: currentUser.name || 'Unknown User',
+      userPhone: currentUser.phone || 'Unknown',
+      isRead: false
     };
 
     setMessages(prev => [...prev, userMessage]);
     setNewMessage('');
 
+    // Save to localStorage for admin panel
+    const existingMessages = JSON.parse(localStorage.getItem('supportMessages') || '[]');
+    existingMessages.push(userMessage);
+    localStorage.setItem('supportMessages', JSON.stringify(existingMessages));
+
     // Simulate support response after a delay
     setTimeout(() => {
       const supportResponse = {
-        id: messages.length + 2,
+        id: Date.now() + 1,
         text: "Thank you for your message! Our support team will review it and get back to you soon. In the meantime, you can check our About page for more information.",
         sender: 'support',
         timestamp: new Date(),
