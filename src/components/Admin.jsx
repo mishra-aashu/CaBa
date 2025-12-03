@@ -29,7 +29,7 @@ const Admin = () => {
         return;
       }
 
-      // Check if user is admin (phone number check for now)
+      // Check if user is admin using the is_admin column
       const { data: userData, error } = await supabase
         .from('users')
         .select('*')
@@ -42,8 +42,8 @@ const Admin = () => {
         return;
       }
 
-      // Check if phone is admin phone (you can modify this logic)
-      if (userData.phone !== '8002122966') {
+      // Check if user has admin privileges
+      if (!userData.is_admin) {
         alert('Access denied. Admin privileges required.');
         navigate('/');
         return;

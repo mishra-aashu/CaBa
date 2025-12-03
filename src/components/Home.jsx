@@ -130,9 +130,8 @@ const Home = () => {
       // Update localStorage for compatibility
       localStorage.setItem('currentUser', JSON.stringify(currentUserData));
 
-      // Check if user is admin from localStorage (role column doesn't exist in users table)
-      const isAdminUser = localStorage.getItem('userRole') === 'admin';
-      setIsAdmin(isAdminUser);
+      // Check if user is admin from database
+      setIsAdmin(dbUser.is_admin || false);
 
       // Check if user needs to complete phone number (shouldn't happen for existing users, but just in case)
       if (!dbUser.phone) {
