@@ -682,15 +682,12 @@ const UserDetails = () => {
             <div className="user-actions">
                 <button className="action-btn" id="messageUserBtn" onClick={handleMessage}>
                     <MessageCircle size={24} style={{ color: 'white' }} />
-                    <span className="label">Message</span>
                 </button>
                 <button className="action-btn" id="voiceCallUserBtn" onClick={handleVoiceCall}>
                     <Phone size={24} style={{ color: 'white' }} />
-                    <span className="label">Call</span>
                 </button>
                 <button className="action-btn" id="videoCallUserBtn" onClick={handleVideoCall}>
                     <Video size={24} style={{ color: 'white' }} />
-                    <span className="label">Video</span>
                 </button>
             </div>
 
