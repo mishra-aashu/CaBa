@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useCall } from '../context/CallContext';
 import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit, MoreVertical } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
@@ -40,9 +41,10 @@ const dpOptionsData = [
 ];
 
 const UserDetails = () => {
-    const { userId } = useParams();
+    const { id: userId } = useParams();
     const navigate = useNavigate();
     const { supabase } = useSupabase();
+    const { startCall } = useCall();
 
     // State
     const [user, setUser] = useState(null);
@@ -196,9 +198,23 @@ const UserDetails = () => {
                 return;
             }
 
-            // For now, set placeholder counts
-            // In a real app, you would count actual media, links, and docs
-            setMediaCount({ images: 0, links: 0, docs: 0 });
+            // Count different types of media messages
+            const { data: messages, error: messagesError } = await supabase
+                .from('messages')
+                .select('message_type, content')
+                .eq('chat_id', chat.id);
+
+            if (messagesError) throw messagesError;
+
+            let images = 0, links = 0, docs = 0;
+
+            messages.forEach(msg => {
+                if (msg.message_type === 'image') images++;
+                else if (msg.message_type === 'document') docs++;
+                else if (msg.content && (msg.content.includes('http://') || msg.content.includes('https://'))) links++;
+            });
+
+            setMediaCount({ images, links, docs });
         } catch (error) {
             console.error('Error loading media count:', error);
             setMediaCount({ images: 0, links: 0, docs: 0 });
@@ -251,22 +267,24 @@ const UserDetails = () => {
         }
     };
 
-    const handleVoiceCall = () => {
-        // Set pending call in localStorage
-        localStorage.setItem('pendingCall', JSON.stringify({
-            contact: user,
-            type: 'voice'
-        }));
-        navigate('/calls');
+    const handleVoiceCall = async () => {
+        try {
+            const { callId } = await startCall(user.id, 'voice');
+            navigate(`/call/${callId}`);
+        } catch (error) {
+            console.error('Failed to start voice call:', error);
+            alert('Failed to start call: ' + error.message);
+        }
     };
 
-    const handleVideoCall = () => {
-        // Set pending call in localStorage
-        localStorage.setItem('pendingCall', JSON.stringify({
-            contact: user,
-            type: 'video'
-        }));
-        navigate('/calls');
+    const handleVideoCall = async () => {
+        try {
+            const { callId } = await startCall(user.id, 'video');
+            navigate(`/call/${callId}`);
+        } catch (error) {
+            console.error('Failed to start video call:', error);
+            alert('Failed to start call: ' + error.message);
+        }
     };
 
     const handleMuteToggle = () => {
@@ -663,15 +681,15 @@ const UserDetails = () => {
             {/* Action Buttons */}
             <div className="user-actions">
                 <button className="action-btn" id="messageUserBtn" onClick={handleMessage}>
-                    <span className="icon">chat</span>
+                    <MessageCircle size={24} style={{ color: 'white' }} />
                     <span className="label">Message</span>
                 </button>
                 <button className="action-btn" id="voiceCallUserBtn" onClick={handleVoiceCall}>
-                    <Phone className="icon" size={24} />
+                    <Phone size={24} style={{ color: 'white' }} />
                     <span className="label">Call</span>
                 </button>
                 <button className="action-btn" id="videoCallUserBtn" onClick={handleVideoCall}>
-                    <Video className="icon" size={24} />
+                    <Video size={24} style={{ color: 'white' }} />
                     <span className="label">Video</span>
                 </button>
             </div>

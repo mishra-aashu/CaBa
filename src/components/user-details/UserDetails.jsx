@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabase';
+import { useCall } from '../../context/CallContext';
 import { X } from 'lucide-react';
 import './UserDetails.css';
 
@@ -36,14 +38,18 @@ const dpOptionsData = [
   { id: 28, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267717_w.jpg` }
 ];
 
-const UserDetails = ({ userId, onBack }) => {
+const UserDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { startCall } = useCall();
   const [currentUser, setCurrentUser] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mediaCounts, setMediaCounts] = useState({ images: 0, links: 0, docs: 0 });
 
   useEffect(() => {
     initializeUserDetails();
-  }, [userId]);
+  }, [id]);
 
   const initializeUserDetails = async () => {
     try {
@@ -56,7 +62,8 @@ const UserDetails = ({ userId, onBack }) => {
       const currentUserData = JSON.parse(userStr);
       setCurrentUser(currentUserData);
 
-      await loadUserDetails(userId);
+      await loadUserDetails(id);
+      await loadMediaCounts(id);
       setLoading(false);
     } catch (error) {
       console.error('Error initializing user details:', error);
@@ -80,20 +87,84 @@ const UserDetails = ({ userId, onBack }) => {
     }
   };
 
+  const loadMediaCounts = async (userId) => {
+    try {
+      // Find the chat between current user and viewed user
+      const { data: chat, error: chatError } = await supabase
+        .from('chats')
+        .select('id')
+        .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${currentUser.id})`)
+        .single();
+
+      if (chatError || !chat) {
+        setMediaCounts({ images: 0, links: 0, docs: 0 });
+        return;
+      }
+
+      // Count different types of media messages
+      const { data: messages, error: messagesError } = await supabase
+        .from('messages')
+        .select('message_type, content')
+        .eq('chat_id', chat.id);
+
+      if (messagesError) throw messagesError;
+
+      let images = 0, links = 0, docs = 0;
+
+      messages.forEach(msg => {
+        if (msg.message_type === 'image') images++;
+        else if (msg.message_type === 'document') docs++;
+        else if (msg.content && (msg.content.includes('http://') || msg.content.includes('https://'))) links++;
+      });
+
+      setMediaCounts({ images, links, docs });
+    } catch (error) {
+      console.error('Error loading media counts:', error);
+      setMediaCounts({ images: 0, links: 0, docs: 0 });
+    }
+  };
+
   const handleMessage = () => {
-    alert('Navigate to chat - feature not implemented');
+    navigate(`/chat/new/${id}`);
   };
 
-  const handleCall = () => {
-    alert('Start voice call - feature not implemented');
+  const handleCall = async () => {
+    try {
+      const { callId } = await startCall(user.id, 'voice');
+      navigate(`/call/${callId}`);
+    } catch (error) {
+      console.error('Failed to start voice call:', error);
+      alert('Failed to start call: ' + error.message);
+    }
   };
 
-  const handleVideoCall = () => {
-    alert('Start video call - feature not implemented');
+  const handleVideoCall = async () => {
+    try {
+      const { callId } = await startCall(user.id, 'video');
+      navigate(`/call/${callId}`);
+    } catch (error) {
+      console.error('Failed to start video call:', error);
+      alert('Failed to start call: ' + error.message);
+    }
   };
 
-  const handleBlock = () => {
-    alert('Block user - feature not implemented');
+  const handleBlock = async () => {
+    const confirmed = window.confirm(`Block ${user.name}? They won't be able to message or call you.`);
+    if (!confirmed || !currentUser) return;
+
+    try {
+      const { error } = await supabase
+        .from('blocked_users')
+        .insert([{
+          blocker_id: currentUser.id,
+          blocked_id: user.id
+        }]);
+
+      if (error) throw error;
+      navigate('/');
+    } catch (error) {
+      console.error('Error blocking user:', error);
+    }
   };
 
   const getInitials = (name) => {
@@ -113,7 +184,7 @@ const UserDetails = ({ userId, onBack }) => {
     return (
       <div className="user-details-error">
         <p><X size={16} /> User not found</p>
-        <button onClick={onBack}>Go Back</button>
+        <button onClick={() => navigate('/')}>Go Back</button>
       </div>
     );
   }
@@ -122,7 +193,7 @@ const UserDetails = ({ userId, onBack }) => {
     <div className="user-details-container">
       <header className="app-header">
         <div className="header-left">
-          <button className="back-btn" onClick={onBack}>
+          <button className="back-btn" onClick={() => navigate('/')}>
             <i className="fas fa-arrow-left"></i>
           </button>
         </div>
@@ -177,15 +248,15 @@ const UserDetails = ({ userId, onBack }) => {
           <div className="media-preview">
             <div className="media-item">
               <i className="fas fa-image icon"></i>
-              <span className="count">0</span>
+              <span className="count">{mediaCounts.images}</span>
             </div>
             <div className="media-item">
               <i className="fas fa-link icon"></i>
-              <span className="count">0</span>
+              <span className="count">{mediaCounts.links}</span>
             </div>
             <div className="media-item">
               <i className="fas fa-file icon"></i>
-              <span className="count">0</span>
+              <span className="count">{mediaCounts.docs}</span>
             </div>
           </div>
         </div>

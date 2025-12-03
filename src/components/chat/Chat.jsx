@@ -483,10 +483,12 @@ const Chat = () => {
   };
 
   const handleViewContact = () => {
+    console.log('handleViewContact called, otherUserId:', otherUserId);
     if (!otherUserId || otherUserId === 'undefined') {
       alert('User information not available');
       return;
     }
+    console.log('Navigating to:', `/user-details/${otherUserId}`);
     navigate(`/user-details/${otherUserId}`);
   };
 
@@ -906,7 +908,7 @@ const Chat = () => {
               Cancel
             </button>
             <button className="delete-confirm-btn" onClick={confirmSelectionDelete}>
-              Delete
+              Confirm Delete
             </button>
           </div>
         </div>
@@ -986,3 +988,4 @@ const Chat = () => {
 };
  
 export default Chat;
+

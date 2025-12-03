@@ -419,7 +419,7 @@ const MessageItem = ({
                 onClick={confirmDelete}
                 style={{ padding: '10px 20px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}
               >
-                Delete
+                Confirm Delete
               </button>
             </div>
           </div>
