@@ -299,7 +299,7 @@ const Home = () => {
   };
 
   const handleAboutApp = () => {
-    alert('CaBa Messaging App v1.0.0\n\nA modern messaging application with end-to-end encryption.');
+    navigate('/about');
   };
 
   const handleHelp = () => {

@@ -14,6 +14,7 @@ import Calls from './components/calls';
 import Blocked from './components/blocked';
 import UserDetails from './components/UserDetails';
 import SharedProfile from './components/shared-profile';
+import About from './components/About';
 import Intro from './components/Intro';
 import CallScreen from './components/CallScreen';
 import CallStatusIndicator from './components/CallStatusIndicator';
@@ -93,6 +94,7 @@ function App() {
             <Route path="/create-reminder" element={<ProtectedRoute><CreateReminder /></ProtectedRoute>} />
             <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
             <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
+            <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
             <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
             <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
           </Routes>
