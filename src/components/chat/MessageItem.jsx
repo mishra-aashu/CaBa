@@ -25,6 +25,8 @@ const MessageItem = ({
   onSelect,
   onReply,
   onDelete,
+  onMediaView,
+  onMediaDownload,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -175,15 +177,15 @@ const MessageItem = ({
   };
 
   const handleDownload = async (mediaUrl, messageId) => {
-    // Placeholder for download functionality
-    console.log('Downloading media:', mediaUrl, messageId);
-    // In a real implementation, this would download the media
+    if (onMediaDownload) {
+      await onMediaDownload(mediaUrl, messageId);
+    }
   };
 
   const handleView = (mediaUrl, mediaType) => {
-    // Placeholder for view functionality
-    console.log('Viewing media:', mediaUrl, mediaType);
-    // In a real implementation, this would open a media viewer
+    if (onMediaView) {
+      onMediaView(mediaUrl, mediaType, message);
+    }
   };
 
   const renderMessageContent = () => {
@@ -301,6 +303,7 @@ const MessageItem = ({
         </div>
       )}
       <div className="message-content">
+        {/* Message bubble with all content */}
         <div className="message-bubble" ref={bubbleRef}>
           {/* Reply indicator */}
           {isReplied && (
@@ -340,12 +343,6 @@ const MessageItem = ({
             renderMessageContent()
           )}
 
-          {/* Message time */}
-          <span className="message-time">
-            {formatTime(message.created_at)}
-            {message.edited_at && ' (edited)'}
-          </span>
-
           {/* Vanish timer */}
           {message.vanish_at && !message.is_vanished && (
             <div className="vanish-timer">
@@ -365,6 +362,15 @@ const MessageItem = ({
             </span>
           )}
         </div>
+
+        {/* Timestamp positioned outside bubble */}
+        <div className="message-meta">
+          <span className="message-time">
+            {formatTime(message.created_at)}
+            {message.edited_at && ' (edited)'}
+          </span>
+        </div>
+
         {/* Message actions dropdown */}
         {showActions && !isSelectionMode && (
           <div className="message-actions">

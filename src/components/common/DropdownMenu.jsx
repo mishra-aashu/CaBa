@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MoreVertical } from 'lucide-react';
+import { useChatTheme } from '../../contexts/ChatThemeContext';
 import './DropdownMenu.css';
 
 const DropdownMenu = ({
@@ -11,6 +12,9 @@ const DropdownMenu = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+    
+    // Get theme context for dynamic colors
+    const { currentThemeData } = useChatTheme();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -56,9 +60,12 @@ const DropdownMenu = ({
                                     className={`dropdown-item ${item.danger ? 'danger' : ''} ${item.className || ''}`}
                                     onClick={() => handleItemClick(item)}
                                     disabled={item.disabled}
-                                    style={item.style}
+                                    style={{
+                                        ...item.style,
+                                        color: item.danger ? '#dc3545' : 'var(--chat-input-text, #212529)'
+                                    }}
                                 >
-                                    {item.icon && <span className="dropdown-item-icon">{item.icon}</span>}
+                                    {item.icon && <span className="dropdown-item-icon" style={{color: item.danger ? '#dc3545' : 'var(--chat-input-icon-color, #667eea)'}}>{item.icon}</span>}
                                     <span className="dropdown-item-label">{item.label}</span>
                                     {item.badge && <span className="dropdown-item-badge">{item.badge}</span>}
                                 </button>

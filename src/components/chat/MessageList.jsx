@@ -8,7 +8,9 @@ const MessageList = ({
   isSelectionMode,
   onMessageSelect,
   onReply,
-  onDelete
+  onDelete,
+  onMediaView,
+  onMediaDownload
 }) => {
   // Group messages by date
   const groupMessagesByDate = (messages) => {
@@ -49,6 +51,8 @@ const MessageList = ({
               onSelect={() => onMessageSelect(message.id)}
               onReply={() => onReply(message)}
               onDelete={onDelete}
+              onMediaView={onMediaView}
+              onMediaDownload={onMediaDownload}
             />
           ))}
         </React.Fragment>

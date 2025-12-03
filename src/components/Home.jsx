@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck, Edit, Trash2 } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import Chat from './chat/Chat';
@@ -31,12 +31,15 @@ const Home = () => {
   const [savedContacts, setSavedContacts] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [showContactActions, setShowContactActions] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [phoneLoading, setPhoneLoading] = useState(false);
+  const [contactMenuOpen, setContactMenuOpen] = useState(null);
 
   // Realtime chat list
   const { chats: allChats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id);
@@ -401,10 +404,35 @@ const Home = () => {
 
       // Reload contacts
       await loadSavedContacts();
+      setContactMenuOpen(null);
     } catch (error) {
       console.error('Error in handleDeleteContact:', error);
       alert('Failed to delete contact');
     }
+  };
+
+  const handleContactMenuToggle = (contactId, event, contactIndex) => {
+    event.stopPropagation();
+    // For top contacts (first 2-3), show menu above, for others show below
+    const shouldShowAbove = contactIndex < 3;
+    setContactMenuOpen({
+      id: contactMenuOpen?.id === contactId ? null : contactId,
+      showAbove: shouldShowAbove
+    });
+  };
+
+  const handleContactClick = (contact) => {
+    if (contactMenuOpen) {
+      setContactMenuOpen(null);
+    } else {
+      handleStartChatWithContact(contact);
+    }
+  };
+
+  const handleEditContact = (contact) => {
+    // For now, just show an alert - edit functionality can be added later
+    alert(`Edit functionality for ${contact.name} coming soon!`);
+    setContactMenuOpen(null);
   };
 
   const getInitials = (name) => {
@@ -456,7 +484,7 @@ const Home = () => {
         .select('id, name, phone, avatar, is_online')
         .eq('phone', phone)
         .neq('id', currentUser?.id)
-        .neq('phone', '8002122966') // Hide admin phone from search results
+        .eq('is_admin', false) // Hide admin users from search results
         .limit(1); // Since phone should be unique
 
       if (error) throw error;
@@ -533,7 +561,7 @@ const Home = () => {
       {/* Desktop Layout */}
       <div className={`desktop-layout ${isChatOpen ? 'chat-active' : ''}`}>
         {/* Sidebar */}
-        <aside className={`sidebar ${isChatOpen ? 'hidden-on-mobile' : ''}`}>
+        <aside className={`sidebar ${isChatOpen ? 'visible-on-mobile' : 'hidden-on-mobile'}`}>
           <div className="sidebar-header">
             <div className="app-logo-small">CB</div>
             <span className="app-name-small">CaBa</span>
@@ -904,8 +932,12 @@ const Home = () => {
                 <h3>Saved Contacts</h3>
                 <div className="saved-contacts-list">
                   {savedContacts.length > 0 ? (
-                    savedContacts.map(contact => (
-                      <div key={contact.id} className="saved-contact-item">
+                    savedContacts.map((contact, index) => (
+                      <div
+                        key={contact.id}
+                        className={`saved-contact-item ${contactMenuOpen?.id === contact.id ? 'menu-open' : ''}`}
+                        onClick={() => handleContactClick(contact)}
+                      >
                         <div className="contact-info">
                           <div className="contact-avatar">
                             {contact.avatar ? (
@@ -918,18 +950,42 @@ const Home = () => {
                               <div>{getInitials(contact.name)}</div>
                             )}
                           </div>
-                          <div>
+                          <div className="contact-details">
                             <div className="contact-name">{contact.name}</div>
                             <div className="contact-phone">{contact.phone}</div>
                           </div>
                         </div>
                         <button
-                          className="delete-contact-btn"
-                          onClick={() => handleDeleteContact(contact.id)}
-                          title="Delete"
+                          className="contact-menu-btn"
+                          onClick={(e) => handleContactMenuToggle(contact.id, e, index)}
+                          title="Options"
                         >
-                          <X size={18} />
+                          <MoreVertical size={18} />
                         </button>
+                        {contactMenuOpen?.id === contact.id && (
+                          <div className={`contact-menu ${contactMenuOpen.showAbove ? 'show-above' : 'show-below'}`}>
+                            <button
+                              className="menu-item edit-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditContact(contact);
+                              }}
+                            >
+                              <Edit size={16} />
+                              Edit
+                            </button>
+                            <button
+                              className="menu-item delete-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteContact(contact.id);
+                              }}
+                            >
+                              <Trash2 size={16} />
+                              Delete
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))
                   ) : (

@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { useChatTheme } from '../../contexts/ChatThemeContext';
@@ -10,11 +10,13 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import WallpaperSelector from './WallpaperSelector';
+import MediaViewer from '../media/MediaViewer';
 import MessagingLoader from '../MessagingLoader';
 import { useRealtimeMessages } from '../../hooks/useRealtimeMessages';
 import { useTypingIndicator } from '../../hooks/useRealtimeTyping';
 import { useMessageStatusUpdates } from '../../hooks/useMessageStatusUpdates';
-import './Chat.css';
+import '../../styles/chat.css';
+import './AttachmentMenu.css';
 
 // DP options for avatar display
 const baseUrl = import.meta.env.BASE_URL || '/';
@@ -53,9 +55,15 @@ const Chat = () => {
   const { chatId, otherUserId, userId } = useParams();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
-  const { chatTheme, chatThemes, selectTheme, setScrollPercentage } = useChatTheme();
+  const { chatTheme, chatThemes, selectTheme, setChatId, setScrollPercentage } = useChatTheme();
   const { startCall } = useCall();
 
+  // Initialize chat theme when chatId changes
+  useEffect(() => {
+    if (chatId) {
+      setChatId(chatId);
+    }
+  }, [chatId, setChatId]);
   // State
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
@@ -76,6 +84,8 @@ const Chat = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
+  const [currentMediaInfo, setCurrentMediaInfo] = useState(null);
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -318,8 +328,8 @@ const Chat = () => {
   };
 
 
-  const sendMessage = async (content) => {
-    if (!content.trim() || !currentUser) return;
+  const sendMessage = async (content, mediaData = null) => {
+    if ((!content.trim() && !mediaData) || !currentUser) return;
 
     try {
       const newMessage = {
@@ -327,10 +337,18 @@ const Chat = () => {
         chat_id: chatId,
         sender_id: currentUser.id,
         receiver_id: otherUserId,
-        content: content.trim(),
-        message_type: 'text',
+        content: content.trim() || (mediaData ? mediaData.fileName : ''),
+        message_type: mediaData ? mediaData.mediaType : 'text',
         is_read: false
       };
+
+      // Add media fields if present
+      if (mediaData) {
+        newMessage.media_url = mediaData.mediaUrl;
+        newMessage.media_type = mediaData.mediaType;
+        newMessage.file_name = mediaData.fileName;
+        newMessage.file_size = mediaData.fileSize;
+      }
 
       const { data, error } = await supabase
         .from('messages')
@@ -343,10 +361,15 @@ const Chat = () => {
         setMessages(prev => [...prev, data[0]]);
       }
 
+      // Update chat's last message
+      const lastMessageText = mediaData ?
+        `📎 ${mediaData.fileName}` :
+        content.substring(0, 50);
+
       await supabase
         .from('chats')
         .update({
-          last_message: content.substring(0, 50),
+          last_message: lastMessageText,
           last_message_time: new Date().toISOString()
         })
         .eq('id', chatId);
@@ -673,6 +696,37 @@ const Chat = () => {
     markMessagesAsRead();
   };
 
+  const handleMediaView = (mediaUrl, mediaType, message) => {
+    // For now, we'll use the media URL directly
+    // In a more complete implementation, we'd get the media ID from the message
+    const fileInfo = {
+      file_name: message.file_name || 'Unknown',
+      file_size: message.file_size || 0,
+      mime_type: message.media_type || 'image/jpeg',
+      storage_url: mediaUrl,
+      file_type: mediaType
+    };
+
+    setCurrentMediaInfo({ fileInfo });
+    setMediaViewerOpen(true);
+  };
+
+  const handleMediaDownload = async (mediaUrl, messageId) => {
+    try {
+      // Create a temporary link to download the file
+      const link = document.createElement('a');
+      link.href = mediaUrl;
+      link.download = `media_${messageId}`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download media');
+    }
+  };
+
   if (!otherUser || !currentUser) {
     return <MessagingLoader />;
   }
@@ -812,6 +866,8 @@ const Chat = () => {
           onMessageSelect={handleMessageSelect}
           onReply={handleReply}
           onDelete={(messageId) => setMessages(prev => prev.filter(m => m.id !== messageId))}
+          onMediaView={handleMediaView}
+          onMediaDownload={handleMediaDownload}
         />
 
         <TypingIndicator isVisible={isOtherUserTyping} />
@@ -835,6 +891,8 @@ const Chat = () => {
         onTyping={handleTyping}
         replyingTo={replyingTo}
         onCancelReply={cancelReply}
+        chatId={chatId}
+        receiverId={otherUserId}
       />
 
       {/* Wallpaper Selector */}
@@ -932,7 +990,7 @@ const Chat = () => {
                   borderRadius: '8px',
                   overflow: 'hidden',
                   transition: 'transform 0.2s, box-shadow 0.2s',
-                  border: chatTheme === key ? '3px solid var(--primary-color)' : '1px solid #ddd',
+                  border: chatTheme === key ? '3px solid var(--chat-input-icon-color, #667eea)' : '1px solid var(--chat-input-icon-color, #ddd)',
                   height: '80px',
                   background: 'none',
                   padding: 0
@@ -949,7 +1007,8 @@ const Chat = () => {
                   display: 'flex',
                   justifyContent: 'space-between',
                   padding: '4px 8px',
-                  height: '40%'
+                  height: '40%',
+                  background: 'rgba(0, 0, 0, 0.2)'
                 }}>
                   <div style={{
                     width: '35px',
@@ -971,8 +1030,8 @@ const Chat = () => {
                   right: '8px',
                   fontSize: '0.7rem',
                   fontWeight: '500',
-                  color: '#ffffff',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                  color: theme.header.text,
+                  textShadow: '0 1px 2px rgba(0,0,0,0.7)',
                   textAlign: 'center'
                 }}>
                   {theme.name}
@@ -983,9 +1042,22 @@ const Chat = () => {
         </div>
       </Modal>
 
+      {/* Media Viewer */}
+      <MediaViewer
+        isOpen={mediaViewerOpen}
+        onClose={() => {
+          setMediaViewerOpen(false);
+          setCurrentMediaInfo(null);
+        }}
+        mediaId={currentMediaInfo?.mediaId}
+        fileInfo={currentMediaInfo?.fileInfo}
+      />
+
     </div>
   );
 };
  
 export default Chat;
+
+
 

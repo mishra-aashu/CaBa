@@ -1,10 +1,19 @@
 import React, { useState, useRef } from 'react';
-import EmojiPicker from '../common/EmojiPicker';
+import AttachmentMenu from './AttachmentMenu';
 
-const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) => {
+const MessageInput = ({ 
+  onSendMessage, 
+  onTyping, 
+  replyingTo, 
+  onCancelReply,
+  chatId,
+  receiverId
+}) => {
   const [message, setMessage] = useState('');
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [showQuickReplies, setShowQuickReplies] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const textareaRef = useRef(null);
 
   // Default quick reply messages
@@ -28,7 +37,7 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+      textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
     }
 
     // Trigger typing indicator
@@ -54,26 +63,58 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
   };
 
   const toggleAttachmentMenu = () => {
+    console.log('Attachment button clicked! Current state:', showAttachmentMenu);
     setShowAttachmentMenu(!showAttachmentMenu);
+    setShowQuickReplies(false);
+    console.log('New state:', !showAttachmentMenu);
   };
 
-  const handleFileSelect = (type) => {
-    // Handle file selection based on type
-    console.log('File type selected:', type);
-    setShowAttachmentMenu(false);
+  // Handle file selection from the attachment menu
+  const handleFileSelect = async (mediaData) => {
+    setIsUploading(true);
+
+    try {
+      if (mediaData.type === 'location') {
+        // Handle location share
+        const locationMessage = `📍 Location: ${mediaData.address}`;
+        onSendMessage(locationMessage);
+      } else if (mediaData.type === 'contact') {
+        // Handle contact share
+        const contactMessage = `👤 Contact: ${mediaData.name}${mediaData.phones.length > 0 ? ` (${mediaData.phones[0]})` : ''}`;
+        onSendMessage(contactMessage);
+      } else if (mediaData.type === 'reminder') {
+        // Handle reminder share
+        const reminderMessage = `⏰ Reminder: ${mediaData.message}`;
+        onSendMessage(reminderMessage);
+      } else {
+        // Handle media upload (image, video, audio, document)
+        const content = mediaData.fileName || 'File';
+        onSendMessage(content, {
+          mediaUrl: mediaData.mediaUrl,
+          mediaType: mediaData.mediaType,
+          fileName: mediaData.fileName,
+          fileSize: mediaData.fileSize,
+          mimeType: mediaData.mimeType
+        });
+      }
+
+      // Reset state
+      setMessage('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
+
+    } catch (error) {
+      console.error('Error handling file selection:', error);
+      alert('Failed to process file: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleQuickReply = (reply) => {
     onSendMessage(reply);
     setShowQuickReplies(false);
-  };
-
-  const handleEmojiSelect = (emoji) => {
-    setMessage(prev => prev + emoji);
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.focus();
-    }
   };
 
   const toggleQuickReplies = () => {
@@ -102,7 +143,7 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
         <button
           className="btn-attach"
           onClick={toggleAttachmentMenu}
-          title="Attach"
+          title="Attach Media"
         >
           <i className="fas fa-paperclip"></i>
         </button>
@@ -115,8 +156,6 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
           <i className="fas fa-comment-dots"></i>
         </button>
 
-        <EmojiPicker onEmojiSelect={handleEmojiSelect} />
-
         <textarea
           ref={textareaRef}
           className="chat-input"
@@ -124,60 +163,33 @@ const MessageInput = ({ onSendMessage, onTyping, replyingTo, onCancelReply }) =>
           value={message}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          rows={1}
+          rows={2}
+          disabled={isUploading}
         />
 
         <button
           className="btn-send"
           onClick={handleSend}
-          disabled={!message.trim()}
+          disabled={!message.trim() || isUploading}
         >
           <span id="sendIcon">
-            <i className="fas fa-paper-plane"></i>
+            {isUploading ? (
+              <i className="fas fa-spinner fa-spin"></i>
+            ) : (
+              <i className="fas fa-paper-plane"></i>
+            )}
           </span>
         </button>
       </div>
 
-      {/* Attachment Menu */}
-      {showAttachmentMenu && (
-        <div className="attachment-menu">
-          <button
-            className="attach-option"
-            onClick={() => handleFileSelect('image')}
-          >
-            <i className="fas fa-image"></i>
-            <span>Image</span>
-          </button>
-          <button
-            className="attach-option"
-            onClick={() => handleFileSelect('video')}
-          >
-            <i className="fas fa-video"></i>
-            <span>Video</span>
-          </button>
-          <button
-            className="attach-option"
-            onClick={() => handleFileSelect('audio')}
-          >
-            <i className="fas fa-microphone"></i>
-            <span>Audio</span>
-          </button>
-          <button
-            className="attach-option"
-            onClick={() => handleFileSelect('document')}
-          >
-            <i className="fas fa-file"></i>
-            <span>Document</span>
-          </button>
-          <button
-            className="attach-option"
-            onClick={() => handleFileSelect('screen-share')}
-          >
-            <i className="fas fa-desktop"></i>
-            <span>Screen Share</span>
-          </button>
-        </div>
-      )}
+      {/* WhatsApp-Style Attachment Menu */}
+      <AttachmentMenu
+        isVisible={showAttachmentMenu}
+        onFileSelect={handleFileSelect}
+        onClose={() => setShowAttachmentMenu(false)}
+        chatId={chatId}
+        receiverId={receiverId}
+      />
 
       {/* Quick Replies Menu */}
       {showQuickReplies && (
