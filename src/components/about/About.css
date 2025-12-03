@@ -197,10 +197,19 @@
 }
 
 .privacy-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
   padding: 16px;
   background: var(--home-hover, #f8f9fa);
   border-radius: 8px;
   border-left: 4px solid var(--home-primary, #4CAF50);
+}
+
+.privacy-icon {
+  color: var(--home-primary, #4CAF50);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .privacy-point h4 {

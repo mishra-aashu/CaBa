@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Lock, Eye, MessageCircle, Phone, Users, Heart } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Eye, MessageCircle, Phone, Users, Heart, Trash2, FileText } from 'lucide-react';
 import './about/About.css';
 
 const About = () => {
@@ -100,28 +100,58 @@ const About = () => {
           <h3>Your Privacy Matters</h3>
           <div className="privacy-points">
             <div className="privacy-point">
-              <h4>🔒 Data Encryption</h4>
-              <p>Your messages are encrypted in transit and at rest using AES-256 encryption.</p>
+              <div className="privacy-icon">
+                <Lock size={20} />
+              </div>
+              <div>
+                <h4>Data Encryption</h4>
+                <p>Your messages are encrypted in transit and at rest using AES-256 encryption.</p>
+              </div>
             </div>
             <div className="privacy-point">
-              <h4>🚫 No Tracking</h4>
-              <p>We don't track your location or monitor your online activity.</p>
+              <div className="privacy-icon">
+                <Shield size={20} />
+              </div>
+              <div>
+                <h4>No Tracking</h4>
+                <p>We don't track your location or monitor your online activity.</p>
+              </div>
             </div>
             <div className="privacy-point">
-              <h4>📱 Device Control</h4>
-              <p>You control who can contact you and what information is shared.</p>
+              <div className="privacy-icon">
+                <Eye size={20} />
+              </div>
+              <div>
+                <h4>Device Control</h4>
+                <p>You control who can contact you and what information is shared.</p>
+              </div>
             </div>
             <div className="privacy-point">
-              <h4>🗑️ Data Deletion</h4>
-              <p>You can delete your account and all associated data at any time.</p>
+              <div className="privacy-icon">
+                <Trash2 size={20} />
+              </div>
+              <div>
+                <h4>Data Deletion</h4>
+                <p>You can delete your account and all associated data at any time.</p>
+              </div>
             </div>
             <div className="privacy-point">
-              <h4>🔐 Secure Authentication</h4>
-              <p>Multi-factor authentication and secure login methods protect your account.</p>
+              <div className="privacy-icon">
+                <Shield size={20} />
+              </div>
+              <div>
+                <h4>Secure Authentication</h4>
+                <p>Multi-factor authentication and secure login methods protect your account.</p>
+              </div>
             </div>
             <div className="privacy-point">
-              <h4>📋 Minimal Data Collection</h4>
-              <p>We only collect what's necessary: your name, phone number, and profile information.</p>
+              <div className="privacy-icon">
+                <FileText size={20} />
+              </div>
+              <div>
+                <h4>Minimal Data Collection</h4>
+                <p>We only collect what's necessary: your name, phone number, and profile information.</p>
+              </div>
             </div>
           </div>
         </div>
