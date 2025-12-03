@@ -5,6 +5,7 @@ import { useCall } from '../context/CallContext';
 import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit, MoreVertical } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
+import MessagingLoader from './MessagingLoader';
 import './user-details/UserDetails.css';
 
 // DP options for avatar display
@@ -624,12 +625,7 @@ const UserDetails = () => {
     };
 
     if (loading) {
-        return (
-            <div className="user-details-loading">
-                <div className="loading-spinner"></div>
-                <p>Loading...</p>
-            </div>
-        );
+        return <MessagingLoader />;
     }
 
     if (!user) {
