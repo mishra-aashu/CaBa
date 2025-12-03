@@ -15,6 +15,7 @@ import Blocked from './components/blocked';
 import UserDetails from './components/UserDetails';
 import SharedProfile from './components/shared-profile';
 import About from './components/About';
+import SupportChat from './components/SupportChat';
 import Intro from './components/Intro';
 import CallScreen from './components/CallScreen';
 import CallStatusIndicator from './components/CallStatusIndicator';
@@ -95,6 +96,7 @@ function App() {
             <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
             <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
             <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+            <Route path="/support" element={<ProtectedRoute><SupportChat /></ProtectedRoute>} />
             <Route path="/user-details/:id" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
             <Route path="/shared-profile/:id" element={<ProtectedRoute><SharedProfile /></ProtectedRoute>} />
           </Routes>

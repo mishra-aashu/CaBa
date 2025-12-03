@@ -480,7 +480,7 @@ const Home = () => {
   const handleSuggestionClick = (user) => {
     // Special handling for support account
     if (user.id === 'support-account') {
-      alert('Welcome to CaBa Support!\n\nFor help and support, please describe your issue and we\'ll assist you.\n\nYou can also visit our About page for more information about the app.');
+      navigate('/support');
       setShowSearch(false);
       setSearchTerm('');
       setSearchSuggestions([]);
