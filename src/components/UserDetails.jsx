@@ -899,22 +899,25 @@ const UserDetails = () => {
             </Modal>
 
             {/* Image Modal */}
-            <Modal
-                isOpen={showImageModal}
-                onClose={() => setShowImageModal(false)}
-                title=""
-                size="large"
-            >
-                <div className="image-modal-content">
-                    {user.avatar && (
-                        <img
-                            src={parseInt(user.avatar) ? dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path : user.avatar}
-                            alt={user.name}
-                            className="full-screen-image"
-                        />
-                    )}
+            {showImageModal && (
+                <div className="modal-backdrop" onClick={() => setShowImageModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="close-modal-btn" onClick={() => setShowImageModal(false)}>
+                            ×
+                        </button>
+                        <div className="image-modal-content">
+                            {user.avatar && (
+                                <img
+                                    src={parseInt(user.avatar) ? dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path : user.avatar}
+                                    alt={user.name}
+                                    className="full-screen-image"
+                                    onClick={() => setShowImageModal(false)}
+                                />
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </Modal>
+            )}
         </div>
     );
 };
