@@ -63,6 +63,7 @@ const UserDetails = () => {
     const [showBlockModal, setShowBlockModal] = useState(false);
     const [showEditContactModal, setShowEditContactModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showImageModal, setShowImageModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
     const [reportDetails, setReportDetails] = useState('');
 
@@ -663,7 +664,7 @@ const UserDetails = () => {
 
             {/* User Profile Section */}
             <div className="user-profile-section">
-                <div className="user-details-avatar" id="userDetailAvatar">
+                <div className="user-details-avatar" id="userDetailAvatar" onClick={() => user.avatar && setShowImageModal(true)} style={{ cursor: user.avatar ? 'pointer' : 'default' }}>
                     {user.avatar ? (
                         parseInt(user.avatar) ? (
                             <img id="userDetailImg" src={dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path} alt={user.name} />
@@ -894,6 +895,24 @@ const UserDetails = () => {
                             Report
                         </button>
                     </div>
+                </div>
+            </Modal>
+
+            {/* Image Modal */}
+            <Modal
+                isOpen={showImageModal}
+                onClose={() => setShowImageModal(false)}
+                title=""
+                size="large"
+            >
+                <div className="image-modal-content">
+                    {user.avatar && (
+                        <img
+                            src={parseInt(user.avatar) ? dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path : user.avatar}
+                            alt={user.name}
+                            className="full-screen-image"
+                        />
+                    )}
                 </div>
             </Modal>
         </div>
