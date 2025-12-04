@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../utils/supabase';
+import { useEffect, useState, useCallback } from 'react';
+import { useSupabase } from '../contexts/SupabaseContext';
 
 export const useTypingIndicator = (chatId, currentUserId) => {
+    const { supabase } = useSupabase();
     const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
 
     useEffect(() => {
-        if (!chatId) return;
+        if (!chatId || !supabase) return;
 
         const channel = supabase
             .channel(`typing_${chatId}`)
@@ -13,7 +14,6 @@ export const useTypingIndicator = (chatId, currentUserId) => {
                 if (payload.payload.userId !== currentUserId) {
                     setIsOtherUserTyping(payload.payload.isTyping);
 
-                    // Auto-hide after 3 seconds
                     if (payload.payload.isTyping) {
                         setTimeout(() => setIsOtherUserTyping(false), 3000);
                     }
@@ -22,16 +22,18 @@ export const useTypingIndicator = (chatId, currentUserId) => {
             .subscribe();
 
         return () => channel.unsubscribe();
-    }, [chatId, currentUserId]);
+    }, [chatId, currentUserId, supabase]);
 
-    const sendTypingStatus = (isTyping) => {
+    const sendTypingStatus = useCallback((isTyping) => {
+        if (!supabase || !chatId) return;
+        
         const channel = supabase.channel(`typing_${chatId}`);
         channel.send({
             type: 'broadcast',
             event: 'typing',
             payload: { userId: currentUserId, isTyping }
         });
-    };
+    }, [supabase, chatId, currentUserId]);
 
     return { isOtherUserTyping, sendTypingStatus };
 };

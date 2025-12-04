@@ -43,8 +43,8 @@ const Home = () => {
   const [phoneLoading, setPhoneLoading] = useState(false);
   const [contactMenuOpen, setContactMenuOpen] = useState(null);
 
-  // Realtime chat list
-  const { chats: allChats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id);
+  // Realtime chat list with service role for custom auth
+  const { chats: allChats, setChats, loading: chatsLoading } = useChatListRealtime(currentUser?.id ? currentUser.id : null);
 
   // Filter out support chats for admin (if any exist)
   const chats = allChats.filter(chat =>
@@ -536,8 +536,21 @@ const Home = () => {
     if (existingChat) {
       handleChatClick(existingChat);
     } else {
-      // Navigate to new chat
-      navigate(`/chat/new/${user.id}`);
+      // Create new chat in localStorage
+      const newChat = {
+        id: `chat_${currentUser.id}_${user.id}`,
+        otherUser: user,
+        last_message: '',
+        last_message_time: new Date().toISOString(),
+        unreadCount: 0
+      };
+      
+      const updatedChats = [newChat, ...chats];
+      setChats(updatedChats);
+      localStorage.setItem(`chats_${currentUser.id}`, JSON.stringify(updatedChats));
+      
+      // Navigate to chat
+      navigate(`/chat/${newChat.id}/${user.id}`);
     }
     setShowSearch(false);
     setSearchTerm('');
@@ -551,14 +564,133 @@ const Home = () => {
     if (existingChat) {
       handleChatClick(existingChat);
     } else {
-      // Navigate to new chat
-      navigate(`/chat/new/${contact.id}`);
+      // Create new chat in localStorage
+      const newChat = {
+        id: `chat_${currentUser.id}_${contact.id}`,
+        otherUser: contact,
+        last_message: '',
+        last_message_time: new Date().toISOString(),
+        unreadCount: 0
+      };
+      
+      const updatedChats = [newChat, ...chats];
+      setChats(updatedChats);
+      localStorage.setItem(`chats_${currentUser.id}`, JSON.stringify(updatedChats));
+      
+      // Navigate to chat
+      navigate(`/chat/${newChat.id}/${contact.id}`);
     }
     setShowNewContactModal(false);
     setShowSelectContact(false);
   };
 
-  if (authLoading || loading || chatsLoading) {
+  if (authLoading || loading) {
+    return <MessagingLoader />;
+  }
+
+  // Show phone modal if needed
+  if (showPhoneModal) {
+    return (
+      <div className="home-container">
+        <Modal
+          isOpen={showPhoneModal}
+          onClose={() => {}}
+          title="Complete Your Profile"
+          size="medium"
+        >
+          <div className="phone-completion-modal">
+            <div className="phone-modal-header">
+              <h3>Complete Your Profile</h3>
+              <p>Please provide your phone number and create a password to complete your account setup.</p>
+            </div>
+
+            <form onSubmit={handlePhoneSubmit} className="phone-form">
+              <div className="input-group">
+                <label htmlFor="phone">Phone Number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  placeholder="10 digit mobile number"
+                  pattern="[0-9]{10}"
+                  maxLength="10"
+                  required
+                  autoComplete="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  disabled={phoneLoading}
+                />
+                <small>10 digits without country code</small>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="password">Password (Required for backup login)</label>
+                <div className="password-input">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    placeholder="Create a password (min 6 characters)"
+                    minLength="6"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={phoneLoading}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <small>Required: Create password for backup login</small>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <div className="password-input">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    placeholder="Confirm your password"
+                    minLength="6"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={phoneLoading}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={phoneLoading || phoneNumber.length !== 10}
+              >
+                {phoneLoading ? 'Saving...' : 'Save Profile'}
+              </button>
+            </form>
+
+            <div className="phone-modal-footer">
+              <p className="phone-note">
+                <strong>Note:</strong> Your phone number will be visible to other users for contact purposes.
+                The password enables backup login access.
+              </p>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    );
+  }
+
+  if (chatsLoading) {
     return <MessagingLoader />;
   }
 
@@ -739,7 +871,11 @@ const Home = () => {
           {/* Chat List */}
           <div className="chat-list-container">
             <div className="chat-list">
-              {filteredChats.length > 0 ? (
+              {chatsLoading ? (
+                <div className="loading-state">
+                  <p>Loading chats...</p>
+                </div>
+              ) : filteredChats.length > 0 ? (
                 filteredChats.map(chat => (
                   <div
                     key={chat.id}
@@ -747,16 +883,16 @@ const Home = () => {
                     onClick={() => handleChatClick(chat)}
                   >
                     <div className="chat-avatar">
-                      {chat.otherUser.avatar ? (
+                      {chat.otherUser?.avatar ? (
                         <img src={parseInt(chat.otherUser.avatar) ? dpOptions.find(dp => dp.id === parseInt(chat.otherUser.avatar))?.path : chat.otherUser.avatar} alt={chat.otherUser.name} />
                       ) : (
-                        <div>{getInitials(chat.otherUser.name)}</div>
+                        <div>{getInitials(chat.otherUser?.name || 'U')}</div>
                       )}
-                      <span className={`online-status ${chat.otherUser.is_online ? 'online' : ''}`}></span>
+                      <span className={`online-status ${chat.otherUser?.is_online ? 'online' : ''}`}></span>
                     </div>
                     <div className="chat-info">
                       <div className="chat-header">
-                        <h3 className="chat-name">{chat.otherUser.name}</h3>
+                        <h3 className="chat-name">{chat.otherUser?.name || 'Unknown'}</h3>
                         <span className="chat-time">
                           {formatTime(chat.last_message_time)}
                         </span>
@@ -776,7 +912,7 @@ const Home = () => {
                 <div key="empty-state" className="empty-state">
                   <MessageCircle size={64} />
                   <h3>No conversations yet</h3>
-                  <p>Start messaging your contacts</p>
+                  <p>Start messaging your contacts or search by phone number</p>
                 </div>
               )}
             </div>

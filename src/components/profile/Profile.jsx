@@ -46,49 +46,30 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ chats: 0, calls: 0, contacts: 0 });
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showNameModal, setShowNameModal] = useState(false);
-  const [showAboutModal, setShowAboutModal] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
   const [showDpModal, setShowDpModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showScanQrModal, setShowScanQrModal] = useState(false);
   const [showUserFoundModal, setShowUserFoundModal] = useState(false);
   const [foundUser, setFoundUser] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', about: '', email: '' });
-  const [modalForm, setModalForm] = useState({ name: '', about: '', email: '' });
-  const [dpOptions, setDpOptions] = useState(dpOptionsData);
-  const [currentPlayingAudio, setCurrentPlayingAudio] = useState(null);
 
-  // Load profile data on component mount
   useEffect(() => {
     if (!authLoading) {
       loadProfileData();
     }
-    return () => {
-      // Cleanup audio on unmount
-      if (currentPlayingAudio) {
-        currentPlayingAudio.pause();
-      }
-    };
   }, [authUser, authLoading]);
 
-  // Load profile data
   const loadProfileData = async () => {
     try {
-      if (!authUser) {
-        console.log('No authenticated user found');
-        return;
-      }
+      if (!authUser) return;
 
-      // Try to get from cache first
       const cachedProfile = localStorage.getItem(`digidad_profile_${authUser.id}`);
       if (cachedProfile) {
         const profile = JSON.parse(cachedProfile);
         setUser(profile);
-        loadProfileStats(profile.id);
+        loadProfileStats();
       }
 
-      // Fetch fresh data
       const { data: userProfile, error } = await supabase
         .from('users')
         .select('*')
@@ -97,16 +78,15 @@ const Profile = () => {
 
       let currentUser;
       if (error && error.code === 'PGRST116') {
-        // Create profile if not exists
         const { data: newProfile, error: createError } = await supabase
           .from('users')
           .insert([{
             id: authUser.id,
-            name: authUser.user_metadata?.name || 'User',
-            phone: authUser.user_metadata?.phone || '',
+            name: authUser.name || 'User',
+            phone: authUser.phone || '',
             email: authUser.email,
-            avatar: authUser.user_metadata?.avatar || null,
-            about: authUser.user_metadata?.about || 'Hey there! I am using CaBa',
+            avatar: authUser.avatar || null,
+            about: 'Hey there! I am using CaBa',
             is_online: false,
             last_seen: new Date().toISOString(),
             created_at: new Date().toISOString(),
@@ -116,64 +96,37 @@ const Profile = () => {
           .single();
 
         if (createError) throw createError;
-        currentUser = {
-          id: authUser.id,
-          name: newProfile.name,
-          phone: newProfile.phone,
-          email: newProfile.email,
-          avatar: newProfile.avatar,
-          about: newProfile.about,
-          created_at: newProfile.created_at
-        };
+        currentUser = newProfile;
       } else if (error) {
         throw error;
       } else {
-        currentUser = {
-          id: authUser.id,
-          name: userProfile?.name || authUser.user_metadata?.name || 'User',
-          phone: authUser.user_metadata?.phone || userProfile?.phone,
-          email: authUser.email || userProfile?.email,
-          avatar: userProfile?.avatar || authUser.user_metadata?.avatar,
-          about: userProfile?.about || authUser.user_metadata?.about || 'Hey there! I am using CaBa',
-          created_at: userProfile?.created_at || authUser.created_at
-        };
+        currentUser = userProfile;
       }
 
-      // Cache and update state
       localStorage.setItem(`digidad_profile_${authUser.id}`, JSON.stringify(currentUser));
       setUser(currentUser);
-      loadProfileStats(currentUser.id);
+      loadProfileStats();
 
     } catch (error) {
       console.error('Error loading profile:', error);
-      alert('Failed to load profile');
     } finally {
       setLoading(false);
     }
   };
 
-  // Load profile stats
-  const loadProfileStats = async (userId) => {
-    try {
-      const contacts = JSON.parse(localStorage.getItem('CaBa_contacts') || '[]');
-
-      setStats({
-        chats: contacts.length || 0,
-        calls: 0, // Not implemented
-        contacts: contacts.length || 0
-      });
-    } catch (error) {
-      console.error('Error loading stats:', error);
-      setStats({ chats: 0, calls: 0, contacts: 0 });
-    }
+  const loadProfileStats = () => {
+    const contacts = JSON.parse(localStorage.getItem('CaBa_contacts') || '[]');
+    setStats({
+      chats: contacts.length || 0,
+      calls: 0,
+      contacts: contacts.length || 0
+    });
   };
 
-  // Get initials for avatar
   const getInitials = (name) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  // Handle edit profile
   const handleEditProfile = () => {
     setEditForm({
       name: user.name,
@@ -183,11 +136,8 @@ const Profile = () => {
     setShowEditModal(true);
   };
 
-  // Save profile changes
   const saveProfileChanges = async () => {
     try {
-      if (!authUser) throw new Error('Not authenticated');
-
       const { name, about, email } = editForm;
 
       if (name.length < 3) {
@@ -195,28 +145,6 @@ const Profile = () => {
         return;
       }
 
-      if (email && !validateEmail(email)) {
-        alert('Invalid email address');
-        return;
-      }
-
-      // Try to update auth metadata for Supabase users
-      if (authUser.authType === 'supabase') {
-        try {
-          const { error: updateAuthError } = await supabase.auth.updateUser({
-            email: email || undefined,
-            data: { name, about }
-          });
-
-          if (updateAuthError) {
-            console.warn('Auth update failed:', updateAuthError);
-          }
-        } catch (authError) {
-          console.warn('Auth update not available for custom users:', authError);
-        }
-      }
-
-      // Update profile in database
       const { error } = await supabase
         .from('users')
         .update({ name, about, email: email || null })
@@ -224,7 +152,6 @@ const Profile = () => {
 
       if (error) throw error;
 
-      // Update local state and cache
       const updatedUser = { ...user, name, about, email };
       setUser(updatedUser);
       localStorage.setItem(`digidad_profile_${authUser.id}`, JSON.stringify(updatedUser));
@@ -239,121 +166,8 @@ const Profile = () => {
     }
   };
 
-  // Handle individual field edits
-  const handleEditName = () => {
-    setModalForm({ ...modalForm, name: user.name });
-    setShowNameModal(true);
-  };
-
-  const handleEditAbout = () => {
-    setModalForm({ ...modalForm, about: user.about || '' });
-    setShowAboutModal(true);
-  };
-
-  const handleEditEmail = () => {
-    setModalForm({ ...modalForm, email: user.email || '' });
-    setShowEmailModal(true);
-  };
-
-  // Save individual fields
-  const saveName = async () => {
-    const name = modalForm.name.trim();
-    if (name.length < 3) {
-      alert('Name must be at least 3 characters');
-      return;
-    }
-    await updateField('name', name);
-    setShowNameModal(false);
-  };
-
-  const saveAbout = async () => {
-    const about = modalForm.about.trim();
-    await updateField('about', about);
-    setShowAboutModal(false);
-  };
-
-  const saveEmail = async () => {
-    const email = modalForm.email.trim();
-    if (email && !validateEmail(email)) {
-      alert('Invalid email address');
-      return;
-    }
-    await updateField('email', email);
-    setShowEmailModal(false);
-  };
-
-  // Update individual field
-  const updateField = async (field, value) => {
-    try {
-      if (!authUser) throw new Error('Not authenticated');
-
-      // Try to update auth metadata for Supabase users
-      if (authUser.authType === 'supabase') {
-        try {
-          const { error: updateAuthError } = await supabase.auth.updateUser({
-            data: { [field]: value }
-          });
-
-          if (updateAuthError) {
-            console.warn('Auth update failed:', updateAuthError);
-          }
-        } catch (authError) {
-          console.warn('Auth update not available for custom users:', authError);
-        }
-      }
-
-      // Update profile in database
-      const { error } = await supabase
-        .from('users')
-        .update({ [field]: value })
-        .eq('id', authUser.id);
-
-      if (error) throw error;
-
-      // Update local state
-      const updatedUser = { ...user, [field]: value };
-      setUser(updatedUser);
-      localStorage.setItem(`digidad_profile_${authUser.id}`, JSON.stringify(updatedUser));
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-
-      alert(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`);
-
-    } catch (error) {
-      console.error(`Error updating ${field}:`, error);
-      alert(`Failed to update ${field}`);
-    }
-  };
-
-  // Validate email
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  // Handle avatar upload
-  const handleUploadPhoto = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        // Handle file upload (would need media uploader integration)
-        alert('Photo upload functionality would be implemented here');
-      }
-    };
-    input.click();
-  };
-
-  // Handle DP selection
-  const handleChooseDp = () => {
-    setShowDpModal(true);
-  };
-
   const selectDp = async (dpId) => {
     try {
-      if (!authUser) throw new Error('Not authenticated');
-
       const { error } = await supabase
         .from('users')
         .update({ avatar: dpId.toString() })
@@ -375,97 +189,21 @@ const Profile = () => {
     }
   };
 
-  // Share profile
-  const shareProfile = () => {
-    const shareUrl = `${window.location.origin}/shared-profile.html?userId=${user.id}`;
-    const shareText = `Connect with me on CaBa!\nName: ${user.name}\nPhone: ${user.phone}\n\nView Profile: ${shareUrl}`;
-
-    if (navigator.share) {
-      navigator.share({
-        title: 'CaBa Profile',
-        text: shareText,
-        url: shareUrl
-      });
-    } else {
-      navigator.clipboard.writeText(shareText).then(() => {
-        alert('Profile link copied to clipboard');
-      });
-    }
-  };
-
-  // QR Code functionality
-  const showQRCode = () => {
-    setShowQrModal(true);
-  };
-
-  const handleQrDownload = () => {
-    alert('QR Code saved to device!');
-  };
-
-  const scanQrCode = () => {
-    setShowQrModal(false);
-    setShowScanQrModal(true);
-  };
-
   const handleQrScan = (scannedData) => {
     setShowScanQrModal(false);
     
     try {
-      let userId;
-      
-      if (scannedData.type === 'caba_profile' && scannedData.userId) {
-        // Our custom CaBa QR format
-        userId = scannedData.userId;
-      } else if (scannedData.type === 'url' && scannedData.url) {
-        // URL format - extract userId from URL
-        const url = new URL(scannedData.url);
-        userId = url.searchParams.get('userId');
-      }
-      
-      if (userId) {
-        // Load scanned user profile
-        loadScannedUserProfile(userId);
-      } else {
-        alert('Invalid QR code format');
+      const userData = JSON.parse(scannedData);
+      if (userData.id && userData.name) {
+        setFoundUser(userData);
+        setShowUserFoundModal(true);
       }
     } catch (error) {
-      console.error('Error processing QR scan:', error);
       alert('Invalid QR code format');
     }
   };
 
-  const loadScannedUserProfile = async (scannedUserId) => {
-    try {
-      const { data: scannedUser, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', scannedUserId)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      if (scannedUser) {
-        setFoundUser(scannedUser);
-        setShowUserFoundModal(true);
-      } else {
-        alert('User not found');
-      }
-    } catch (error) {
-      console.error('Error loading scanned user:', error);
-      alert('Failed to load user profile');
-    }
-  };
-
-  // User found modal
-  const displayUserFoundModal = (foundUserData) => {
-    setFoundUser(foundUserData);
-    setShowUserFoundModal(true);
-  };
-
   const addToContacts = () => {
-    // Add to contacts logic
     let contacts = JSON.parse(localStorage.getItem('CaBa_contacts') || '[]');
     if (!contacts.some(c => c.id === foundUser.id)) {
       contacts.push({
@@ -477,23 +215,11 @@ const Profile = () => {
       });
       localStorage.setItem('CaBa_contacts', JSON.stringify(contacts));
       alert(`${foundUser.name} added to contacts`);
+      loadProfileStats();
     } else {
       alert('User already in contacts');
     }
     setShowUserFoundModal(false);
-  };
-
-  const chatWithUser = () => {
-    // Store the target user info for chat
-    sessionStorage.setItem('chatTargetUser', JSON.stringify({
-      id: foundUser.id,
-      name: foundUser.name,
-      phone: foundUser.phone,
-      about: foundUser.about
-    }));
-    
-    // Navigate to chat - you might need to adjust this based on your routing
-    window.location.href = '/chat';
   };
 
   if (loading) {
@@ -504,9 +230,16 @@ const Profile = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="profile-screen">
+        <div style={{ textAlign: 'center', padding: '50px' }}>Please log in to view profile</div>
+      </div>
+    );
+  }
+
   return (
     <div className="profile-screen">
-      {/* Profile Header */}
       <header className="profile-header">
         <button className="back-btn" onClick={() => window.history.back()}>
           <span className="icon">←</span>
@@ -517,15 +250,13 @@ const Profile = () => {
         </button>
       </header>
 
-      {/* Profile Content */}
       <div className="profile-content">
-        {/* Profile Picture Section */}
         <div className="profile-picture-section">
-          <div className="profile-avatar">
+          <div className="profile-avatar" onClick={() => setShowDpModal(true)}>
             {user.avatar ? (
               <img
                 src={parseInt(user.avatar) ?
-                  dpOptions.find(dp => dp.id === parseInt(user.avatar))?.path :
+                  dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path :
                   user.avatar}
                 alt="Profile Picture"
                 style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
@@ -533,48 +264,30 @@ const Profile = () => {
             ) : (
               <div className="profile-initials">{getInitials(user.name)}</div>
             )}
-            <div className="avatar-action-buttons">
-              <button className="avatar-action-btn camera-btn" onClick={handleUploadPhoto} title="Upload Photo">
-                <i className="fas fa-camera"></i>
-              </button>
-              <button className="avatar-action-btn dp-btn" onClick={handleChooseDp} title="Choose DP">
-                <i className="fas fa-images"></i>
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Profile Info */}
         <div className="profile-info-section">
-          {/* Name */}
           <div className="info-item">
             <div className="info-label">
               <i className="fas fa-user"></i>
               <span className="label">Name</span>
             </div>
-            <div className="info-value" style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="info-value">
               <span>{user.name}</span>
-              <button className="edit-name-btn" onClick={handleEditName} style={{ marginLeft: 'auto', border: 'none', background: 'none', cursor: 'pointer', padding: '5px', fontSize: '16px' }}>
-                <i className="fas fa-edit"></i>
-              </button>
             </div>
           </div>
 
-          {/* About */}
           <div className="info-item">
             <div className="info-label">
               <i className="fas fa-info-circle"></i>
               <span className="label">About</span>
             </div>
-            <div className="info-value" style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="info-value">
               <span>{user.about || 'Hey there! I am using CaBa'}</span>
-              <button className="edit-about-btn" onClick={handleEditAbout} style={{ marginLeft: 'auto', border: 'none', background: 'none', cursor: 'pointer', padding: '5px', fontSize: '16px' }}>
-                <i className="fas fa-edit"></i>
-              </button>
             </div>
           </div>
 
-          {/* Phone */}
           <div className="info-item">
             <div className="info-label">
               <i className="fas fa-phone"></i>
@@ -585,22 +298,17 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Email */}
           <div className="info-item">
             <div className="info-label">
               <i className="fas fa-envelope"></i>
               <span className="label">Email</span>
             </div>
-            <div className="info-value" style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="info-value">
               <span>{user.email || 'Not set'}</span>
-              <button className="edit-email-btn" onClick={handleEditEmail} style={{ marginLeft: 'auto', border: 'none', background: 'none', cursor: 'pointer', padding: '5px', fontSize: '16px' }}>
-                <i className="fas fa-edit"></i>
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Account Stats */}
         <div className="profile-stats">
           <div className="stat-item">
             <h3>{stats.chats}</h3>
@@ -616,17 +324,12 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Account Actions */}
         <div className="profile-actions">
-          <button className="action-btn" onClick={shareProfile}>
-            <i className="fas fa-share"></i>
-            <span className="label">Share Profile</span>
-          </button>
-          <button className="action-btn" onClick={showQRCode}>
+          <button className="action-btn" onClick={() => setShowQrModal(true)}>
             <i className="fas fa-qrcode"></i>
             <span className="label">My QR Code</span>
           </button>
-          <button className="action-btn" onClick={scanQrCode}>
+          <button className="action-btn" onClick={() => setShowScanQrModal(true)}>
             <i className="fas fa-camera"></i>
             <span className="label">Scan QR Code</span>
           </button>
@@ -682,93 +385,6 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Edit Name Modal */}
-      {showNameModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Edit Name</h2>
-              <button className="close-modal" onClick={() => setShowNameModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={(e) => { e.preventDefault(); saveName(); }}>
-                <div className="input-group">
-                  <label htmlFor="modalEditName">Full Name</label>
-                  <input
-                    type="text"
-                    id="modalEditName"
-                    value={modalForm.name}
-                    onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
-                    required
-                    minLength="3"
-                  />
-                </div>
-                <button type="submit" className="btn-primary">Save</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit About Modal */}
-      {showAboutModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Edit About</h2>
-              <button className="close-modal" onClick={() => setShowAboutModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={(e) => { e.preventDefault(); saveAbout(); }}>
-                <div className="input-group">
-                  <label htmlFor="modalEditAbout">About</label>
-                  <textarea
-                    id="modalEditAbout"
-                    rows="3"
-                    maxLength="150"
-                    value={modalForm.about}
-                    onChange={(e) => setModalForm({ ...modalForm, about: e.target.value })}
-                  />
-                </div>
-                <button type="submit" className="btn-primary">Save</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Email Modal */}
-      {showEmailModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Edit Email</h2>
-              <button className="close-modal" onClick={() => setShowEmailModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={(e) => { e.preventDefault(); saveEmail(); }}>
-                <div className="input-group">
-                  <label htmlFor="modalEditEmail">Email</label>
-                  <input
-                    type="email"
-                    id="modalEditEmail"
-                    value={modalForm.email}
-                    onChange={(e) => setModalForm({ ...modalForm, email: e.target.value })}
-                  />
-                </div>
-                <button type="submit" className="btn-primary">Save</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Choose DP Modal */}
       {showDpModal && (
         <div className="modal" style={{ display: 'flex' }}>
@@ -781,7 +397,7 @@ const Profile = () => {
             </div>
             <div className="modal-body">
               <div className="dp-options-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px' }}>
-                {dpOptions.map(option => (
+                {dpOptionsData.map(option => (
                   <img
                     key={option.id}
                     src={option.path}
@@ -802,7 +418,6 @@ const Profile = () => {
           userId={user.id}
           userName={user.name}
           userPhone={user.phone}
-          onDownload={handleQrDownload}
           onClose={() => setShowQrModal(false)}
         />
       )}
@@ -812,11 +427,6 @@ const Profile = () => {
         <QRCodeScanner
           onScan={handleQrScan}
           onClose={() => setShowScanQrModal(false)}
-          onError={(error) => {
-            console.error('QR Scanner error:', error);
-            alert('Failed to access camera. Please check permissions.');
-            setShowScanQrModal(false);
-          }}
         />
       )}
 
@@ -847,10 +457,6 @@ const Profile = () => {
                 <button className="btn-primary" onClick={addToContacts}>
                   <i className="fas fa-user-plus"></i>
                   Add to Contacts
-                </button>
-                <button className="btn-secondary" onClick={chatWithUser}>
-                  <i className="fas fa-comment"></i>
-                  Chat
                 </button>
               </div>
             </div>

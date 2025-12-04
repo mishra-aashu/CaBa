@@ -1,10 +1,17 @@
-import { useEffect } from 'react';
-import { supabase } from '../utils/supabase';
+import { useEffect, useCallback } from 'react';
+import { useSupabase } from '../contexts/SupabaseContext';
 import NotificationSound from '../utils/notificationSound';
 
 export const useRealtimeMessages = (chatId, onMessage) => {
+    const { supabase } = useSupabase();
+    
+    const stableOnMessage = useCallback((payload) => {
+        onMessage(payload.new);
+        NotificationSound.playMessageNotification();
+    }, [onMessage]);
+    
     useEffect(() => {
-        if (!chatId) return;
+        if (!chatId || !supabase) return;
 
         const channel = supabase
             .channel(`chat_messages_${chatId}`)
@@ -13,15 +20,11 @@ export const useRealtimeMessages = (chatId, onMessage) => {
                 schema: 'public',
                 table: 'messages',
                 filter: `chat_id=eq.${chatId}`
-            }, (payload) => {
-                onMessage(payload.new);
-                // Play notification sound for new messages
-                NotificationSound.playMessageNotification();
-            })
+            }, stableOnMessage)
             .subscribe();
 
         return () => {
             channel.unsubscribe();
         };
-    }, [chatId, onMessage]);
+    }, [chatId, supabase, stableOnMessage]);
 };

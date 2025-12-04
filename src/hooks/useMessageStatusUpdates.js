@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
-import { supabase } from '../utils/supabase';
+import { useSupabase } from '../contexts/SupabaseContext';
 
 export const useMessageStatusUpdates = (chatId, onStatusUpdate) => {
+    const { supabase } = useSupabase();
+    
     useEffect(() => {
-        if (!chatId) return;
+        if (!chatId || !supabase) return;
 
         const channel = supabase
             .channel(`message_status_${chatId}`)
@@ -18,5 +20,5 @@ export const useMessageStatusUpdates = (chatId, onStatusUpdate) => {
             .subscribe();
 
         return () => channel.unsubscribe();
-    }, [chatId, onStatusUpdate]);
+    }, [chatId, onStatusUpdate, supabase]);
 };

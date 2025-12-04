@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { useChatTheme } from '../../contexts/ChatThemeContext';
@@ -92,8 +92,8 @@ const Chat = () => {
   const messagesContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // Realtime hooks
-  const handleNewMessage = (newMessage) => {
+  // Realtime hooks - stabilize callback with useCallback
+  const handleNewMessage = useCallback((newMessage) => {
     setMessages(prev => [...prev, newMessage]);
 
     // Increment unread count if not scrolled to bottom
@@ -102,16 +102,18 @@ const Chat = () => {
     } else {
       markMessagesAsRead();
     }
-  };
+  }, [isScrolledToBottom]);
+  
   useRealtimeMessages(chatId, handleNewMessage);
 
   const { isOtherUserTyping, sendTypingStatus } = useTypingIndicator(chatId, currentUser?.id);
 
-  const handleStatusUpdate = (updatedMessage) => {
+  const handleStatusUpdate = useCallback((updatedMessage) => {
     setMessages(prev => prev.map(msg =>
       msg.id === updatedMessage.id ? updatedMessage : msg
     ));
-  };
+  }, []);
+  
   useMessageStatusUpdates(chatId, handleStatusUpdate);
 
   // Initialize chat
@@ -220,12 +222,25 @@ const Chat = () => {
 
   const loadMessages = async () => {
     try {
+      console.log('Loading messages for chat:', chatId);
+      
+      // First check all messages in database
+      const { data: allMessages, error: allError } = await supabase
+        .from('messages')
+        .select('*')
+        .limit(10);
+      
+      console.log('All messages in database:', allMessages);
+      
+      // Then check messages for this chat
       const { data: messagesData, error } = await supabase
         .from('messages')
         .select('*')
         .eq('chat_id', chatId)
         .order('created_at', { ascending: true });
 
+      console.log('Messages query result:', { data: messagesData, error, chatId });
+      
       if (error) throw error;
       setMessages(messagesData || []);
       await markMessagesAsRead();
@@ -399,7 +414,7 @@ const Chat = () => {
     setIsScrolledToBottom(true);
   };
 
-  const markMessagesAsRead = async () => {
+  const markMessagesAsRead = useCallback(async () => {
     try {
       if (!currentUser) return;
 
@@ -412,7 +427,7 @@ const Chat = () => {
     } catch (error) {
       console.error('Error marking messages as read:', error);
     }
-  };
+  }, [currentUser, chatId, supabase]);
 
   const handleReply = (message) => {
     setReplyingTo(message);

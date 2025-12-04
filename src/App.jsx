@@ -4,6 +4,7 @@ import { useSupabase } from './contexts/SupabaseContext';
 import { useAuth } from './hooks/useAuth';
 import { CallProvider } from './context/CallContext';
 import { Login, Signup, ForgotPassword, ResetPassword } from './components/auth';
+import AuthCallback from './components/auth/AuthCallback';
 import { Chat } from './components/chat';
 import Home from './components/Home';
 import Profile from './components/profile';
@@ -31,6 +32,18 @@ const ProtectedRoute = ({ children }) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <MessagingLoader />;
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -65,10 +78,11 @@ function App() {
         {showIntro ? <Intro onComplete={() => setShowIntro(false)} /> : (
           <Routes>
             <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+            <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+            <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+            <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/chat/new/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/call/:callId" element={<ProtectedRoute><CallScreen /></ProtectedRoute>} />

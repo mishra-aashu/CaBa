@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase.js';
+import { createCustomSupabaseClient } from '../utils/customSupabase.js';
 import IncomingCall from '../components/calls/IncomingCall';
+import authService from '../services/authService';
 
 const SupabaseContext = createContext();
 
@@ -12,41 +14,33 @@ export const SupabaseProvider = ({ children }) => {
   const [incomingCallChannel, setIncomingCallChannel] = useState(null);
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Error getting session:', error);
-      } else {
+    // Initialize auth service and listen for changes
+    const initAuth = async () => {
+      const userData = await authService.initialize();
+      if (userData && authService.authType === 'google') {
+        // For Google auth, also get Supabase session
+        const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
       }
       setLoading(false);
     };
 
-    getInitialSession();
+    initAuth();
 
-    // Listen for auth changes
+    // Listen for Supabase auth changes (Google OAuth)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-
-        // Update localStorage for compatibility with existing code
-        if (session?.user) {
-          const userData = {
-            id: session.user.id,
-            name: session.user.user_metadata?.name || 'User',
-            email: session.user.email,
-            phone: session.user.user_metadata?.phone || '',
-            avatar: session.user.user_metadata?.avatar || null
-          };
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-        } else {
-          localStorage.removeItem('currentUser');
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Auth state changed:', event, session);
+          await authService.handleSupabaseUser(session.user);
+          setSession(session);
+          setUser(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
         }
+        setLoading(false);
       }
     );
 
@@ -55,8 +49,9 @@ export const SupabaseProvider = ({ children }) => {
 
   // Setup global incoming call listener
   useEffect(() => {
-    if (user && !incomingCallChannel) {
-      setupGlobalIncomingCallListener();
+    const currentUser = authService.getCurrentUser();
+    if (currentUser && !incomingCallChannel) {
+      setupGlobalIncomingCallListener(currentUser);
     }
 
     return () => {
@@ -67,8 +62,8 @@ export const SupabaseProvider = ({ children }) => {
     };
   }, [user]);
 
-  const setupGlobalIncomingCallListener = () => {
-    console.log('📡 Setting up global incoming call listener for user:', user.id);
+  const setupGlobalIncomingCallListener = (currentUser) => {
+    console.log('📡 Setting up global incoming call listener for user:', currentUser.id);
 
     const channel = supabase
       .channel('global-incoming-calls')
@@ -78,7 +73,7 @@ export const SupabaseProvider = ({ children }) => {
           event: 'INSERT',
           schema: 'public',
           table: 'call_history',
-          filter: `receiver_id=eq.${user.id}`
+          filter: `receiver_id=eq.${currentUser.id}`
         },
         (payload) => {
           console.log('📞 Global incoming call event received:', payload);
@@ -120,7 +115,7 @@ export const SupabaseProvider = ({ children }) => {
   };
 
   const value = {
-    supabase,
+    supabase: createCustomSupabaseClient(),
     user,
     session,
     loading,

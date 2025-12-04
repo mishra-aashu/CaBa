@@ -1,74 +1,93 @@
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../utils/supabase';
+import { useSupabase } from '../contexts/SupabaseContext';
 
 export const useChatListRealtime = (currentUserId) => {
+    const { supabase } = useSupabase();
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const loadChats = useCallback(async (userId) => {
-        if (!userId) return;
+        if (!userId) {
+            console.log('No userId provided to loadChats');
+            setLoading(false);
+            return;
+        }
 
+        console.log('Loading chats for user:', userId);
+        
         try {
+            // Use chat_list_view for better performance
             const { data, error } = await supabase
-                .from('chats')
-                .select(`
-                    *,
-                    user1:users!chats_user1_id_fkey(id, name, avatar, phone, is_online),
-                    user2:users!chats_user2_id_fkey(id, name, avatar, phone, is_online)
-                `)
+                .from('chat_list_view')
+                .select('*')
                 .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
                 .order('last_message_time', { ascending: false });
 
             if (error) throw error;
 
-            const chatsData = data.map(chat => {
-                const otherUser = chat.user1.id === userId ? chat.user2 : chat.user1;
+            // Format chats for display
+            const formattedChats = (data || []).map(chat => {
+                const isUser1 = chat.user1_id === userId;
+                const otherUser = {
+                    id: isUser1 ? chat.user2_id : chat.user1_id,
+                    name: isUser1 ? chat.user2_name : chat.user1_name,
+                    phone: isUser1 ? chat.user2_id : chat.user1_id,
+                    avatar: isUser1 ? chat.user2_avatar : chat.user1_avatar,
+                    is_online: isUser1 ? chat.user2_online : chat.user1_online
+                };
+                
                 return {
-                    ...chat,
+                    id: chat.chat_id,
                     otherUser,
-                    unreadCount: 0
+                    last_message: chat.last_message,
+                    last_message_time: chat.last_message_time,
+                    unreadCount: parseInt(chat.unread_count) || 0
                 };
             });
-
-            setChats(chatsData);
+            setChats(formattedChats);
         } catch (error) {
             console.error('Error loading chats:', error);
+            setChats([]);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [supabase]);
 
     const updateChatInList = useCallback(async (chatId) => {
-        // Fetch updated chat data
+        // Fetch updated chat data from view
         const { data } = await supabase
-            .from('chats')
-            .select(`
-                *,
-                user1:users!chats_user1_id_fkey(id, name, avatar, phone, is_online),
-                user2:users!chats_user2_id_fkey(id, name, avatar, phone, is_online)
-            `)
-            .eq('id', chatId)
+            .from('chat_list_view')
+            .select('*')
+            .eq('chat_id', chatId)
             .single();
 
-        if (data) {
-            const otherUser = data.user1.id === currentUserId ? data.user2 : data.user1;
+        if (data && (data.user1_id === currentUserId || data.user2_id === currentUserId)) {
+            const isUser1 = data.user1_id === currentUserId;
+            const otherUser = {
+                id: isUser1 ? data.user2_id : data.user1_id,
+                name: isUser1 ? data.user2_name : data.user1_name,
+                phone: isUser1 ? data.user2_id : data.user1_id,
+                avatar: isUser1 ? data.user2_avatar : data.user1_avatar,
+                is_online: isUser1 ? data.user2_online : data.user1_online
+            };
+            
             const updatedChat = {
-                ...data,
+                id: data.chat_id,
                 otherUser,
-                unreadCount: 0
+                last_message: data.last_message,
+                last_message_time: data.last_message_time,
+                unreadCount: parseInt(data.unread_count) || 0
             };
 
             setChats(prev => {
                 const index = prev.findIndex(c => c.id === chatId);
                 if (index >= 0) {
-                    // Update existing
                     const updated = [...prev];
                     updated[index] = updatedChat;
                     return updated.sort((a, b) =>
                         new Date(b.last_message_time) - new Date(a.last_message_time)
                     );
                 } else {
-                    // Add new
                     return [updatedChat, ...prev];
                 }
             });
@@ -98,7 +117,6 @@ export const useChatListRealtime = (currentUserId) => {
                 const message = payload.new;
                 if (message.sender_id === currentUserId ||
                     message.receiver_id === currentUserId) {
-                    // Update specific chat
                     await updateChatInList(message.chat_id);
                 }
             })
