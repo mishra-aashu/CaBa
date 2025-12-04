@@ -25,10 +25,13 @@ const ForgotPassword = () => {
 
   const getUserByPhone = async (phone) => {
     try {
+      // Normalize phone number (remove + if present for database lookup)
+      const normalizedPhone = phone.startsWith('+') ? phone.substring(1) : phone;
+      
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('phone', phone)
+        .eq('phone', normalizedPhone)
         .single();
 
       if (error) {

@@ -306,15 +306,30 @@ const Settings = () => {
     if (!confirm('This will permanently delete all your messages, calls, and data. Continue?')) return;
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) throw new Error('Not authenticated');
+      // Get current user from the authentication system
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) {
+        alert('No user session found');
+        navigate('/login');
+        return;
+      }
 
-      // Delete user profile data
-      await supabase
+      const userData = JSON.parse(currentUser);
+      
+      // Delete user profile data from database
+      const { error } = await supabase
         .from('users')
         .delete()
-        .eq('id', user.id);
+        .eq('id', userData.id);
 
+      if (error) {
+        console.error('Error deleting user data:', error);
+        alert('Failed to delete account');
+        return;
+      }
+
+      // Clear local storage and navigate to login
+      localStorage.clear();
       alert('Account deleted successfully');
       navigate('/login');
 

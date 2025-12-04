@@ -1,6 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { useAuth } from '../../hooks/useAuth';
+import { QRCodeGenerator, QRCodeScanner } from '../qr';
 import '../../styles/profile.css';
+import '../qr/QRCodeGenerator.css';
+import '../qr/QRCodeScanner.css';
 
 // DP options for avatar display
 const baseUrl = import.meta.env.BASE_URL || '/';
@@ -37,6 +41,7 @@ const dpOptionsData = [
 
 const Profile = () => {
   const { supabase } = useSupabase();
+  const { user: authUser, loading: authLoading } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ chats: 0, calls: 0, contacts: 0 });
@@ -49,31 +54,29 @@ const Profile = () => {
   const [showScanQrModal, setShowScanQrModal] = useState(false);
   const [showUserFoundModal, setShowUserFoundModal] = useState(false);
   const [foundUser, setFoundUser] = useState(null);
-  const [qrCode, setQrCode] = useState('');
   const [editForm, setEditForm] = useState({ name: '', about: '', email: '' });
   const [modalForm, setModalForm] = useState({ name: '', about: '', email: '' });
   const [dpOptions, setDpOptions] = useState(dpOptionsData);
   const [currentPlayingAudio, setCurrentPlayingAudio] = useState(null);
-  const qrReaderRef = useRef(null);
-  const html5QrcodeScannerRef = useRef(null);
 
   // Load profile data on component mount
   useEffect(() => {
-    loadProfileData();
+    if (!authLoading) {
+      loadProfileData();
+    }
     return () => {
       // Cleanup audio on unmount
       if (currentPlayingAudio) {
         currentPlayingAudio.pause();
       }
     };
-  }, []);
+  }, [authUser, authLoading]);
 
   // Load profile data
   const loadProfileData = async () => {
     try {
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      if (authError || !authUser) {
-        window.location.href = '/login';
+      if (!authUser) {
+        console.log('No authenticated user found');
         return;
       }
 
@@ -152,14 +155,12 @@ const Profile = () => {
   // Load profile stats
   const loadProfileStats = async (userId) => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-      const contactCount = users.filter(u => u.phone !== currentUser.phone).length;
+      const contacts = JSON.parse(localStorage.getItem('CaBa_contacts') || '[]');
 
       setStats({
-        chats: contactCount || 0,
+        chats: contacts.length || 0,
         calls: 0, // Not implemented
-        contacts: contactCount || 0
+        contacts: contacts.length || 0
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -185,8 +186,7 @@ const Profile = () => {
   // Save profile changes
   const saveProfileChanges = async () => {
     try {
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      if (authError || !authUser) throw new Error('Not authenticated');
+      if (!authUser) throw new Error('Not authenticated');
 
       const { name, about, email } = editForm;
 
@@ -200,14 +200,20 @@ const Profile = () => {
         return;
       }
 
-      // Update auth metadata
-      const { error: updateAuthError } = await supabase.auth.updateUser({
-        email: email || undefined,
-        data: { name, about }
-      });
+      // Try to update auth metadata for Supabase users
+      if (authUser.authType === 'supabase') {
+        try {
+          const { error: updateAuthError } = await supabase.auth.updateUser({
+            email: email || undefined,
+            data: { name, about }
+          });
 
-      if (updateAuthError) {
-        console.warn('Auth update failed:', updateAuthError);
+          if (updateAuthError) {
+            console.warn('Auth update failed:', updateAuthError);
+          }
+        } catch (authError) {
+          console.warn('Auth update not available for custom users:', authError);
+        }
       }
 
       // Update profile in database
@@ -279,16 +285,21 @@ const Profile = () => {
   // Update individual field
   const updateField = async (field, value) => {
     try {
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      if (authError || !authUser) throw new Error('Not authenticated');
+      if (!authUser) throw new Error('Not authenticated');
 
-      // Update auth metadata
-      const { error: updateAuthError } = await supabase.auth.updateUser({
-        data: { [field]: value }
-      });
+      // Try to update auth metadata for Supabase users
+      if (authUser.authType === 'supabase') {
+        try {
+          const { error: updateAuthError } = await supabase.auth.updateUser({
+            data: { [field]: value }
+          });
 
-      if (updateAuthError) {
-        console.warn('Auth update failed:', updateAuthError);
+          if (updateAuthError) {
+            console.warn('Auth update failed:', updateAuthError);
+          }
+        } catch (authError) {
+          console.warn('Auth update not available for custom users:', authError);
+        }
       }
 
       // Update profile in database
@@ -341,8 +352,7 @@ const Profile = () => {
 
   const selectDp = async (dpId) => {
     try {
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      if (authError || !authUser) throw new Error('Not authenticated');
+      if (!authUser) throw new Error('Not authenticated');
 
       const { error } = await supabase
         .from('users')
@@ -385,26 +395,67 @@ const Profile = () => {
 
   // QR Code functionality
   const showQRCode = () => {
-    const shareUrl = `${window.location.origin}/shared-profile.html?userId=${user.id}`;
-    setQrCode(shareUrl);
     setShowQrModal(true);
   };
 
-  const saveQrCode = () => {
-    // QR code saving would require canvas implementation
-    alert('QR code saving functionality would be implemented here');
+  const handleQrDownload = () => {
+    alert('QR Code saved to device!');
   };
 
   const scanQrCode = () => {
     setShowQrModal(false);
     setShowScanQrModal(true);
-    // Initialize QR scanner
-    initializeQrScanner();
   };
 
-  const initializeQrScanner = () => {
-    // QR scanner initialization would require html5-qrcode library
-    alert('QR scanning functionality would be implemented here');
+  const handleQrScan = (scannedData) => {
+    setShowScanQrModal(false);
+    
+    try {
+      let userId;
+      
+      if (scannedData.type === 'caba_profile' && scannedData.userId) {
+        // Our custom CaBa QR format
+        userId = scannedData.userId;
+      } else if (scannedData.type === 'url' && scannedData.url) {
+        // URL format - extract userId from URL
+        const url = new URL(scannedData.url);
+        userId = url.searchParams.get('userId');
+      }
+      
+      if (userId) {
+        // Load scanned user profile
+        loadScannedUserProfile(userId);
+      } else {
+        alert('Invalid QR code format');
+      }
+    } catch (error) {
+      console.error('Error processing QR scan:', error);
+      alert('Invalid QR code format');
+    }
+  };
+
+  const loadScannedUserProfile = async (scannedUserId) => {
+    try {
+      const { data: scannedUser, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', scannedUserId)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (scannedUser) {
+        setFoundUser(scannedUser);
+        setShowUserFoundModal(true);
+      } else {
+        alert('User not found');
+      }
+    } catch (error) {
+      console.error('Error loading scanned user:', error);
+      alert('Failed to load user profile');
+    }
   };
 
   // User found modal
@@ -415,15 +466,16 @@ const Profile = () => {
 
   const addToContacts = () => {
     // Add to contacts logic
-    let contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+    let contacts = JSON.parse(localStorage.getItem('CaBa_contacts') || '[]');
     if (!contacts.some(c => c.id === foundUser.id)) {
       contacts.push({
         id: foundUser.id,
         name: foundUser.name,
         phone: foundUser.phone,
+        about: foundUser.about,
         addedAt: new Date().toISOString()
       });
-      localStorage.setItem('contacts', JSON.stringify(contacts));
+      localStorage.setItem('CaBa_contacts', JSON.stringify(contacts));
       alert(`${foundUser.name} added to contacts`);
     } else {
       alert('User already in contacts');
@@ -432,11 +484,16 @@ const Profile = () => {
   };
 
   const chatWithUser = () => {
+    // Store the target user info for chat
     sessionStorage.setItem('chatTargetUser', JSON.stringify({
       id: foundUser.id,
-      name: foundUser.name
+      name: foundUser.name,
+      phone: foundUser.phone,
+      about: foundUser.about
     }));
-    window.location.href = 'chat.html';
+    
+    // Navigate to chat - you might need to adjust this based on your routing
+    window.location.href = '/chat';
   };
 
   if (loading) {
@@ -568,6 +625,10 @@ const Profile = () => {
           <button className="action-btn" onClick={showQRCode}>
             <i className="fas fa-qrcode"></i>
             <span className="label">My QR Code</span>
+          </button>
+          <button className="action-btn" onClick={scanQrCode}>
+            <i className="fas fa-camera"></i>
+            <span className="label">Scan QR Code</span>
           </button>
         </div>
       </div>
@@ -736,63 +797,27 @@ const Profile = () => {
       )}
 
       {/* QR Code Modal */}
-      {showQrModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>My QR Code</h2>
-              <button className="close-modal" onClick={() => setShowQrModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="modal-body" style={{ textAlign: 'center' }}>
-              <div id="qrcode" style={{ display: 'inline-block', marginBottom: '20px' }}>
-                {/* QR Code would be generated here */}
-                <div style={{ width: '200px', height: '200px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  QR Code
-                </div>
-              </div>
-              <p style={{ marginBottom: '20px', color: 'var(--text-secondary)' }}>Scan this QR code to view my profile</p>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <button className="btn-secondary" onClick={saveQrCode}>
-                  <i className="fas fa-download"></i>
-                  Save QR Code
-                </button>
-                <button className="btn-primary" onClick={scanQrCode}>
-                  <i className="fas fa-camera"></i>
-                  Scan QR Code
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {showQrModal && user && (
+        <QRCodeGenerator
+          userId={user.id}
+          userName={user.name}
+          userPhone={user.phone}
+          onDownload={handleQrDownload}
+          onClose={() => setShowQrModal(false)}
+        />
       )}
 
       {/* Scan QR Modal */}
       {showScanQrModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Scan QR Code</h2>
-              <button className="close-modal" onClick={() => setShowScanQrModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="modal-body" style={{ textAlign: 'center' }}>
-              <div id="qr-reader" ref={qrReaderRef} style={{ width: '100%', maxWidth: '400px', margin: '0 auto', height: '300px', border: '1px solid #ccc' }}>
-                {/* QR Scanner would be initialized here */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                  Camera View
-                </div>
-              </div>
-              <p style={{ marginTop: '20px', color: 'var(--text-secondary)' }}>Point your camera at a QR code to scan</p>
-              <button className="btn-secondary" style={{ marginTop: '20px' }}>
-                <i className="fas fa-upload"></i>
-                Upload from Gallery
-              </button>
-            </div>
-          </div>
-        </div>
+        <QRCodeScanner
+          onScan={handleQrScan}
+          onClose={() => setShowScanQrModal(false)}
+          onError={(error) => {
+            console.error('QR Scanner error:', error);
+            alert('Failed to access camera. Please check permissions.');
+            setShowScanQrModal(false);
+          }}
+        />
       )}
 
       {/* User Found Modal */}

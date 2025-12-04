@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { useAuth } from '../../hooks/useAuth';
 import { Phone, Lock, Eye, EyeOff } from 'lucide-react';
 import '../../styles/auth.css';
 
 const Login = () => {
-  const { supabase, user } = useSupabase();
+  const { supabase } = useSupabase();
+  const { customLogin } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     phone: '',
     password: ''
@@ -15,25 +18,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // Store user data and redirect
-        const userData = {
-          id: session.user.id,
-          name: session.user.user_metadata?.name || 'User',
-          email: session.user.email,
-          phone: session.user.user_metadata?.phone || '',
-          avatar: session.user.user_metadata?.avatar || null
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        window.location.href = '/CaBa/';
-      }
-    };
-
-    checkSession();
-
     // Check for email verification confirmation
     const urlParams = new URLSearchParams(window.location.search);
     const verified = urlParams.get('verified');
@@ -74,24 +58,32 @@ const Login = () => {
     return phoneRegex.test(phone);
   };
 
-  const getEmailByPhone = async (phone) => {
+  const getUserByPhone = async (phone) => {
     try {
+      // Normalize phone number (remove + if present for database lookup)
+      const normalizedPhone = phone.startsWith('+') ? phone.substring(1) : phone;
+      
       const { data, error } = await supabase
         .from('users')
-        .select('email')
-        .eq('phone', phone)
+        .select('*')
+        .eq('phone', normalizedPhone)
         .single();
 
       if (error) {
-        console.error('Error getting email by phone:', error);
+        console.error('Error getting user by phone:', error);
         return null;
       }
 
-      return data?.email || null;
+      return data || null;
     } catch (error) {
-      console.error('Error in getEmailByPhone:', error);
+      console.error('Error in getUserByPhone:', error);
       return null;
     }
+  };
+
+  const verifyPassword = async (password, storedPassword) => {
+    // Simple password comparison - in production, use proper hashing
+    return password === storedPassword;
   };
 
   const handleSubmit = async (e) => {
@@ -117,48 +109,125 @@ const Login = () => {
     try {
       console.log('🔧 Attempting login for phone:', phone);
 
-      // Get email by phone from database
-      const email = await getEmailByPhone(phone);
-      console.log('🔧 Email retrieved for phone:', phone, '->', email);
+      // Get user by phone from database
+      const user = await getUserByPhone(phone);
+      console.log('🔧 User retrieved for phone:', phone, '->', user);
 
-      if (!email) {
-        console.error('❌ No email found for phone:', phone);
+      if (!user) {
+        console.error('❌ No user found for phone:', phone);
         setMessage({ text: 'Phone number not registered', type: 'error' });
         setLoading(false);
         return;
       }
 
-      console.log('🔧 Logging in with email:', email);
+      // Try Supabase Auth first
+      let authData = null;
+      let authError = null;
+      
+      if (user.email && user.email.trim()) {
+        console.log('🔧 Trying Supabase Auth with email:', user.email);
+        
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: user.email,
+            password: password
+          });
 
-      // Login with Supabase Auth using real email
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+          authData = data;
+          authError = error;
+          console.log('🔧 Auth response:', { data: data ? 'success' : null, error });
+        } catch (supabaseError) {
+          console.log('🔧 Supabase Auth error:', supabaseError);
+          authError = supabaseError;
+        }
+      } else {
+        console.log('🔧 User has no email, skipping Supabase Auth');
+      }
 
-      console.log('🔧 Login response:', { data: data ? 'success' : null, error });
+      // If Supabase Auth failed, try custom password verification
+      if (authError || !user.email) {
+        console.log('🔧 Supabase Auth failed, checking custom password...');
+        
+        if (!user.password) {
+          console.error('❌ No password found for user:', phone);
+          setMessage({ text: 'Account setup incomplete. Please sign up again.', type: 'error' });
+          setLoading(false);
+          return;
+        }
 
-      if (error) throw error;
+        // Verify password
+        const isPasswordValid = await verifyPassword(password, user.password);
+        if (!isPasswordValid) {
+          console.error('❌ Invalid password for phone:', phone);
+          setMessage({ text: 'Invalid phone number or password', type: 'error' });
+          setLoading(false);
+          return;
+        }
 
-      // Check if email is confirmed
-      if (!data.user.email_confirmed_at) {
-        setMessage({
-          text: 'Please verify your email first by clicking the confirmation link sent to your email.',
-          type: 'error'
-        });
+        // Custom login successful - use universal auth
+        console.log('🔧 Custom login successful for phone:', phone);
+        
+        // Use the centralized authentication system
+        const userData = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          avatar: user.avatar
+        };
+        
+        customLogin(userData);
+
+        // Update user online status for custom auth
+        await supabase
+          .from('users')
+          .update({
+            is_online: true,
+            last_seen: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        // Log successful login
+        try {
+          await supabase
+            .from('login_history')
+            .insert([{
+              user_id: user.id,
+              phone: phone,
+              success: true,
+              action: 'login',
+              created_at: new Date().toISOString()
+            }]);
+        } catch (logError) {
+          console.error('Failed to log login:', logError);
+        }
+
+        setMessage({ text: 'Login successful!', type: 'success' });
+
+        // Navigate to home page after successful login
+        setTimeout(() => {
+          navigate('/');
+        }, 500);
+        
         setLoading(false);
         return;
       }
 
-      // Store user data
+      // Supabase Auth was successful
+      if (authError) {
+        throw authError;
+      }
+
+      // Use the centralized authentication system for Supabase Auth
       const userData = {
-        id: data.user.id,
-        name: data.user.user_metadata?.name || 'User',
-        email: data.user.email,
-        phone: data.user.user_metadata?.phone || '',
-        avatar: data.user.user_metadata?.avatar || null
+        id: authData.user.id,
+        name: authData.user.user_metadata?.name || authData.user.name || 'User',
+        email: authData.user.user_metadata?.email || authData.user.email || '',
+        phone: authData.user.user_metadata?.phone || authData.user.phone || '',
+        avatar: authData.user.user_metadata?.avatar || authData.user.avatar || null
       };
-      localStorage.setItem('currentUser', JSON.stringify(userData));
+      
+      customLogin(userData);
 
       // Update user online status and log login
       await supabase
@@ -167,16 +236,16 @@ const Login = () => {
           is_online: true,
           last_seen: new Date().toISOString()
         })
-        .eq('id', data.user.id);
+        .eq('id', authData.user.id);
 
       // Log successful login
       try {
         await supabase
           .from('login_history')
           .insert([{
-            user_id: data.user.id,
+            user_id: authData.user.id,
             phone: phone,
-            email: data.user.email,
+            email: authData.user.email || '',
             success: true,
             action: 'login',
             created_at: new Date().toISOString()
@@ -185,11 +254,12 @@ const Login = () => {
         console.error('Failed to log login:', logError);
       }
 
-      setMessage({ text: 'Login successful! Redirecting...', type: 'success' });
+      setMessage({ text: 'Login successful!', type: 'success' });
 
+      // Navigate to home page after successful login
       setTimeout(() => {
-        window.location.href = '/CaBa/';
-      }, 1000);
+        navigate('/');
+      }, 500);
 
     } catch (error) {
       console.error('Login error:', error);

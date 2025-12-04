@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useSupabase } from './contexts/SupabaseContext';
+import { useAuth } from './hooks/useAuth';
 import { CallProvider } from './context/CallContext';
 import { Login, Signup, ForgotPassword, ResetPassword } from './components/auth';
 import { Chat } from './components/chat';
@@ -24,40 +25,22 @@ import { IncomingCallModal } from './components/IncomingCallModal';
 import MessagingLoader from './components/MessagingLoader';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useSupabase();
+  const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) return <MessagingLoader />;
-  return user ? children : <Navigate to="/login" replace />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };
 
 const CallProviderWrapper = ({ children }) => {
-  const { user } = useSupabase();
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    if (user) {
-      setCurrentUser({
-        id: user.id,
-        name: user.user_metadata?.name || 'User',
-        email: user.email,
-        phone: user.user_metadata?.phone || '',
-        avatar: user.user_metadata?.avatar || null
-      });
-    } else {
-      // Load from localStorage if user not available yet
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        try {
-          setCurrentUser(JSON.parse(storedUser));
-        } catch (error) {
-          console.error('Error parsing stored user:', error);
-        }
-      }
-    }
-  }, [user]);
+  const { user } = useAuth();
 
   return (
-    <CallProvider currentUser={currentUser}>
+    <CallProvider currentUser={user}>
       {children}
     </CallProvider>
   );

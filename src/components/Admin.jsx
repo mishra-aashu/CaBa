@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useAuth } from '../hooks/useAuth';
 import {
   ArrowLeft, MessageSquare, Users, Settings, BarChart3, Shield,
   UserCheck, UserX, User, MessageCircle, Newspaper, Flag, Activity,
@@ -56,7 +57,8 @@ const getAvatarUrl = (avatar) => {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user, supabase } = useSupabase();
+  const { supabase } = useSupabase();
+  const { user } = useAuth();
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
@@ -122,6 +124,7 @@ const Admin = () => {
   const checkAdminAccess = async () => {
     try {
       if (!user) {
+        console.log('🔧 No valid user found in Admin, redirecting to login');
         navigate('/login');
         return;
       }

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useSupabase } from './SupabaseContext';
 
 // Complete Chat Themes Data with enhanced visibility and proper naming

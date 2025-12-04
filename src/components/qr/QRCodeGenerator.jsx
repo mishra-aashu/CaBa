@@ -1,0 +1,128 @@
+import React, { useEffect, useRef, useState } from 'react';
+import QRCode from 'qrcode';
+import './QRCodeGenerator.css';
+
+const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) => {
+  const canvasRef = useRef(null);
+  const [qrData, setQrData] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    generateQRCode();
+  }, [userId]);
+
+  const generateQRCode = async () => {
+    try {
+      setLoading(true);
+      const profileUrl = `${window.location.origin}/shared-profile.html?userId=${userId}`;
+      
+      // Enhanced QR data with user information
+      const qrDataString = JSON.stringify({
+        type: 'caba_profile',
+        userId: userId,
+        userName: userName,
+        userPhone: userPhone,
+        url: profileUrl,
+        timestamp: Date.now()
+      });
+
+      setQrData(qrDataString);
+
+      // Generate QR code on canvas
+      if (canvasRef.current) {
+        await QRCode.toCanvas(canvasRef.current, qrDataString, {
+          width: 256,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        });
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleDownload = () => {
+    try {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const link = document.createElement('a');
+        link.download = `${userName}-CaBa-QR.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        if (onDownload) {
+          onDownload();
+        }
+      }
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+      alert('Failed to download QR code');
+    }
+  };
+
+  return (
+    <div className="qr-generator-modal">
+      <div className="qr-generator-content">
+        <div className="qr-generator-header">
+          <h3>My QR Code</h3>
+          <button className="qr-close-btn" onClick={onClose}>
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div className="qr-generator-body">
+          {loading ? (
+            <div className="qr-loading">
+              <div className="spinner"></div>
+              <p>Generating QR Code...</p>
+            </div>
+          ) : (
+            <>
+              <div className="qr-canvas-container">
+                <canvas ref={canvasRef} className="qr-canvas"></canvas>
+              </div>
+              
+              <div className="qr-info">
+                <p className="qr-title">{userName}</p>
+                {userPhone && <p className="qr-phone">📱 {userPhone}</p>}
+                <p className="qr-description">
+                  Scan this QR code to view my CaBa profile
+                </p>
+              </div>
+              
+              <div className="qr-actions">
+                <button className="qr-download-btn" onClick={handleDownload}>
+                  <i className="fas fa-download"></i>
+                  Download QR
+                </button>
+                <button className="qr-share-btn" onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: `${userName} - CaBa Profile`,
+                      text: `Connect with ${userName} on CaBa!`,
+                      url: `${window.location.origin}/shared-profile.html?userId=${userId}`
+                    });
+                  } else {
+                    navigator.clipboard.writeText(`${window.location.origin}/shared-profile.html?userId=${userId}`)
+                      .then(() => alert('Profile link copied to clipboard!'));
+                  }
+                }}>
+                  <i className="fas fa-share"></i>
+                  Share Link
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default QRCodeGenerator;

@@ -1,6 +1,7 @@
  import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
+import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../contexts/ThemeContext';
 import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck, Edit, Trash2 } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
@@ -11,7 +12,8 @@ import { useChatListRealtime } from '../hooks/useChatListRealtime';
 import '../styles/home.css';
 
 const Home = () => {
-  const { supabase, user, loading: authLoading } = useSupabase();
+  const { supabase } = useSupabase();
+  const { user, loading: authLoading } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { chatId, otherUserId } = useParams();
@@ -99,6 +101,7 @@ const Home = () => {
   const initializeHome = async () => {
     try {
       if (!user) {
+        console.log('🔧 No valid user found, redirecting to login');
         navigate('/login');
         return;
       }
@@ -327,10 +330,13 @@ const Home = () => {
       }
 
       // Check if user exists with this phone number
+      // Normalize phone number (remove + if present for database lookup)
+      const normalizedPhone = contactPhone.startsWith('+') ? contactPhone.substring(1) : contactPhone;
+      
       const { data: existingUser, error: userError } = await supabase
         .from('users')
         .select('id, name, phone')
-        .eq('phone', contactPhone)
+        .eq('phone', normalizedPhone)
         .neq('id', currentUser.id)
         .single();
 
@@ -479,10 +485,13 @@ const Home = () => {
         return;
       }
 
+      // Normalize phone number (remove + if present for database lookup)
+      const normalizedPhone = phone.startsWith('+') ? phone.substring(1) : phone;
+      
       const { data, error } = await supabase
         .from('users')
         .select('id, name, phone, avatar, is_online')
-        .eq('phone', phone)
+        .eq('phone', normalizedPhone)
         .neq('id', currentUser?.id)
         .eq('is_admin', false) // Hide admin users from search results
         .limit(1); // Since phone should be unique
