@@ -28,8 +28,9 @@ import AuthDebug from './components/AuthDebug';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();
+  const { loading: supabaseLoading } = useSupabase();
 
-  if (loading) return <MessagingLoader />;
+  if (loading || supabaseLoading) return <MessagingLoader />;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -40,8 +41,9 @@ const ProtectedRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const { loading: supabaseLoading } = useSupabase();
 
-  if (loading) return <MessagingLoader />;
+  if (loading || supabaseLoading) return <MessagingLoader />;
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;

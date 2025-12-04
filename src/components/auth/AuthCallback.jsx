@@ -18,13 +18,13 @@ const AuthCallback = () => {
         if (error) {
           console.error('Auth callback error:', error);
           setStatus('Authentication failed');
-          setTimeout(() => navigate('/login'), 2000);
+          navigate('/login');
           return;
         }
 
         if (!session?.user) {
           setStatus('No user session found');
-          setTimeout(() => navigate('/login'), 2000);
+          navigate('/login');
           return;
         }
 
@@ -41,29 +41,27 @@ const AuthCallback = () => {
         if (dbError && dbError.code !== 'PGRST116') {
           console.error('Database error:', dbError);
           setStatus('Database verification failed');
-          setTimeout(() => navigate('/login'), 2000);
+          navigate('/login');
           return;
         }
 
         if (!dbUser) {
           // User not in database, redirect to complete profile
           setStatus('Completing profile setup...');
-          setTimeout(() => navigate('/'), 100);
+          navigate('/');
           return;
         }
 
         // User exists in database, complete login
         setStatus('Login successful! Redirecting...');
         
-        // Let authService handle the user
-        await authService.handleSupabaseUser(user);
-
-        setTimeout(() => navigate('/'), 1000);
+        // Direct navigation without waiting for authService
+        navigate('/');
 
       } catch (error) {
         console.error('Auth callback error:', error);
         setStatus('Authentication failed');
-        setTimeout(() => navigate('/login'), 2000);
+        navigate('/login');
       }
     };
 

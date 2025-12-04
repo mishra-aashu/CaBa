@@ -16,7 +16,19 @@ class AuthService {
   // Initialize auth state
   async initialize() {
     try {
-      // Check for existing session
+      // Check for phone auth first
+      const phoneAuthToken = localStorage.getItem('phoneAuthToken');
+      const phoneAuthUser = localStorage.getItem('phoneAuthUser');
+      
+      if (phoneAuthToken && phoneAuthUser) {
+        const userData = JSON.parse(phoneAuthUser);
+        this.currentUser = userData;
+        this.authType = 'phone';
+        this.notifyListeners();
+        return userData;
+      }
+
+      // Check for legacy session
       const savedUser = localStorage.getItem('currentUser');
       const authToken = localStorage.getItem('authToken');
       const authType = localStorage.getItem('authType');
@@ -126,29 +138,6 @@ class AuthService {
         throw new Error('Invalid password');
       }
 
-      // Create Supabase session for phone login
-      const sessionData = {
-        access_token: `phone_${user.id}_${Date.now()}`,
-        refresh_token: `refresh_${user.id}`,
-        expires_in: 3600,
-        expires_at: Math.floor(Date.now() / 1000) + 3600,
-        token_type: 'bearer',
-        user: {
-          id: user.id,
-          email: user.email || `${user.phone}@phone.local`,
-          phone: user.phone,
-          user_metadata: {
-            name: user.name,
-            phone: user.phone,
-            avatar: user.avatar
-          }
-        }
-      };
-
-      // Set session in localStorage for Supabase compatibility
-      const supabaseUrl = supabase.supabaseUrl.replace('https://', '').replace('.supabase.co', '');
-      localStorage.setItem(`sb-${supabaseUrl}-auth-token`, JSON.stringify(sessionData));
-
       const userData = {
         id: user.id,
         name: user.name,
@@ -158,7 +147,11 @@ class AuthService {
         authType: 'phone'
       };
 
-      // Update online status and trigger auth state change
+      // Store phone auth data
+      localStorage.setItem('phoneAuthToken', btoa(user.id));
+      localStorage.setItem('phoneAuthUser', JSON.stringify(userData));
+
+      // Update online status
       await supabase
         .from('users')
         .update({
@@ -166,11 +159,6 @@ class AuthService {
           last_seen: new Date().toISOString()
         })
         .eq('id', user.id);
-
-      // Trigger auth state change manually
-      window.dispatchEvent(new CustomEvent('supabase-auth-change', {
-        detail: { event: 'SIGNED_IN', session: sessionData }
-      }));
 
       this.setSession(userData, 'phone');
       return userData;
@@ -215,23 +203,13 @@ class AuthService {
     this.currentUser = null;
     this.authType = null;
     
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('authType');
-    localStorage.removeItem('sessionPermanent');
+    // Clear all auth tokens
+    const keysToRemove = [
+      'currentUser', 'authToken', 'authType', 'sessionPermanent',
+      'phoneAuthToken', 'phoneAuthUser'
+    ];
     
-    // Clear Supabase session
-    const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.startsWith('sb-') && key.includes('-auth-token')) {
-        localStorage.removeItem(key);
-      }
-    });
-    
-    // Trigger auth state change
-    window.dispatchEvent(new CustomEvent('supabase-auth-change', {
-      detail: { event: 'SIGNED_OUT', session: null }
-    }));
+    keysToRemove.forEach(key => localStorage.removeItem(key));
     
     this.notifyListeners();
   }

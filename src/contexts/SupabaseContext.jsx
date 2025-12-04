@@ -3,6 +3,7 @@ import { supabase } from '../utils/supabase.js';
 import { createCustomSupabaseClient } from '../utils/customSupabase.js';
 import IncomingCall from '../components/calls/IncomingCall';
 import authService from '../services/authService';
+import phoneAuth from '../utils/phoneAuth';
 
 const SupabaseContext = createContext();
 
@@ -18,54 +19,55 @@ export const SupabaseProvider = ({ children }) => {
     const initAuth = async () => {
       const userData = await authService.initialize();
       if (userData) {
-        // Get Supabase session for both auth types
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
+        if (authService.authType === 'phone') {
+          // Create mock session for phone users
+          const mockSession = {
+            user: {
+              id: userData.id,
+              email: userData.email || `${userData.phone}@phone.local`,
+              user_metadata: {
+                name: userData.name,
+                phone: userData.phone,
+                avatar: userData.avatar
+              }
+            }
+          };
+          setSession(mockSession);
+          setUser(mockSession.user);
+        } else {
+          // Get real Supabase session for Google auth
+          const { data: { session } } = await supabase.auth.getSession();
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
       }
       setLoading(false);
     };
 
     initAuth();
 
-    // Listen for Supabase auth changes (both Google and Phone)
+    // Listen for Supabase auth changes (Google OAuth only)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Handle both Google OAuth and Phone login
-          if (session.user.email && !session.user.email.includes('@phone.local')) {
-            // Google OAuth user
-            await authService.handleSupabaseUser(session.user);
-          }
+        // Only handle real Supabase sessions (Google OAuth)
+        if (event === 'SIGNED_IN' && session?.user && !session.access_token?.startsWith('phone_')) {
+          console.log('Google auth state changed:', event);
+          await authService.handleSupabaseUser(session.user);
           setSession(session);
           setUser(session.user);
+          setLoading(false);
         } else if (event === 'SIGNED_OUT') {
           setSession(null);
           setUser(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
-    // Listen for custom auth events (phone login)
-    const handleCustomAuth = (event) => {
-      const { event: authEvent, session } = event.detail;
-      if (authEvent === 'SIGNED_IN') {
-        setSession(session);
-        setUser(session.user);
-      } else if (authEvent === 'SIGNED_OUT') {
-        setSession(null);
-        setUser(null);
-      }
-    };
 
-    window.addEventListener('supabase-auth-change', handleCustomAuth);
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('supabase-auth-change', handleCustomAuth);
     };
   }, []);
 

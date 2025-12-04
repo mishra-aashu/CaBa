@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../contexts/ThemeContext';
+import phoneAuth from '../utils/phoneAuth';
 import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck, Edit, Trash2 } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
@@ -13,7 +14,7 @@ import '../styles/home.css';
 
 const Home = () => {
   const { supabase } = useSupabase();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, authType } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { chatId, otherUserId } = useParams();
@@ -102,18 +103,47 @@ const Home = () => {
     try {
       if (!user) {
         console.log('🔧 No valid user found, redirecting to login');
+        setLoading(false);
         navigate('/login');
         return;
       }
 
-      // Check if user exists in database
-      const { data: dbUsers, error: dbError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id);
+      // Skip database queries for phone auth users
+      if (authType === 'phone' || phoneAuth.isPhoneAuthenticated()) {
+        console.log('🔧 Phone auth user detected, skipping database queries');
+        const currentUserData = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          avatar: user.avatar
+        };
+        
+        setCurrentUser(currentUserData);
+        localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+        setLoading(false);
+        return;
+      }
 
-      if (dbError) {
-        console.error('Database error checking user:', dbError);
+      console.log('🔧 Google auth user detected, querying database');
+
+      // For Google auth users, query database
+      let dbUsers;
+      try {
+        const { data, error: dbError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id);
+
+        if (dbError) {
+          console.error('Database error checking user:', dbError);
+          setLoading(false);
+          return;
+        }
+        
+        dbUsers = data;
+      } catch (error) {
+        console.error('Database query failed:', error);
         setLoading(false);
         return;
       }
