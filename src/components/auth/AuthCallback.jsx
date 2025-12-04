@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
-import { useAuth } from '../../hooks/useAuth';
+import authService from '../../services/authService';
 import MessagingLoader from '../MessagingLoader';
 
 const AuthCallback = () => {
   const { supabase } = useSupabase();
-  const { customLogin } = useAuth();
   const navigate = useNavigate();
   const [status, setStatus] = useState('Processing authentication...');
 
@@ -56,31 +55,8 @@ const AuthCallback = () => {
         // User exists in database, complete login
         setStatus('Login successful! Redirecting...');
         
-        const userData = {
-          id: dbUser.id,
-          name: dbUser.name,
-          email: dbUser.email,
-          phone: dbUser.phone,
-          avatar: dbUser.avatar,
-          authType: 'google',
-          loginTime: new Date().toISOString()
-        };
-
-        // Create session
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        localStorage.setItem('authToken', dbUser.id);
-        localStorage.setItem('sessionPermanent', 'true');
-        
-        customLogin(userData);
-
-        // Update user online status
-        await supabase
-          .from('users')
-          .update({
-            is_online: true,
-            last_seen: new Date().toISOString()
-          })
-          .eq('id', dbUser.id);
+        // Let authService handle the user
+        await authService.handleSupabaseUser(user);
 
         setTimeout(() => navigate('/'), 1000);
 
@@ -92,7 +68,7 @@ const AuthCallback = () => {
     };
 
     handleAuthCallback();
-  }, [supabase, navigate, customLogin]);
+  }, [supabase, navigate]);
 
   return (
     <div style={{ 

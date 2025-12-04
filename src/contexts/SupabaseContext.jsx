@@ -14,11 +14,11 @@ export const SupabaseProvider = ({ children }) => {
   const [incomingCallChannel, setIncomingCallChannel] = useState(null);
 
   useEffect(() => {
-    // Initialize auth service and listen for changes
+    // Initialize auth service
     const initAuth = async () => {
       const userData = await authService.initialize();
-      if (userData && authService.authType === 'google') {
-        // For Google auth, also get Supabase session
+      if (userData) {
+        // Get Supabase session for both auth types
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
@@ -28,12 +28,17 @@ export const SupabaseProvider = ({ children }) => {
 
     initAuth();
 
-    // Listen for Supabase auth changes (Google OAuth)
+    // Listen for Supabase auth changes (both Google and Phone)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session);
+        
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('Auth state changed:', event, session);
-          await authService.handleSupabaseUser(session.user);
+          // Handle both Google OAuth and Phone login
+          if (session.user.email && !session.user.email.includes('@phone.local')) {
+            // Google OAuth user
+            await authService.handleSupabaseUser(session.user);
+          }
           setSession(session);
           setUser(session.user);
         } else if (event === 'SIGNED_OUT') {
@@ -44,14 +49,34 @@ export const SupabaseProvider = ({ children }) => {
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Listen for custom auth events (phone login)
+    const handleCustomAuth = (event) => {
+      const { event: authEvent, session } = event.detail;
+      if (authEvent === 'SIGNED_IN') {
+        setSession(session);
+        setUser(session.user);
+      } else if (authEvent === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('supabase-auth-change', handleCustomAuth);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('supabase-auth-change', handleCustomAuth);
+    };
   }, []);
 
   // Setup global incoming call listener
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
-    if (currentUser && !incomingCallChannel) {
-      setupGlobalIncomingCallListener(currentUser);
+    if ((user || currentUser) && !incomingCallChannel) {
+      const userId = user?.id || currentUser?.id;
+      if (userId) {
+        setupGlobalIncomingCallListener({ id: userId });
+      }
     }
 
     return () => {

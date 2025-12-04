@@ -24,6 +24,7 @@ import CallScreen from './components/CallScreen';
 import CallStatusIndicator from './components/CallStatusIndicator';
 import { IncomingCallModal } from './components/IncomingCallModal';
 import MessagingLoader from './components/MessagingLoader';
+import AuthDebug from './components/AuthDebug';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();
@@ -104,6 +105,7 @@ function App() {
         {/* Global Call Components */}
         <CallStatusIndicator />
         <IncomingCallModal />
+        <AuthDebug />
       </BrowserRouter>
     </CallProviderWrapper>
   );

@@ -100,7 +100,7 @@ class AuthService {
     }
   }
 
-  // Phone/Password login
+  // Phone/Password login with Supabase Auth integration
   async loginWithPhone(phone, password) {
     try {
       // Normalize phone
@@ -121,10 +121,33 @@ class AuthService {
         throw new Error('Account setup incomplete');
       }
 
-      // Verify password (simple comparison - use bcrypt in production)
+      // Verify password
       if (password !== user.password) {
         throw new Error('Invalid password');
       }
+
+      // Create Supabase session for phone login
+      const sessionData = {
+        access_token: `phone_${user.id}_${Date.now()}`,
+        refresh_token: `refresh_${user.id}`,
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        token_type: 'bearer',
+        user: {
+          id: user.id,
+          email: user.email || `${user.phone}@phone.local`,
+          phone: user.phone,
+          user_metadata: {
+            name: user.name,
+            phone: user.phone,
+            avatar: user.avatar
+          }
+        }
+      };
+
+      // Set session in localStorage for Supabase compatibility
+      const supabaseUrl = supabase.supabaseUrl.replace('https://', '').replace('.supabase.co', '');
+      localStorage.setItem(`sb-${supabaseUrl}-auth-token`, JSON.stringify(sessionData));
 
       const userData = {
         id: user.id,
@@ -135,7 +158,7 @@ class AuthService {
         authType: 'phone'
       };
 
-      // Update online status
+      // Update online status and trigger auth state change
       await supabase
         .from('users')
         .update({
@@ -143,6 +166,11 @@ class AuthService {
           last_seen: new Date().toISOString()
         })
         .eq('id', user.id);
+
+      // Trigger auth state change manually
+      window.dispatchEvent(new CustomEvent('supabase-auth-change', {
+        detail: { event: 'SIGNED_IN', session: sessionData }
+      }));
 
       this.setSession(userData, 'phone');
       return userData;
@@ -155,15 +183,15 @@ class AuthService {
   // Google OAuth login
   async loginWithGoogle() {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/CaBa/auth/callback`
         }
       });
 
       if (error) throw error;
-      return data;
+      return null; // OAuth redirects, no immediate return
     } catch (error) {
       console.error('Google login error:', error);
       throw error;
@@ -192,6 +220,19 @@ class AuthService {
     localStorage.removeItem('authType');
     localStorage.removeItem('sessionPermanent');
     
+    // Clear Supabase session
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('sb-') && key.includes('-auth-token')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Trigger auth state change
+    window.dispatchEvent(new CustomEvent('supabase-auth-change', {
+      detail: { event: 'SIGNED_OUT', session: null }
+    }));
+    
     this.notifyListeners();
   }
 
@@ -209,11 +250,9 @@ class AuthService {
           .eq('id', this.currentUser.id);
       }
 
-      // Sign out from Supabase if Google auth
-      if (this.authType === 'google') {
-        await supabase.auth.signOut();
-      }
-
+      // Always sign out from Supabase to clear all sessions
+      await supabase.auth.signOut();
+      
       this.clearSession();
     } catch (error) {
       console.error('Logout error:', error);
