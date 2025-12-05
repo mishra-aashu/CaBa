@@ -14,7 +14,7 @@ import '../styles/home.css';
 
 const Home = () => {
   const { supabase } = useSupabase();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { chatId, otherUserId } = useParams();
@@ -186,7 +186,7 @@ const Home = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    signOut();
     navigate('/login');
   };
 
