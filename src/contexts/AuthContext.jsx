@@ -16,6 +16,16 @@ export const AuthProvider = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
+        // Check for user from HTML login pages first
+        const storedUser = sessionStorage.getItem('_auth_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          setIsAuthenticated(true);
+          setLoading(false);
+          return;
+        }
+
         const service = new AuthService(supabase);
         await service.initialize();
         
@@ -126,7 +136,7 @@ export const AuthProvider = ({ children }) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/CaBa/`
+          redirectTo: `${window.location.origin}/CaBa/auth-callback.html`
         }
       });
       
@@ -146,6 +156,30 @@ export const AuthProvider = ({ children }) => {
     return signInWithGoogle();
   };
 
+  const signOut = async () => {
+    try {
+      // Clear session storage
+      sessionStorage.removeItem('_auth_user');
+      
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      
+      // Clear auth service
+      if (authService) {
+        authService.signOut();
+      }
+      
+      // Update state
+      setUser(null);
+      setIsAuthenticated(false);
+      
+      // Redirect to HTML login
+      window.location.href = '/CaBa/login.html';
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -154,7 +188,7 @@ export const AuthProvider = ({ children }) => {
     signUpWithPhone: (phone, password, name, email) => authService?.signUpWithPhone(phone, password, name, email),
     signInWithGoogle,
     signUpWithGoogle,
-    signOut: () => authService?.signOut(),
+    signOut,
     handleGoogleCallback,
   };
 

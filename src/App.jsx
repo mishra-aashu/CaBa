@@ -33,7 +33,9 @@ const ProtectedRoute = ({ children }) => {
   if (loading) return <MessagingLoader />;
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Redirect to HTML login page instead of React login
+    window.location.href = '/CaBa/login.html';
+    return <MessagingLoader />;
   }
 
   return children;
@@ -93,8 +95,7 @@ function App() {
         {showIntro ? <Intro onComplete={() => setShowIntro(false)} /> : (
           <Routes>
             <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-            <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+            {/* Login/Signup routes removed - now handled by HTML pages */}
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
             <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
             <Route path="/auth/callback" element={<AuthCallback />} />

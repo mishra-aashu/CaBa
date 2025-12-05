@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useSupabase } from '../../contexts/SupabaseContext';
-import { isInWebView } from '../../utils/appDetection';
+import { isInWebView, generateSessionId } from '../../utils/appDetection';
 import ExternalAuthService from '../../services/externalAuthService';
+import BrowserFallback from './BrowserFallback';
 import '../../styles/auth.css';
 
 const Signup = () => {
@@ -13,6 +14,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isWebView] = useState(isInWebView());
+  const [showFallback, setShowFallback] = useState(false);
+  const [authUrl, setAuthUrl] = useState('');
 
 
 
@@ -30,14 +33,24 @@ const Signup = () => {
           // Authentication successful, navigate to home
           navigate('/');
         } else if (!result.success) {
-          setError(result.error || 'Authentication failed');
+          // Show fallback options
+          const sessionId = generateSessionId();
+          const fallbackUrl = `${window.location.origin}/CaBa/external-login.html?session=${sessionId}&action=signup`;
+          setAuthUrl(fallbackUrl);
+          setShowFallback(true);
+          setError('');
         }
       } else {
         // Use normal Google OAuth for regular browsers
         const result = await signUpWithGoogle();
         
         if (!result.success) {
-          setError(result.error || 'Google sign up failed');
+          // Show fallback options
+          const sessionId = generateSessionId();
+          const fallbackUrl = `${window.location.origin}/CaBa/external-login.html?session=${sessionId}&action=signup`;
+          setAuthUrl(fallbackUrl);
+          setShowFallback(true);
+          setError('');
         }
       }
     } catch (error) {
@@ -73,6 +86,17 @@ const Signup = () => {
             <div className="error-message">
               {error}
             </div>
+          )}
+          
+          {/* Browser Fallback */}
+          {showFallback && (
+            <BrowserFallback 
+              authUrl={authUrl}
+              onCancel={() => {
+                setShowFallback(false);
+                setAuthUrl('');
+              }}
+            />
           )}
 
           {/* Google Signup Button */}

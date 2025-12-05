@@ -19,16 +19,61 @@ class ExternalAuthService {
       // Generate unique session ID
       this.sessionId = generateSessionId();
       
-      // Create external auth URL
-      const authUrl = `${window.location.origin}/CaBa/external-auth?session=${this.sessionId}&action=login`;
+      // Create external auth URL (HTML version)
+      const authUrl = `${window.location.origin}/CaBa/external-login.html?session=${this.sessionId}&action=login`;
       
-      // Open in external browser
-      if (window.open) {
-        this.authWindow = window.open(authUrl, '_blank');
-      } else {
-        // Fallback: redirect current window
+      console.log('🔗 Attempting to open external HTML login:', authUrl);
+      
+      // Try multiple methods to open external browser
+      let opened = false;
+      
+      // Method 1: window.open with _system target (for mobile apps)
+      try {
+        this.authWindow = window.open(authUrl, '_system');
+        if (this.authWindow) {
+          opened = true;
+          console.log('✅ Opened with _system target');
+        }
+      } catch (e) {
+        console.log('❌ _system target failed:', e.message);
+      }
+      
+      // Method 2: window.open with _blank
+      if (!opened) {
+        try {
+          this.authWindow = window.open(authUrl, '_blank', 'noopener,noreferrer');
+          if (this.authWindow) {
+            opened = true;
+            console.log('✅ Opened with _blank target');
+          }
+        } catch (e) {
+          console.log('❌ _blank target failed:', e.message);
+        }
+      }
+      
+      // Method 3: Create invisible link and click it
+      if (!opened) {
+        try {
+          const link = document.createElement('a');
+          link.href = authUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          opened = true;
+          console.log('✅ Opened with programmatic link click');
+        } catch (e) {
+          console.log('❌ Link click failed:', e.message);
+        }
+      }
+      
+      // Method 4: Direct window.location (last resort)
+      if (!opened) {
+        console.log('🔄 All methods failed, redirecting current window');
         window.location.href = authUrl;
-        return { success: true, external: true };
+        return { success: true, external: true, redirected: true };
       }
 
       // Start polling for auth completion

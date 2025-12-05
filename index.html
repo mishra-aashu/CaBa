@@ -21,5 +21,17 @@
   <body>
     <div id="root"></div>
     <script type="module" src="src/main.jsx"></script>
+    <script>
+      // Check if user is authenticated, if not redirect to HTML login
+      window.addEventListener('load', () => {
+        const storedUser = sessionStorage.getItem('_auth_user');
+        if (!storedUser && !window.location.pathname.includes('auth-callback')) {
+          // Only redirect if we're at the root and not authenticated
+          if (window.location.pathname === '/CaBa/' || window.location.pathname === '/CaBa/index.html') {
+            window.location.href = '/CaBa/login.html';
+          }
+        }
+      });
+    </script>
   </body>
 </html>
