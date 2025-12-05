@@ -885,106 +885,6 @@
   color: var(--text-secondary, #666);
 }
 
-/* Wallpaper Selector */
-.wallpaper-selector-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.wallpaper-selector {
-  background: var(--header-bg, #ffffff);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.wallpaper-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
-}
-
-.wallpaper-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-color, #333);
-}
-
-.close-wallpaper-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: var(--text-secondary, #666);
-  cursor: pointer;
-  padding: 4px;
-}
-
-.close-wallpaper-btn:hover {
-  color: var(--text-color, #333);
-}
-
-.wallpaper-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.wallpaper-item {
-  aspect-ratio: 1;
-  border-radius: 8px;
-  background-size: cover;
-  background-position: center;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.2s;
-}
-
-.wallpaper-item:hover {
-  border-color: var(--primary-color, #007bff);
-  transform: scale(1.05);
-}
-
-.wallpaper-actions {
-  padding: 16px 20px;
-  border-top: 1px solid var(--border-color, #e0e0e0);
-  display: flex;
-  justify-content: center;
-}
-
-.wallpaper-action-btn {
-  background: var(--danger-color, #dc3545);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.wallpaper-action-btn:hover {
-  background: #c82333;
-}
 
 /* Scroll to Bottom Button */
 .scroll-bottom-btn {
@@ -1150,15 +1050,6 @@
     padding: 8px 12px;
   }
 
-  .wallpaper-selector {
-    width: 95%;
-    max-height: 90vh;
-  }
-
-  .wallpaper-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    padding: 16px;
-  }
 
   .scroll-bottom-btn {
     bottom: 70px;

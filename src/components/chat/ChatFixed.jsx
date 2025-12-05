@@ -10,7 +10,6 @@ import Modal from '../common/Modal';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
-import WallpaperSelector from './WallpaperSelector';
 import MediaViewer from '../media/MediaViewer';
 import MessagingLoader from '../MessagingLoader';
 import { useRealtimeMessages } from '../../hooks/useRealtimeMessages';
@@ -64,8 +63,6 @@ const Chat = () => {
 
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
-  const [wallpaper, setWallpaper] = useState('default-gradient');
-  const [showWallpaperSelector, setShowWallpaperSelector] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isTempChat, setIsTempChat] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -123,8 +120,7 @@ const Chat = () => {
 
       await Promise.all([
         loadOtherUserInfo(otherUserId),
-        loadMessages(),
-        loadWallpaper()
+        loadMessages()
       ]);
 
       setLoading(false);
@@ -173,34 +169,6 @@ const Chat = () => {
     }
   };
 
-  const loadWallpaper = async () => {
-    try {
-      const { data: chatWallpaper, error } = await supabase
-        .from('chat_wallpapers')
-        .select('wallpaper_id')
-        .eq('chat_id', chatId)
-        .maybeSingle();
-
-      if (error) return;
-
-      if (chatWallpaper?.wallpaper_id) {
-        if (chatWallpaper.wallpaper_id === 'default-gradient') {
-          setWallpaper('default-gradient');
-        } else {
-          const { data: wallpaperData } = await supabase
-            .from('wallpapers')
-            .select('url')
-            .eq('id', chatWallpaper.wallpaper_id)
-            .single();
-
-          if (wallpaperData) setWallpaper(wallpaperData.url);
-        }
-      }
-    } catch (error) {
-      console.warn('Error loading wallpaper:', error);
-      setWallpaper('default-gradient');
-    }
-  };
 
   const sendMessage = async (content, mediaData = null) => {
     if (!content.trim() && !mediaData) return;
@@ -362,8 +330,7 @@ const Chat = () => {
       </header>
 
       <div
-        className={`messages-container ${wallpaper === 'default-gradient' ? 'default-gradient-bg' : ''}`}
-        style={wallpaper && wallpaper !== 'default-gradient' ? { backgroundImage: `url(${wallpaper})` } : {}}
+        className="messages-container"
         onScroll={handleScroll}
         ref={messagesContainerRef}
       >
@@ -406,14 +373,6 @@ const Chat = () => {
         receiverId={otherUserId}
       />
 
-      <WallpaperSelector
-        isVisible={showWallpaperSelector}
-        onClose={() => setShowWallpaperSelector(false)}
-        onWallpaperSelect={async (wp) => {
-          setWallpaper(wp.url || 'default-gradient');
-          setShowWallpaperSelector(false);
-        }}
-      />
 
       {process.env.NODE_ENV === 'development' && authUser && (
         <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 1000 }}>

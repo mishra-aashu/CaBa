@@ -33,8 +33,7 @@ const initializeChat = async () => {
     setupMessageSubscriptions();
     setupTypingSubscriptions();
 
-    // Load wallpaper and theme
-    await loadWallpaper();
+    // Load theme
     loadTheme();
 
   } catch (error) {
@@ -137,63 +136,7 @@ const setupTypingSubscriptions = () => {
     .subscribe();
 };
 
-const loadWallpaper = async () => {
-  try {
-    const { data: chatWallpaper, error } = await supabase
-      .from('chat_wallpapers')
-      .select('wallpaper_id')
-      .eq('chat_id', chatId)
-      .maybeSingle();
 
-    if (error) {
-      console.log('Wallpaper tables not available');
-      return;
-    }
-
-    if (chatWallpaper && chatWallpaper.wallpaper_id) {
-      const { data: wallpaper, error: wallpaperError } = await supabase
-        .from('wallpapers')
-        .select('url')
-        .eq('id', chatWallpaper.wallpaper_id)
-        .single();
-
-      if (!wallpaperError && wallpaper) {
-        setWallpaper(wallpaper.url);
-      }
-    }
-  } catch (error) {
-    console.warn('Error loading wallpaper:', error);
-  }
-};
-
-const handleWallpaperSelect = async (selectedWallpaper) => {
-  try {
-    if (selectedWallpaper) {
-      // Set wallpaper
-      const { error } = await supabase
-        .from('chat_wallpapers')
-        .upsert([{
-          chat_id: chatId,
-          wallpaper_id: selectedWallpaper.id,
-          set_by: currentUser.id
-        }]);
-
-      if (error) throw error;
-      setWallpaper(selectedWallpaper.url);
-    } else {
-      // Remove wallpaper
-      const { error } = await supabase
-        .from('chat_wallpapers')
-        .delete()
-        .eq('chat_id', chatId);
-
-      if (error) throw error;
-      setWallpaper(null);
-    }
-  } catch (error) {
-    console.error('Error setting wallpaper:', error);
-  }
-};
 
 const handleBlockUser = async () => {
   const confirmed = window.confirm(`Block ${otherUser.name}? They won't be able to message or call you.`);
@@ -346,12 +289,6 @@ const handleMessageSelect = (messageId) => {
   onCancelReply={cancelReply}
 />
 
-{/* Wallpaper Selector */ }
-<WallpaperSelector
-  isVisible={showWallpaperSelector}
-  onClose={() => setShowWallpaperSelector(false)}
-  onWallpaperSelect={handleWallpaperSelect}
-/>
       </div >
 );
 };

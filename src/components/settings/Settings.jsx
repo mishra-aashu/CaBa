@@ -34,10 +34,8 @@ const Settings = () => {
 
   const [showPrivacyOptions, setShowPrivacyOptions] = useState(false);
   const [showStorageDetails, setShowStorageDetails] = useState(false);
-  const [showWallpaperModal, setShowWallpaperModal] = useState(false);
   const [showRingtoneModal, setShowRingtoneModal] = useState(false);
   const [showChatThemeModal, setShowChatThemeModal] = useState(false);
-  const [wallpapers, setWallpapers] = useState([]);
   const [currentPlayingAudio, setCurrentPlayingAudio] = useState(null);
   const [selectedRingtone, setSelectedRingtone] = useState('fm-freemusic-give-me-a-smile(chosic.com).mp3');
 
@@ -61,7 +59,6 @@ const Settings = () => {
 
   useEffect(() => {
     loadSettings();
-    loadWallpapers();
     return () => {
       // Cleanup audio on unmount
       if (currentPlayingAudio) {
@@ -102,20 +99,6 @@ const Settings = () => {
     calculateStorageUsage();
   };
 
-  // Load wallpapers
-  const loadWallpapers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('wallpapers')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setWallpapers(data || []);
-    } catch (error) {
-      console.error('Error loading wallpapers:', error);
-    }
-  };
 
   // Calculate storage usage
   const calculateStorageUsage = async () => {
@@ -184,15 +167,6 @@ const Settings = () => {
     setSettings(prev => ({ ...prev, [settingKey]: newValue }));
   };
 
-  // Show wallpaper settings
-  const handleWallpaperSettings = () => {
-    setShowWallpaperModal(true);
-  };
-
-  // Select wallpaper
-  const selectWallpaper = (wallpaperId) => {
-    alert('Wallpapers are set per chat. Go to a chat and use the menu to change wallpaper.');
-  };
 
   // Show ringtone modal
   const handleRingtoneSelection = () => {
@@ -487,14 +461,6 @@ const Settings = () => {
               <span className="icon arrow">›</span>
             </div>
           </div>
-
-          <div className="settings-item" onClick={handleWallpaperSettings}>
-            <div className="item-left">
-              <i className="fas fa-image"></i>
-              <span className="label">Chat Wallpaper</span>
-            </div>
-            <span className="icon arrow">›</span>
-          </div>
         </div>
 
         {/* Notifications Section */}
@@ -747,41 +713,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Wallpaper Modal */}
-      {showWallpaperModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>Chat Wallpapers</h2>
-              <button className="close-modal" onClick={() => setShowWallpaperModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div style={{ marginBottom: '20px' }}>
-                <p>Wallpapers are set per individual chat. Go to any chat conversation and use the menu (<MoreVertical size={16} />) to change or remove wallpapers.</p>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                {wallpapers.map(wallpaper => (
-                  <div
-                    key={wallpaper.id}
-                    style={{
-                      width: '100px',
-                      height: '100px',
-                      backgroundImage: `url('${wallpaper.url}')`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      borderRadius: '8px',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => selectWallpaper(wallpaper.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Ringtone Modal */}
       {showRingtoneModal && (

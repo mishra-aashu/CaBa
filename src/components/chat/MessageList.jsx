@@ -31,9 +31,6 @@ const MessageList = ({
 
   const groupedMessages = groupMessagesByDate(messages);
 
-  // Debug messages state
-  console.log('MessageList render - messages:', messages.length, messages);
-
   if (!messages || messages.length === 0) {
     return (
       <div className="messages-wrapper">

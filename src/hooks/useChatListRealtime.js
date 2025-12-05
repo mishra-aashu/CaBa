@@ -8,13 +8,10 @@ export const useChatListRealtime = (currentUserId) => {
 
     const loadChats = useCallback(async (userId) => {
         if (!userId) {
-            console.log('No userId provided to loadChats');
             setLoading(false);
             return;
         }
 
-        console.log('Loading chats for user:', userId);
-        
         try {
             const { data, error } = await supabase
                 .from('chat_list_view')
@@ -30,8 +27,6 @@ export const useChatListRealtime = (currentUserId) => {
                 setLoading(false);
                 return;
             }
-
-            console.log('Loaded chats from database:', data);
 
             const formattedChats = (data || []).map(chat => {
                 const isUser1 = chat.user1_id === userId;

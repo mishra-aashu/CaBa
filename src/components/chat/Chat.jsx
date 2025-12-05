@@ -10,7 +10,6 @@ import Modal from '../common/Modal';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
-import WallpaperSelector from './WallpaperSelector';
 import MediaViewer from '../media/MediaViewer';
 import MessagingLoader from '../MessagingLoader';
 import { useRealtimeMessages } from '../../hooks/useRealtimeMessages';
@@ -72,8 +71,6 @@ const Chat = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedMessages, setSelectedMessages] = useState(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
-  const [wallpaper, setWallpaper] = useState('default-gradient');
-  const [showWallpaperSelector, setShowWallpaperSelector] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isTempChat, setIsTempChat] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -157,7 +154,6 @@ const Chat = () => {
       } else if (chatId && otherUserId) {
         await loadOtherUserInfo(otherUserId);
         await loadMessages();
-        await loadWallpaper();
       }
     } catch (error) {
       console.error('Error initializing chat:', error);
@@ -224,16 +220,12 @@ const Chat = () => {
 
   const loadMessages = async () => {
     try {
-      console.log('Loading messages for chat:', chatId);
-      
       // First check all messages in database
       const { data: allMessages, error: allError } = await supabase
         .from('messages')
         .select('*')
         .limit(10);
-      
-      console.log('All messages in database:', allMessages);
-      
+
       // Then check messages for this chat
       const { data: messagesData, error } = await supabase
         .from('messages')
@@ -241,8 +233,6 @@ const Chat = () => {
         .eq('chat_id', chatId)
         .order('created_at', { ascending: true });
 
-      console.log('Messages query result:', { data: messagesData, error, chatId });
-      
       if (error) throw error;
       setMessages(messagesData || []);
       await markMessagesAsRead();
@@ -252,78 +242,7 @@ const Chat = () => {
   };
 
 
-  const loadWallpaper = async () => {
-    try {
-      const { data: chatWallpaper, error } = await supabase
-        .from('chat_wallpapers')
-        .select('wallpaper_id')
-        .eq('chat_id', chatId)
-        .maybeSingle();
 
-      if (error) {
-        console.log('Wallpaper tables not available');
-        return;
-      }
-
-      if (chatWallpaper && chatWallpaper.wallpaper_id) {
-        if (chatWallpaper.wallpaper_id === 'default-gradient') {
-          setWallpaper('default-gradient');
-        } else {
-          const { data: wallpaper, error: wallpaperError } = await supabase
-            .from('wallpapers')
-            .select('url')
-            .eq('id', chatWallpaper.wallpaper_id)
-            .single();
-
-          if (!wallpaperError && wallpaper) {
-            setWallpaper(wallpaper.url);
-          }
-        }
-      } else {
-        // No wallpaper set, use default
-        setWallpaper('default-gradient');
-      }
-    } catch (error) {
-      console.warn('Error loading wallpaper:', error);
-      setWallpaper('default-gradient');
-    }
-  };
-
-  const handleWallpaperSelect = async (selectedWallpaper) => {
-    try {
-      if (selectedWallpaper === 'default-gradient' || (selectedWallpaper && selectedWallpaper.id === 'default-gradient')) {
-        // For default gradient, delete any existing wallpaper setting
-        const { error } = await supabase
-          .from('chat_wallpapers')
-          .delete()
-          .eq('chat_id', chatId);
-
-        if (error) throw error;
-        setWallpaper('default-gradient');
-      } else if (selectedWallpaper) {
-        const { error } = await supabase
-          .from('chat_wallpapers')
-          .upsert([{
-            chat_id: chatId,
-            wallpaper_id: selectedWallpaper.id,
-            set_by: currentUser.id
-          }], { onConflict: 'chat_id' });
-
-        if (error) throw error;
-        setWallpaper(selectedWallpaper.url);
-      } else {
-        const { error } = await supabase
-          .from('chat_wallpapers')
-          .delete()
-          .eq('chat_id', chatId);
-
-        if (error) throw error;
-        setWallpaper('default-gradient'); // Set to default
-      }
-    } catch (error) {
-      console.error('Error setting wallpaper:', error);
-    }
-  };
 
   const handleBlockUser = async () => {
     const confirmed = window.confirm(`Block ${otherUser.name}? They won't be able to message or call you.`);
@@ -523,12 +442,10 @@ const Chat = () => {
   };
 
   const handleViewContact = () => {
-    console.log('handleViewContact called, otherUserId:', otherUserId);
     if (!otherUserId || otherUserId === 'undefined') {
       alert('User information not available');
       return;
     }
-    console.log('Navigating to:', `/user-details/${otherUserId}`);
     navigate(`/user-details/${otherUserId}`);
   };
 
@@ -807,11 +724,6 @@ const Chat = () => {
                 onClick: handleSearchMessages
               },
               {
-                icon: <Image size={16} />,
-                label: 'Change Wallpaper',
-                onClick: () => setShowWallpaperSelector(true)
-              },
-              {
                 icon: <Palette size={16} />,
                 label: 'Themes',
                 onClick: handleChangeTheme
@@ -870,8 +782,7 @@ const Chat = () => {
 
       {/* Messages Container */}
       <div
-        className={`messages-container ${wallpaper === 'default-gradient' ? 'default-gradient-bg' : ''}`}
-        style={wallpaper && wallpaper !== 'default-gradient' ? { backgroundImage: `url(${wallpaper})` } : {}}
+        className="messages-container"
         onScroll={handleScroll}
         ref={messagesContainerRef}
       >
@@ -912,12 +823,6 @@ const Chat = () => {
         receiverId={otherUserId}
       />
 
-      {/* Wallpaper Selector */}
-      <WallpaperSelector
-        isVisible={showWallpaperSelector}
-        onClose={() => setShowWallpaperSelector(false)}
-        onWallpaperSelect={handleWallpaperSelect}
-      />
 
       {/* Message Search Modal */}
       <Modal
