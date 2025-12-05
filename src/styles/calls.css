@@ -1,16 +1,17 @@
 /* =============================================
-    CALLS COMPONENT STYLES
+    CALLS COMPONENT STYLES - UPDATED
     ============================================= */
 
 :root {
-    --calls-primary: #4CAF50;
-    --calls-secondary: #2196F3;
-    --calls-text: #333333;
-    --calls-text-light: #666666;
-    --calls-background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --calls-primary: #25d366;
+    --calls-secondary: #34b7f1;
+    --calls-text: #111b21;
+    --calls-text-light: #667781;
+    --calls-text-muted: #8696a0;
+    --calls-background: #f0f2f5;
     --calls-surface: #ffffff;
-    --calls-border: #dddddd;
-    --calls-hover: #f8f9fa;
+    --calls-border: #e9edef;
+    --calls-hover: #f5f6f6;
 }
 
 /* Dark theme overrides for calls */

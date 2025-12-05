@@ -8,6 +8,7 @@ import { CallButton } from '../CallButton';
 import { IncomingCallModal } from '../IncomingCallModal';
 import BottomNavigation from '../common/BottomNavigation';
 import '../../styles/calls.css';
+import '../../styles/calls-improved.css';
 
 const Calls = () => {
   const navigate = useNavigate();

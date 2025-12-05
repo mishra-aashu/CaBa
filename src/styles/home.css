@@ -735,22 +735,30 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  padding: 40px;
+  background: #f0f2f5;
 }
 
 .chat-preview-placeholder svg {
-  margin-bottom: 20px;
-  opacity: 0.5;
+  margin-bottom: 32px;
+  opacity: 0.3;
+  color: #54656f;
 }
 
 .chat-preview-placeholder h3 {
-  margin: 0 0 8px 0;
-  font-size: 20px;
-  color: var(--home-text);
+  margin: 0 0 16px 0;
+  font-size: 32px;
+  font-weight: 300;
+  color: #41525d;
+  letter-spacing: -0.5px;
 }
 
 .chat-preview-placeholder p {
   margin: 0;
   font-size: 14px;
+  color: #667781;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 /* Responsive Helper Classes */

@@ -2,8 +2,22 @@
 .chat-screen {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   background: var(--chat-bg-gradient, #f0f0f0);
+}
+
+/* Desktop layout - chat should fill the right panel */
+@media (min-width: 769px) {
+  .right-panel .chat-screen {
+    height: 100vh;
+  }
+}
+
+/* Mobile layout - chat should be full screen */
+@media (max-width: 768px) {
+  .chat-screen {
+    height: 100vh;
+  }
 }
 
 /* Chat Container with Dynamic Wallpaper */
