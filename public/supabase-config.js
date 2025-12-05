@@ -5,7 +5,7 @@ const SUPABASE_CONFIG = {
 };
 
 // Initialize Supabase client
-const { createClient } = supabase;
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
 // Make it available globally
