@@ -138,6 +138,58 @@
   color: var(--primary-color);
 }
 
+.qr-start-section {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.qr-start-icon {
+  font-size: 64px;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.qr-start-section p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  line-height: 1.4;
+}
+
+.qr-start-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.qr-start-btn:hover {
+  background: var(--primary-color-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.qr-alternative {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.qr-alternative span {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
 .qr-scanner-actions {
   margin-top: 20px;
 }
@@ -160,6 +212,26 @@
 .qr-upload-btn:hover {
   background: var(--primary-color);
   color: white;
+}
+
+.qr-stop-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-stop-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
 }
 
 /* Override html5-qrcode library styles */

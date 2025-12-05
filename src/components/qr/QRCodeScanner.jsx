@@ -9,7 +9,6 @@ const QRCodeScanner = ({ onScan, onClose, onError }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    initializeScanner();
     return () => {
       cleanupScanner();
     };
@@ -150,12 +149,36 @@ const QRCodeScanner = ({ onScan, onClose, onError }) => {
                 Try Again
               </button>
             </div>
+          ) : !isScanning ? (
+            <div className="qr-start-section">
+              <div className="qr-start-icon">
+                <i className="fas fa-camera"></i>
+              </div>
+              <p>Scan QR codes to connect with CaBa users</p>
+              <button className="qr-start-btn" onClick={initializeScanner}>
+                <i className="fas fa-qrcode"></i>
+                Start Scanning
+              </button>
+              <div className="qr-alternative">
+                <span>or</span>
+                <label className="qr-upload-btn">
+                  <i className="fas fa-upload"></i>
+                  Upload from Gallery
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+              </div>
+            </div>
           ) : (
             <>
               <div className="qr-reader-container">
                 <div id="qr-reader" ref={scannerRef} className="qr-reader"></div>
               </div>
-              
+
               <div className="qr-scanner-info">
                 <p>Position the QR code within the frame</p>
                 <div className="qr-scanner-tips">
@@ -169,18 +192,15 @@ const QRCodeScanner = ({ onScan, onClose, onError }) => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="qr-scanner-actions">
-                <label className="qr-upload-btn">
-                  <i className="fas fa-upload"></i>
-                  Upload from Gallery
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    style={{ display: 'none' }}
-                  />
-                </label>
+                <button className="qr-stop-btn" onClick={() => {
+                  cleanupScanner();
+                  setIsScanning(false);
+                }}>
+                  <i className="fas fa-stop"></i>
+                  Stop Scanning
+                </button>
               </div>
             </>
           )}
