@@ -904,10 +904,6 @@ const Home = () => {
           <span className="label">Chats</span>
           <span className="badge">5</span>
         </button>
-        <button className="nav-item" onClick={() => handleNavigation('/qr')}>
-          <QrCode size={20} />
-          <span className="label">QR</span>
-        </button>
         <button className="nav-item" onClick={() => handleNavigation('/news')}>
           <Newspaper size={20} />
           <span className="label">News</span>
@@ -916,6 +912,10 @@ const Home = () => {
           <Phone size={20} />
           <span className="label">Audio Call</span>
           <span className="badge">2</span>
+        </button>
+        <button className="nav-item" onClick={() => handleNavigation('/settings')}>
+          <Settings size={20} />
+          <span className="label">Settings</span>
         </button>
       </nav>
 
