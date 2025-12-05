@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useSupabase } from './contexts/SupabaseContext';
 import { useAuth } from './hooks/useAuth';
 import { CallProvider } from './context/CallContext';
-import { Login, Signup, ForgotPassword, ResetPassword } from './components/auth';
-import AuthCallback from './components/auth/AuthCallback';
+import { Login, Signup, ForgotPassword, ResetPassword, AuthCallback } from './components/auth';
 import { Chat } from './components/chat';
 import Home from './components/Home';
 import Profile from './components/profile';
@@ -28,9 +27,8 @@ import AuthDebug from './components/AuthDebug';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();
-  const { loading: supabaseLoading } = useSupabase();
 
-  if (loading || supabaseLoading) return <MessagingLoader />;
+  if (loading) return <MessagingLoader />;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -41,9 +39,8 @@ const ProtectedRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  const { loading: supabaseLoading } = useSupabase();
 
-  if (loading || supabaseLoading) return <MessagingLoader />;
+  if (loading) return <MessagingLoader />;
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;

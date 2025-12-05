@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../utils/supabase.js';
-import { createCustomSupabaseClient } from '../utils/customSupabase.js';
+import { supabase } from '../config/supabase.js';
 import IncomingCall from '../components/calls/IncomingCall';
-import authService from '../services/authService';
-import phoneAuth from '../utils/phoneAuth';
 
 const SupabaseContext = createContext();
 
@@ -11,74 +8,90 @@ export const SupabaseProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [incomingCall, setIncomingCall] = useState(null);
   const [incomingCallChannel, setIncomingCallChannel] = useState(null);
 
   useEffect(() => {
-    // Initialize auth service
-    const initAuth = async () => {
-      const userData = await authService.initialize();
-      if (userData) {
-        if (authService.authType === 'phone') {
-          // Create mock session for phone users
-          const mockSession = {
-            user: {
-              id: userData.id,
-              email: userData.email || `${userData.phone}@phone.local`,
-              user_metadata: {
-                name: userData.name,
-                phone: userData.phone,
-                avatar: userData.avatar
-              }
-            }
-          };
-          setSession(mockSession);
-          setUser(mockSession.user);
-        } else {
-          // Get real Supabase session for Google auth
-          const { data: { session } } = await supabase.auth.getSession();
-          setSession(session);
-          setUser(session?.user ?? null);
-        }
+    // Get initial session
+    const getInitialSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error getting session:', error);
+      } else {
+        setSession(session);
+        setUser(session?.user ?? null);
       }
       setLoading(false);
     };
 
-    initAuth();
+    getInitialSession();
 
-    // Listen for Supabase auth changes (Google OAuth only)
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Only handle real Supabase sessions (Google OAuth)
-        if (event === 'SIGNED_IN' && session?.user && !session.access_token?.startsWith('phone_')) {
-          console.log('Google auth state changed:', event);
-          await authService.handleSupabaseUser(session.user);
-          setSession(session);
-          setUser(session.user);
-          setLoading(false);
-        } else if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-          setLoading(false);
+        console.log('Auth state changed:', event, session);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+
+        // Update localStorage for compatibility with existing code
+        if (session?.user) {
+          const userData = {
+            id: session.user.id,
+            name: session.user.user_metadata?.name || 'User',
+            email: session.user.email,
+            phone: session.user.user_metadata?.phone || '',
+            avatar: session.user.user_metadata?.avatar || null
+          };
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          localStorage.setItem('authType', 'google');
+        } else {
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('authType');
         }
       }
     );
 
+    return () => subscription.unsubscribe();
+  }, []);
 
-
-    return () => {
-      subscription.unsubscribe();
+  // Listen for localStorage changes to sync auth state
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'currentUser' || e.key === 'authType') {
+        // Trigger a re-check of auth state
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          try {
+            const userData = JSON.parse(currentUser);
+            setUser(userData);
+            setIsAuthenticated(true);
+          } catch (error) {
+            console.error('Error parsing user data:', error);
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
     };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Setup global incoming call listener
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if ((user || currentUser) && !incomingCallChannel) {
-      const userId = user?.id || currentUser?.id;
-      if (userId) {
-        setupGlobalIncomingCallListener({ id: userId });
+    if (user && !incomingCallChannel) {
+      // Skip WebSocket subscriptions for phone users
+      if (user.id && user.id.startsWith('phone_')) {
+        console.log('Skipping incoming call listener for phone user');
+        return;
       }
+      setupGlobalIncomingCallListener();
     }
 
     return () => {
@@ -89,8 +102,8 @@ export const SupabaseProvider = ({ children }) => {
     };
   }, [user]);
 
-  const setupGlobalIncomingCallListener = (currentUser) => {
-    console.log('📡 Setting up global incoming call listener for user:', currentUser.id);
+  const setupGlobalIncomingCallListener = () => {
+    console.log('📡 Setting up global incoming call listener for user:', user.id);
 
     const channel = supabase
       .channel('global-incoming-calls')
@@ -100,7 +113,7 @@ export const SupabaseProvider = ({ children }) => {
           event: 'INSERT',
           schema: 'public',
           table: 'call_history',
-          filter: `receiver_id=eq.${currentUser.id}`
+          filter: `receiver_id=eq.${user.id}`
         },
         (payload) => {
           console.log('📞 Global incoming call event received:', payload);
@@ -142,7 +155,7 @@ export const SupabaseProvider = ({ children }) => {
   };
 
   const value = {
-    supabase: createCustomSupabaseClient(),
+    supabase,
     user,
     session,
     loading,

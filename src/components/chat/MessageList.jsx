@@ -31,6 +31,23 @@ const MessageList = ({
 
   const groupedMessages = groupMessagesByDate(messages);
 
+  // Debug messages state
+  console.log('MessageList render - messages:', messages.length, messages);
+
+  if (!messages || messages.length === 0) {
+    return (
+      <div className="messages-wrapper">
+        <div className="no-messages-placeholder">
+          <div className="no-messages-content">
+            <div className="no-messages-icon">💬</div>
+            <h3>No messages yet</h3>
+            <p>Start the conversation by sending a message!</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="messages-wrapper">
       {Object.entries(groupedMessages).map(([dateKey, dateMessages]) => (

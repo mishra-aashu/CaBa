@@ -14,7 +14,7 @@ import '../styles/home.css';
 
 const Home = () => {
   const { supabase } = useSupabase();
-  const { user, loading: authLoading, authType } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { chatId, otherUserId } = useParams();
@@ -108,75 +108,23 @@ const Home = () => {
         return;
       }
 
-      // Skip database queries for phone auth users
-      if (authType === 'phone' || phoneAuth.isPhoneAuthenticated()) {
-        console.log('🔧 Phone auth user detected, skipping database queries');
-        const currentUserData = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          avatar: user.avatar
-        };
-        
-        setCurrentUser(currentUserData);
-        localStorage.setItem('currentUser', JSON.stringify(currentUserData));
-        setLoading(false);
-        return;
-      }
+      console.log('🔧 Google auth user detected, using user data');
 
-      console.log('🔧 Google auth user detected, querying database');
-
-      // For Google auth users, query database
-      let dbUsers;
-      try {
-        const { data, error: dbError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id);
-
-        if (dbError) {
-          console.error('Database error checking user:', dbError);
-          setLoading(false);
-          return;
-        }
-        
-        dbUsers = data;
-      } catch (error) {
-        console.error('Database query failed:', error);
-        setLoading(false);
-        return;
-      }
-
-      if (!dbUsers || dbUsers.length === 0) {
-        console.log('User authenticated but not in database - showing phone modal');
-        // User authenticated but not in database - needs phone collection
-        setShowPhoneModal(true);
-        setLoading(false);
-        return;
-      }
-
-      const dbUser = dbUsers[0];
-
-      // User exists in database
+      // Use user data directly from auth service
       const currentUserData = {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        phone: dbUser.phone,
-        avatar: dbUser.avatar
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        avatar: user.avatar
       };
 
       setCurrentUser(currentUserData);
-
-      // Update localStorage for compatibility
       localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+      setIsAdmin(user.is_admin || false);
 
-      // Check if user is admin from database
-      setIsAdmin(dbUser.is_admin || false);
-
-      // Check if user needs to complete phone number (shouldn't happen for existing users, but just in case)
-      if (!dbUser.phone) {
+      // Check if user needs phone number
+      if (!user.phone) {
         setShowPhoneModal(true);
       }
 

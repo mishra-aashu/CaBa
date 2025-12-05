@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 const AuthStatus = () => {
-  const { user, loading, authType, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, authType } = useAuth();
 
   if (loading) {
     return (

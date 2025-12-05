@@ -16,16 +16,23 @@ export const useChatListRealtime = (currentUserId) => {
         console.log('Loading chats for user:', userId);
         
         try {
-            // Use chat_list_view for better performance
             const { data, error } = await supabase
                 .from('chat_list_view')
                 .select('*')
                 .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
                 .order('last_message_time', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Error loading chats from view:', error);
+                const storedChats = localStorage.getItem(`chats_${userId}`);
+                const localChats = storedChats ? JSON.parse(storedChats) : [];
+                setChats(localChats);
+                setLoading(false);
+                return;
+            }
 
-            // Format chats for display
+            console.log('Loaded chats from database:', data);
+
             const formattedChats = (data || []).map(chat => {
                 const isUser1 = chat.user1_id === userId;
                 const otherUser = {
@@ -54,7 +61,6 @@ export const useChatListRealtime = (currentUserId) => {
     }, [supabase]);
 
     const updateChatInList = useCallback(async (chatId) => {
-        // Fetch updated chat data from view
         const { data } = await supabase
             .from('chat_list_view')
             .select('*')
@@ -92,7 +98,7 @@ export const useChatListRealtime = (currentUserId) => {
                 }
             });
         }
-    }, [currentUserId]);
+    }, [currentUserId, supabase]);
 
     useEffect(() => {
         if (currentUserId) {
@@ -106,7 +112,6 @@ export const useChatListRealtime = (currentUserId) => {
     useEffect(() => {
         if (!currentUserId) return;
 
-        // Subscribe to new messages
         const messagesChannel = supabase
             .channel('chat_list_messages')
             .on('postgres_changes', {
@@ -122,7 +127,6 @@ export const useChatListRealtime = (currentUserId) => {
             })
             .subscribe();
 
-        // Subscribe to chat updates
         const chatsChannel = supabase
             .channel('chat_list_chats')
             .on('postgres_changes', {
@@ -136,12 +140,11 @@ export const useChatListRealtime = (currentUserId) => {
             })
             .subscribe();
 
-        // Cleanup function
         return () => {
             if (messagesChannel) messagesChannel.unsubscribe();
             if (chatsChannel) chatsChannel.unsubscribe();
         };
-    }, [currentUserId, updateChatInList]);
+    }, [currentUserId, updateChatInList, supabase]);
 
     return { chats, setChats, loading };
 };

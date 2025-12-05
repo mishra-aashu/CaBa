@@ -1,72 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSupabase } from '../../contexts/SupabaseContext';
-import authService from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
 import MessagingLoader from '../MessagingLoader';
 
 const AuthCallback = () => {
-  const { supabase } = useSupabase();
   const navigate = useNavigate();
   const [status, setStatus] = useState('Processing authentication...');
+  const { handleGoogleCallback } = useAuth();
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
+    const processCallback = async () => {
       try {
-        // Get session from URL hash
-        const { data: { session }, error } = await supabase.auth.getSession();
+        setStatus('Processing Google authentication...');
         
-        if (error) {
-          console.error('Auth callback error:', error);
+        const result = await handleGoogleCallback();
+        
+        if (result.success) {
+          setStatus('Login successful! Redirecting to home...');
+          navigate('/');
+        } else {
           setStatus('Authentication failed');
           navigate('/login');
-          return;
         }
-
-        if (!session?.user) {
-          setStatus('No user session found');
-          navigate('/login');
-          return;
-        }
-
-        const user = session.user;
-        setStatus('Verifying user in database...');
-
-        // Check if user exists in database
-        const { data: dbUser, error: dbError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (dbError && dbError.code !== 'PGRST116') {
-          console.error('Database error:', dbError);
-          setStatus('Database verification failed');
-          navigate('/login');
-          return;
-        }
-
-        if (!dbUser) {
-          // User not in database, redirect to complete profile
-          setStatus('Completing profile setup...');
-          navigate('/');
-          return;
-        }
-
-        // User exists in database, complete login
-        setStatus('Login successful! Redirecting...');
-        
-        // Direct navigation without waiting for authService
-        navigate('/');
-
       } catch (error) {
         console.error('Auth callback error:', error);
-        setStatus('Authentication failed');
+        setStatus('Authentication failed: ' + error.message);
         navigate('/login');
       }
     };
 
-    handleAuthCallback();
-  }, [supabase, navigate]);
+    processCallback();
+  }, [handleGoogleCallback, navigate]);
 
   return (
     <div style={{ 

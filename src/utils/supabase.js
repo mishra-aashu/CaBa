@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { supabase } from '../config/supabase';
+// Re-export the supabase client from config for consistency
+export { supabase } from '../config/supabase.js';
 
 /**
  * Validate and get proper avatar URL
@@ -65,7 +66,3 @@ export const getValidAvatarUrl = (avatar) => {
   // For other values, assume it's a media ID and return null (will be handled by media loader)
   return avatarStr;
 };
-
-export { supabase };
-
-export default supabase;

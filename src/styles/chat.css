@@ -249,6 +249,8 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  position: relative;
+  z-index: 1;
 }
 
 .messages-wrapper {
@@ -256,6 +258,43 @@
   margin: 0;
   padding: 0;
   min-height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* No Messages Placeholder */
+.no-messages-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+  padding: 40px 20px;
+}
+
+.no-messages-content {
+  text-align: center;
+  max-width: 300px;
+}
+
+.no-messages-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.no-messages-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color, #333);
+}
+
+.no-messages-content p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  line-height: 1.4;
 }
 
 /* Date Separator */
@@ -281,6 +320,7 @@
   position: relative;
   padding: 8px 5% 35px 5%;
   min-height: 40px;
+  z-index: 10;
 }
 
 .message.received {
