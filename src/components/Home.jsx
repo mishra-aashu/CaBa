@@ -514,21 +514,8 @@ const Home = () => {
     if (existingChat) {
       handleChatClick(existingChat);
     } else {
-      // Create new chat in localStorage
-      const newChat = {
-        id: `chat_${currentUser.id}_${user.id}`,
-        otherUser: user,
-        last_message: '',
-        last_message_time: new Date().toISOString(),
-        unreadCount: 0
-      };
-      
-      const updatedChats = [newChat, ...chats];
-      setChats(updatedChats);
-      localStorage.setItem(`chats_${currentUser.id}`, JSON.stringify(updatedChats));
-      
-      // Navigate to chat
-      navigate(`/chat/${newChat.id}/${user.id}`);
+      // Navigate to new chat - let Chat component handle creation
+      navigate(`/chat//${user.id}`);
     }
     setShowSearch(false);
     setSearchTerm('');
@@ -542,21 +529,8 @@ const Home = () => {
     if (existingChat) {
       handleChatClick(existingChat);
     } else {
-      // Create new chat in localStorage
-      const newChat = {
-        id: `chat_${currentUser.id}_${contact.id}`,
-        otherUser: contact,
-        last_message: '',
-        last_message_time: new Date().toISOString(),
-        unreadCount: 0
-      };
-      
-      const updatedChats = [newChat, ...chats];
-      setChats(updatedChats);
-      localStorage.setItem(`chats_${currentUser.id}`, JSON.stringify(updatedChats));
-      
-      // Navigate to chat
-      navigate(`/chat/${newChat.id}/${contact.id}`);
+      // Navigate to new chat - let Chat component handle creation
+      navigate(`/chat//${contact.id}`);
     }
     setShowNewContactModal(false);
     setShowSelectContact(false);
