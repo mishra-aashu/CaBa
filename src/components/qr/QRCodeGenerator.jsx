@@ -1,34 +1,27 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import './QRCodeGenerator.css';
 
 const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) => {
-  const canvasRef = useRef(null);
-  const [qrData, setQrData] = useState('');
   const [qrDataURL, setQrDataURL] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Wait for component to mount and canvas to be available
-    const timer = setTimeout(() => {
-      generateQRCode();
-    }, 100); // Small delay to ensure canvas is rendered
-
-    return () => clearTimeout(timer);
-  }, [userId]);
+    generateQRCode();
+  }, [userId, userName, userPhone]);
 
   const generateQRCode = async () => {
     try {
       setLoading(true);
+      setError(null);
 
-      // Validate required data
       if (!userId) {
         throw new Error('User ID is required');
       }
 
       const profileUrl = `${window.location.origin}/shared-profile.html?userId=${userId}`;
 
-      // Enhanced QR data with user information
       const qrDataString = JSON.stringify({
         type: 'caba_profile',
         userId: userId,
@@ -39,53 +32,32 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
       });
 
       console.log('Generating QR code with data:', qrDataString);
-      setQrData(qrDataString);
 
-      // Wait for canvas to be available with retry mechanism
-      let attempts = 0;
-      const maxAttempts = 10;
-
-      while (attempts < maxAttempts) {
-        if (canvasRef.current) {
-          await QRCode.toCanvas(canvasRef.current, qrDataString, {
-            width: 256,
-            margin: 2,
-            color: {
-              dark: '#000000',
-              light: '#FFFFFF'
-            }
-          });
-          console.log('QR code generated successfully');
-
-          // Set the data URL for display
-          const dataURL = canvasRef.current.toDataURL();
-          setQrDataURL(dataURL);
-
-          setLoading(false);
-          return;
+      const dataURL = await QRCode.toDataURL(qrDataString, {
+        width: 256,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
         }
+      });
 
-        // Wait 100ms before next attempt
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
-      }
-
-      throw new Error('Canvas element not found after multiple attempts');
+      setQrDataURL(dataURL);
+      setLoading(false);
 
     } catch (error) {
       console.error('Error generating QR code:', error);
-      alert('Failed to generate QR code. Please try again.');
+      setError('Failed to generate QR code. Please try again.');
       setLoading(false);
     }
   };
 
   const handleDownload = () => {
     try {
-      const canvas = canvasRef.current;
-      if (canvas) {
+      if (qrDataURL) {
         const link = document.createElement('a');
-        link.download = `${userName}-CaBa-QR.png`;
-        link.href = canvas.toDataURL();
+        link.download = `${userName || 'User'}-CaBa-QR.png`;
+        link.href = qrDataURL;
         link.click();
 
         if (onDownload) {
@@ -98,7 +70,6 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
     }
   };
 
-
   return (
     <div className="qr-generator-modal">
       <div className="qr-generator-content">
@@ -108,13 +79,17 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
             <i className="fas fa-times"></i>
           </button>
         </div>
-        
-        <canvas ref={canvasRef} style={{ display: 'none' }} />
+
         <div className="qr-generator-body">
           {loading ? (
             <div className="qr-loading">
               <div className="spinner"></div>
               <p>Generating QR Code...</p>
+            </div>
+          ) : error ? (
+            <div className="qr-error">
+              <p>{error}</p>
+              <button onClick={generateQRCode}>Try Again</button>
             </div>
           ) : (
             <>
