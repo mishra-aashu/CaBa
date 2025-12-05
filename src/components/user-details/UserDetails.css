@@ -551,19 +551,19 @@
   }
 
   .user-actions {
-    padding: 24px 16px;
-    gap: 24px;
+    padding: 20px 16px;
+    gap: 20px;
     margin: 12px 8px;
     border-radius: 12px;
   }
 
   .action-btn {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
   }
 
   .action-btn .icon {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .user-info-sections {
@@ -622,6 +622,56 @@
 
   .toggle input:checked + .toggle-slider:before {
     transform: translateX(22px);
+  }
+}
+
+@media (max-width: 480px) {
+  .user-profile-section {
+    padding: 20px 12px;
+  }
+
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+  }
+
+  .user-avatar.scrolled {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  .user-name {
+    font-size: 18px;
+  }
+
+  .user-phone {
+    font-size: 13px;
+  }
+
+  .user-actions {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  .action-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .action-btn .icon {
+    font-size: 16px;
+  }
+
+  .user-info-sections {
+    padding: 0 8px 16px;
+  }
+
+  .info-section {
+    border-radius: 12px;
+    margin-bottom: 12px;
   }
 }
 

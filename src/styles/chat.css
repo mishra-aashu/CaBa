@@ -1045,7 +1045,21 @@
 /* Responsive Design for existing components */
 @media (max-width: 768px) {
   .chat-header {
-    padding: 8px 12px;
+    padding: 6px 12px;
+  }
+
+  .chat-user-info .user-avatar {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+  }
+
+  .user-details h3 {
+    font-size: 15px;
+  }
+
+  .user-details p {
+    font-size: 11px;
   }
 
   .messages-container {
@@ -1082,6 +1096,35 @@
     width: 46px;
     height: 46px;
     font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-header {
+    padding: 4px 8px;
+  }
+
+  .chat-user-info .user-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+
+  .user-details h3 {
+    font-size: 14px;
+  }
+
+  .user-details p {
+    font-size: 10px;
+  }
+
+  .back-btn, .icon-btn {
+    padding: 6px;
+    font-size: 16px;
+  }
+
+  .chat-actions {
+    gap: 6px;
   }
 }
 
