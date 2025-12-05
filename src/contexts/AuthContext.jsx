@@ -121,12 +121,39 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/CaBa/`
+        }
+      });
+      
+      if (error) {
+        console.error('Google sign in error:', error);
+        return { success: false, error: error.message };
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const signUpWithGoogle = async () => {
+    return signInWithGoogle();
+  };
+
   const value = {
     user,
     loading,
     isAuthenticated,
     signInWithPhone: (phone, password) => authService?.authenticateWithPhone(phone, password),
     signUpWithPhone: (phone, password, name, email) => authService?.signUpWithPhone(phone, password, name, email),
+    signInWithGoogle,
+    signUpWithGoogle,
     signOut: () => authService?.signOut(),
     handleGoogleCallback,
   };

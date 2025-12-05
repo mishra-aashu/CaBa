@@ -1,58 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import MessagingLoader from '../MessagingLoader';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState('Processing authentication...');
-  const [callbackProcessed, setCallbackProcessed] = useState(false);
-  const { handleGoogleCallback, isAuthenticated } = useAuth();
+  const { handleGoogleCallback } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const processCallback = async () => {
       try {
-        setStatus('Processing Google authentication...');
-
         const result = await handleGoogleCallback();
-
+        
         if (result.success) {
-          setStatus('Login successful! Redirecting to home...');
-          setCallbackProcessed(true);
+          // Redirect to home page on successful authentication
+          navigate('/', { replace: true });
         } else {
-          setStatus('Authentication failed');
-          navigate('/login');
+          setError(result.error || 'Authentication failed');
+          setTimeout(() => {
+            navigate('/login', { replace: true });
+          }, 3000);
         }
       } catch (error) {
         console.error('Auth callback error:', error);
-        setStatus('Authentication failed: ' + error.message);
-        navigate('/login');
+        setError('Authentication failed');
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 3000);
+      } finally {
+        setLoading(false);
       }
     };
 
     processCallback();
-  }, [handleGoogleCallback, navigate]);
+  }, [navigate, handleGoogleCallback]);
 
-  useEffect(() => {
-    if (callbackProcessed && isAuthenticated) {
-      navigate('/');
-    }
-  }, [callbackProcessed, isAuthenticated, navigate]);
+  if (loading) {
+    return (
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-header">
+            <h1>Authenticating...</h1>
+            <p>Please wait while we complete your Google sign-in</p>
+          </div>
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      height: '100vh',
-      padding: '20px',
-      textAlign: 'center'
-    }}>
-      <MessagingLoader />
-      <p style={{ marginTop: '20px', color: '#666' }}>{status}</p>
-    </div>
-  );
+  if (error) {
+    return (
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-header">
+            <h1>Authentication Error</h1>
+            <p>{error}</p>
+            <p>Redirecting to login page...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default AuthCallback;

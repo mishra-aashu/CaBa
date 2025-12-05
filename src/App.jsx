@@ -4,6 +4,8 @@ import { useSupabase } from './contexts/SupabaseContext';
 import { useAuth } from './hooks/useAuth';
 import { CallProvider } from './context/CallContext';
 import { Login, Signup, ForgotPassword, ResetPassword, AuthCallback } from './components/auth';
+import ExternalAuth from './components/auth/ExternalAuth';
+import ExternalAuthCallback from './components/auth/ExternalAuthCallback';
 import { Chat } from './components/chat';
 import Home from './components/Home';
 import Profile from './components/profile';
@@ -63,6 +65,7 @@ const CallProviderWrapper = ({ children }) => {
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
+  const { supabase } = useSupabase();
 
   useEffect(() => {
     const { pathname, search } = window.location;
@@ -70,7 +73,19 @@ function App() {
       const path = search.slice(2).replace(/~and~/g, '&');
       window.history.replaceState(null, '', pathname + path);
     }
-  }, []);
+
+    // Handle Google OAuth callback
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Google OAuth success, redirecting to home');
+          // User will be automatically redirected by ProtectedRoute logic
+        }
+      });
+
+      return () => subscription?.unsubscribe();
+    }
+  }, [supabase]);
 
   return (
     <CallProviderWrapper>
@@ -83,6 +98,8 @@ function App() {
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
             <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/external-auth" element={<ExternalAuth />} />
+            <Route path="/external-auth-callback" element={<ExternalAuthCallback />} />
             <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/chat/new/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/call/:callId" element={<ProtectedRoute><CallScreen /></ProtectedRoute>} />
