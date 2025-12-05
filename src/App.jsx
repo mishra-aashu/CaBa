@@ -20,6 +20,7 @@ import SharedProfile from './components/shared-profile';
 import About from './components/About';
 import SupportChat from './components/SupportChat';
 import Admin from './components/Admin';
+import { QRPage } from './components/qr';
 import Intro from './components/Intro';
 import CallScreen from './components/CallScreen';
 import CallStatusIndicator from './components/CallStatusIndicator';
@@ -110,6 +111,7 @@ function App() {
             <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
             <Route path="/create-reminder" element={<ProtectedRoute><CreateReminder /></ProtectedRoute>} />
             <Route path="/calls" element={<ProtectedRoute><Calls /></ProtectedRoute>} />
+            <Route path="/qr" element={<ProtectedRoute><QRPage /></ProtectedRoute>} />
             <Route path="/blocked" element={<ProtectedRoute><Blocked /></ProtectedRoute>} />
             <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
             <Route path="/support" element={<ProtectedRoute><SupportChat /></ProtectedRoute>} />

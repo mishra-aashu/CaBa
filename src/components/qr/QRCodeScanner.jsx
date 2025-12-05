@@ -98,21 +98,40 @@ const QRCodeScanner = ({ onScan, onClose, onError }) => {
     }
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        // Handle file upload for QR scanning
-        // Note: html5-qrcode library would need additional setup for file scanning
-        alert('File upload QR scanning coming soon!');
-      };
-      reader.readAsDataURL(file);
+      try {
+        setError('');
+        setIsScanning(true);
+
+        // Import html5-qrcode for file scanning
+        const { Html5Qrcode } = await import('html5-qrcode');
+
+        const html5QrCode = new Html5Qrcode("hidden-qr-reader");
+
+        // Scan the uploaded image
+        const qrCodeResult = await html5QrCode.scanFile(file, false);
+
+        // Clean up
+        html5QrCode.clear();
+
+        // Process the result
+        handleScanSuccess(qrCodeResult, {});
+
+      } catch (error) {
+        console.error('Error scanning uploaded file:', error);
+        setError('Failed to scan QR code from image. Please ensure the image contains a valid QR code.');
+        setIsScanning(false);
+      }
     }
   };
 
   return (
     <div className="qr-scanner-modal">
+      {/* Hidden element for file scanning */}
+      <div id="hidden-qr-reader" style={{ display: 'none' }}></div>
+
       <div className="qr-scanner-content">
         <div className="qr-scanner-header">
           <h3>Scan QR Code</h3>

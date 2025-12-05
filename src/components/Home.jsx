@@ -4,7 +4,7 @@ import { useSupabase } from '../contexts/SupabaseContext';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../contexts/ThemeContext';
 import phoneAuth from '../utils/phoneAuth';
-import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck, Edit, Trash2 } from 'lucide-react';
+import { MessageCircle, Phone, Newspaper, Settings, User, Search, MoreVertical, Plus, Bell, Info, HelpCircle, LogOut, Crown, X, Eye, EyeOff, ShieldCheck, Edit, Trash2, QrCode } from 'lucide-react';
 import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import Chat from './chat/Chat';
@@ -676,6 +676,13 @@ const Home = () => {
             </button>
             <button
               className="sidebar-item"
+              onClick={() => handleNavigation('/qr')}
+            >
+              <QrCode size={20} />
+              <span className="label">QR Code</span>
+            </button>
+            <button
+              className="sidebar-item"
               onClick={() => handleNavigation('/news')}
             >
               <Newspaper size={20} />
@@ -896,6 +903,10 @@ const Home = () => {
           <MessageCircle size={20} />
           <span className="label">Chats</span>
           <span className="badge">5</span>
+        </button>
+        <button className="nav-item" onClick={() => handleNavigation('/qr')}>
+          <QrCode size={20} />
+          <span className="label">QR</span>
         </button>
         <button className="nav-item" onClick={() => handleNavigation('/news')}>
           <Newspaper size={20} />
