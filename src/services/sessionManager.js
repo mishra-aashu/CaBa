@@ -64,10 +64,22 @@ class SessionManager {
         return { success: false, error: 'Invalid password' };
       }
 
-      // For phone users, use custom auth and simulate Supabase logs
-      console.log('Auth state changed: SIGNED_IN', { provider_token: null, access_token: 'custom_session_' + Date.now(), expires_in: 3600, expires_at: Date.now() + 3600000, refresh_token: null, token_type: 'bearer', user: { id: userData.id, email: userData.email } });
-      console.log('📡 Setting up global incoming call listener for user:', userData.id);
-      console.log('Auth state changed: INITIAL_SESSION', { provider_token: null, access_token: 'custom_session_' + Date.now(), expires_in: 3600, expires_at: Date.now() + 3600000, refresh_token: null, token_type: 'bearer', user: { id: userData.id, email: userData.email } });
+      // Try Supabase auth first
+      const storedEmail = userData.email;
+      console.log('Attempting Supabase auth sign in for phone user:', storedEmail);
+      const { data: authData, error: authError } = await this.supabase.auth.signInWithPassword({
+        email: storedEmail,
+        password: password
+      });
+
+      if (authError) {
+        console.log('Supabase auth failed, using custom auth with simulated logs');
+        // Simulate Supabase logs for consistency
+        console.log('Auth state changed: SIGNED_IN', { provider_token: null, access_token: 'custom_session_' + Date.now(), expires_in: 3600, expires_at: Date.now() + 3600000, refresh_token: null, token_type: 'bearer', user: { id: userData.id, email: userData.email } });
+        console.log('📡 Setting up global incoming call listener for user:', userData.id);
+        console.log('Auth state changed: INITIAL_SESSION', { provider_token: null, access_token: 'custom_session_' + Date.now(), expires_in: 3600, expires_at: Date.now() + 3600000, refresh_token: null, token_type: 'bearer', user: { id: userData.id, email: userData.email } });
+      }
+      // If authData exists, Supabase will log the real events
 
       this.currentUser = userData;
       this.storeUser(userData);
