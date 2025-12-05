@@ -67,14 +67,33 @@ class SessionManager {
       // Sign in to Supabase auth using stored email
       const storedEmail = userData.email;
       console.log('Attempting Supabase auth sign in for phone user:', storedEmail);
-      const { data: authData, error: authError } = await this.supabase.auth.signInWithPassword({
+      let { data: authData, error: authError } = await this.supabase.auth.signInWithPassword({
         email: storedEmail,
         password: password
       });
 
       if (authError) {
-        console.error('Supabase auth sign in error:', authError);
-        // Continue anyway, as the user can still use custom auth
+        console.log('Supabase auth user not found, creating one for existing user');
+        // Create Supabase auth user for existing phone user
+        const { data: signUpData, error: signUpError } = await this.supabase.auth.signUp({
+          email: storedEmail,
+          password: password
+        });
+
+        if (signUpError) {
+          console.error('Failed to create Supabase auth user:', signUpError);
+        } else {
+          console.log('Created Supabase auth user, attempting sign in again');
+          // Try sign in again
+          const retryResult = await this.supabase.auth.signInWithPassword({
+            email: storedEmail,
+            password: password
+          });
+          if (!retryResult.error) {
+            authData = retryResult.data;
+            authError = null;
+          }
+        }
       }
 
       this.currentUser = userData;
