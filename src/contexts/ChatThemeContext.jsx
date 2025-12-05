@@ -23,7 +23,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f1f5f9'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
@@ -56,7 +56,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0f9ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
@@ -88,8 +88,8 @@ const chatThemes = {
     },
     header: {
       background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      text: '#f1f5f9',
-      iconColor: '#f1f5f9'
+      text: '#ffffff',
+      iconColor: '#e2e8f0'
     },
     input: {
       background: 'linear-gradient(135deg, #334155 0%, #475569 100%)',
@@ -122,7 +122,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #0c4a6e 0%, #075985 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0f9ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
@@ -155,7 +155,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #14532d 0%, #166534 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0fdf4'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
@@ -188,7 +188,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #c2410c 0%, #ea580c 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fff7ed'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
@@ -221,7 +221,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f3e8ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
@@ -254,7 +254,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #92400e 0%, #b45309 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fffbeb'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
@@ -286,7 +286,7 @@ const chatThemes = {
     },
     header: {
       background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%)',
-      text: '#e0e7ff',
+      text: '#ffffff',
       iconColor: '#e0e7ff'
     },
     input: {
@@ -320,7 +320,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #be185d 0%, #db2777 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fdf2f8'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
@@ -353,7 +353,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#ecfdf5'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
@@ -386,7 +386,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #831843 0%, #a21caf 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fdf2f8'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
@@ -419,7 +419,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
       text: '#00ffff',
-      iconColor: '#00ffff'
+      iconColor: '#00ff00'
     },
     input: {
       background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
@@ -452,7 +452,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #003d5b 0%, #0088cc 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0f9ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
@@ -485,7 +485,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0fdf4'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
@@ -518,7 +518,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fff7ed'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
@@ -551,7 +551,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0f9ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
@@ -584,7 +584,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #78350f 0%, #ca8a04 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fffbeb'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
@@ -617,7 +617,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #581c87 0%, #7c3aed 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f3e8ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
@@ -650,7 +650,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fdf2f8'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
@@ -683,7 +683,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #1f2937 0%, #4b5563 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f9fafb'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
@@ -716,7 +716,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #9a3412 0%, #dc2626 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#fff7ed'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
@@ -749,7 +749,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #14532d 0%, #059669 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f0fdf4'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
@@ -782,7 +782,7 @@ const chatThemes = {
     header: {
       background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
       text: '#ffffff',
-      iconColor: '#ffffff'
+      iconColor: '#f3e8ff'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',

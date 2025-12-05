@@ -201,7 +201,7 @@ const UserDetails = () => {
           <h1>Contact Info</h1>
         </div>
         <div className="header-right">
-          <button className="icon-btn">
+          <button className="icon-btn" onClick={() => console.log('Menu clicked')}>
             <i className="fas fa-ellipsis-v"></i>
           </button>
         </div>
