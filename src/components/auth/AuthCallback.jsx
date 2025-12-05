@@ -6,18 +6,19 @@ import MessagingLoader from '../MessagingLoader';
 const AuthCallback = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('Processing authentication...');
-  const { handleGoogleCallback } = useAuth();
+  const [callbackProcessed, setCallbackProcessed] = useState(false);
+  const { handleGoogleCallback, isAuthenticated } = useAuth();
 
   useEffect(() => {
     const processCallback = async () => {
       try {
         setStatus('Processing Google authentication...');
-        
+
         const result = await handleGoogleCallback();
-        
+
         if (result.success) {
           setStatus('Login successful! Redirecting to home...');
-          navigate('/');
+          setCallbackProcessed(true);
         } else {
           setStatus('Authentication failed');
           navigate('/login');
@@ -31,6 +32,12 @@ const AuthCallback = () => {
 
     processCallback();
   }, [handleGoogleCallback, navigate]);
+
+  useEffect(() => {
+    if (callbackProcessed && isAuthenticated) {
+      navigate('/');
+    }
+  }, [callbackProcessed, isAuthenticated, navigate]);
 
   return (
     <div style={{ 
