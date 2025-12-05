@@ -5,4 +5,3 @@ export { default as MessageInput } from './MessageInput';
 export { default as TypingIndicator } from './TypingIndicator';
 export { default as AttachmentMenu } from './AttachmentMenu';
 export { default as MediaMessage } from './MediaMessage';
-export { default as WallpaperSelector } from './WallpaperSelector';
