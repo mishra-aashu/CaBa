@@ -22,18 +22,9 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
 
       const profileUrl = `${window.location.origin}/shared-profile.html?userId=${userId}`;
 
-      const qrDataString = JSON.stringify({
-        type: 'caba_profile',
-        userId: userId,
-        userName: userName || 'User',
-        userPhone: userPhone || '',
-        url: profileUrl,
-        timestamp: Date.now()
-      });
+      console.log('Generating QR code with URL:', profileUrl);
 
-      console.log('Generating QR code with data:', qrDataString);
-
-      const dataURL = await QRCode.toDataURL(qrDataString, {
+      const dataURL = await QRCode.toDataURL(profileUrl, {
         width: 256,
         margin: 2,
         color: {
