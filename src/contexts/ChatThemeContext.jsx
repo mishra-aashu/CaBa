@@ -469,31 +469,38 @@ const chatThemes = {
     name: 'Spring Vibes',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(255, 222, 233, 0.20) 0%, transparent 55%),
-      radial-gradient(circle at 80% 20%, rgba(181, 255, 252, 0.25) 0%, transparent 60%),
-      radial-gradient(circle at 50% 50%, rgba(236, 252, 203, 0.15) 0%, transparent 65%),
+      radial-gradient(circle at 20% 80%, rgba(255, 222, 233, 0.25) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(181, 255, 252, 0.30) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(236, 252, 203, 0.20) 0%, transparent 65%),
       linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fce7f3 0%, #ecfdf5 50%, #f0fdfa 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-      text: '#f0fdf4'
+      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+      text: '#ffffff',
+      shadow: '0 3px 12px rgba(5, 150, 105, 0.3)',
+      border: '1px solid rgba(255,255,255,0.2)'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
-      text: '#14532d'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+      text: '#1e293b',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)',
+      border: '1px solid rgba(30, 41, 59, 0.1)'
     },
     header: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
       text: '#ffffff',
-      iconColor: '#f0fdf4'
+      iconColor: '#ffffff',
+      shadow: '0 2px 8px rgba(4, 120, 87, 0.3)'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
-      text: '#14532d',
-      iconColor: '#10b981'
+      text: '#1e293b',
+      iconColor: '#059669',
+      border: '1px solid rgba(5, 150, 105, 0.2)',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     }
@@ -535,28 +542,35 @@ const chatThemes = {
     name: 'Winter Calm',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(137, 247, 254, 0.18) 0%, transparent 55%),
-      radial-gradient(circle at 70% 30%, rgba(102, 166, 255, 0.15) 0%, transparent 60%),
-      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.10) 0%, transparent 65%),
+      radial-gradient(circle at 30% 70%, rgba(137, 247, 254, 0.22) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(102, 166, 255, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 65%),
       linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-      text: '#f0f9ff'
+      text: '#ffffff',
+      shadow: '0 3px 12px rgba(2, 132, 199, 0.3)',
+      border: '1px solid rgba(255,255,255,0.2)'
     },
     receivedMessage: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-      text: '#0c4a6e'
+      text: '#0c4a6e',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)',
+      border: '1px solid rgba(12, 74, 110, 0.1)'
     },
     header: {
       background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%)',
       text: '#ffffff',
-      iconColor: '#f0f9ff'
+      iconColor: '#ffffff',
+      shadow: '0 2px 8px rgba(12, 74, 110, 0.3)'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
       text: '#0c4a6e',
-      iconColor: '#0284c7'
+      iconColor: '#0284c7',
+      border: '1px solid rgba(2, 132, 199, 0.2)',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)'
     },
     buttons: {
       background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%)',
@@ -568,28 +582,35 @@ const chatThemes = {
     name: 'Desert Dunes',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(253, 230, 138, 0.15) 0%, transparent 55%),
-      radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
-      radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 65%),
+      radial-gradient(circle at 20% 80%, rgba(253, 230, 138, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.22) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 65%),
       linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fef3c7 0%, #fde68a 50%, #facc15 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #ca8a04 0%, #a16207 100%)',
-      text: '#fffbeb'
+      text: '#ffffff',
+      shadow: '0 3px 12px rgba(202, 138, 4, 0.3)',
+      border: '1px solid rgba(255,255,255,0.2)'
     },
     receivedMessage: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
-      text: '#78350f'
+      text: '#78350f',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)',
+      border: '1px solid rgba(120, 53, 15, 0.1)'
     },
     header: {
       background: 'linear-gradient(135deg, #78350f 0%, #ca8a04 100%)',
       text: '#ffffff',
-      iconColor: '#fffbeb'
+      iconColor: '#ffffff',
+      shadow: '0 2px 8px rgba(120, 53, 15, 0.3)'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
       text: '#78350f',
-      iconColor: '#ca8a04'
+      iconColor: '#ca8a04',
+      border: '1px solid rgba(202, 138, 4, 0.2)',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)'
     },
     buttons: {
       background: 'linear-gradient(135deg, #78350f 0%, #ca8a04 100%)',
@@ -634,28 +655,35 @@ const chatThemes = {
     name: 'Cherry Blossom',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(253, 164, 175, 0.18) 0%, transparent 55%),
-      radial-gradient(circle at 70% 30%, rgba(244, 63, 94, 0.15) 0%, transparent 60%),
-      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.12) 0%, transparent 65%),
+      radial-gradient(circle at 30% 70%, rgba(253, 164, 175, 0.22) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(244, 63, 94, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.14) 0%, transparent 65%),
       linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fce7f3 0%, #fda4af 50%, #fb7185 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #e11d48 0%, #be185d 100%)',
-      text: '#fdf2f8'
+      text: '#ffffff',
+      shadow: '0 3px 12px rgba(225, 29, 72, 0.3)',
+      border: '1px solid rgba(255,255,255,0.2)'
     },
     receivedMessage: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
-      text: '#9f1239'
+      text: '#9f1239',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)',
+      border: '1px solid rgba(159, 18, 57, 0.1)'
     },
     header: {
       background: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)',
       text: '#ffffff',
-      iconColor: '#fdf2f8'
+      iconColor: '#ffffff',
+      shadow: '0 2px 8px rgba(159, 18, 57, 0.3)'
     },
     input: {
       background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
       text: '#9f1239',
-      iconColor: '#f43f5e'
+      iconColor: '#f43f5e',
+      border: '1px solid rgba(244, 63, 94, 0.2)',
+      shadow: '0 2px 8px rgba(0,0,0,0.1)'
     },
     buttons: {
       background: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)',
@@ -932,14 +960,21 @@ export const ChatThemeProvider = ({ children }) => {
     root.style.setProperty('--chat-bg-gradient', theme.background);
     root.style.setProperty('--sent-message-bg', theme.sentMessage.background);
     root.style.setProperty('--sent-message-text', theme.sentMessage.text);
+    root.style.setProperty('--sent-message-shadow', theme.sentMessage.shadow || '0 2px 8px rgba(0,0,0,0.15)');
+    root.style.setProperty('--sent-message-border', theme.sentMessage.border || 'none');
     root.style.setProperty('--received-message-bg', theme.receivedMessage.background);
     root.style.setProperty('--received-message-text', theme.receivedMessage.text);
+    root.style.setProperty('--received-message-shadow', theme.receivedMessage.shadow || '0 2px 8px rgba(0,0,0,0.1)');
+    root.style.setProperty('--received-message-border', theme.receivedMessage.border || 'none');
     root.style.setProperty('--chat-header-bg', theme.header.background);
     root.style.setProperty('--chat-header-text', theme.header.text);
     root.style.setProperty('--chat-header-icon-color', theme.header.iconColor);
+    root.style.setProperty('--chat-header-shadow', theme.header.shadow || '0 2px 8px rgba(0,0,0,0.15)');
     root.style.setProperty('--chat-input-bg', theme.input.background);
     root.style.setProperty('--chat-input-text', theme.input.text);
     root.style.setProperty('--chat-input-icon-color', theme.input.iconColor);
+    root.style.setProperty('--chat-input-border', theme.input.border || 'none');
+    root.style.setProperty('--chat-input-shadow', theme.input.shadow || '0 2px 8px rgba(0,0,0,0.1)');
     root.style.setProperty('--chat-buttons-bg', theme.buttons.background);
     root.style.setProperty('--chat-buttons-text', theme.buttons.text);
     root.style.setProperty('--chat-buttons-icon-color', theme.buttons.iconColor);
@@ -954,17 +989,24 @@ export const ChatThemeProvider = ({ children }) => {
       });
     };
 
-    // Apply styles only to elements outside homescreen
+    // Apply styles only to elements outside homescreen with enhanced visibility
     applyToElementIfNotInHomescreen('.chat-container', 'background', theme.background);
     applyToElementIfNotInHomescreen('#messagesContainer', 'background', theme.background);
     applyToElementIfNotInHomescreen('.chat-header', 'background', theme.header.background);
     applyToElementIfNotInHomescreen('.chat-header', 'color', theme.header.text);
+    applyToElementIfNotInHomescreen('.chat-header', 'boxShadow', theme.header.shadow || '0 2px 8px rgba(0,0,0,0.15)');
+    applyToElementIfNotInHomescreen('.chat-header', 'textShadow', '0 1px 2px rgba(0,0,0,0.3)');
     applyToElementIfNotInHomescreen('.message-input-area', 'background', theme.input.background);
     applyToElementIfNotInHomescreen('.message-input-area', 'color', theme.input.text);
+    applyToElementIfNotInHomescreen('.message-input-area', 'border', theme.input.border || 'none');
+    applyToElementIfNotInHomescreen('.message-input-area', 'boxShadow', theme.input.shadow || '0 2px 8px rgba(0,0,0,0.1)');
     applyToElementIfNotInHomescreen('.input-wrapper', 'background', theme.input.background);
+    applyToElementIfNotInHomescreen('.input-wrapper', 'border', theme.input.border || 'none');
+    applyToElementIfNotInHomescreen('.input-wrapper', 'boxShadow', theme.input.shadow || '0 2px 8px rgba(0,0,0,0.1)');
     applyToElementIfNotInHomescreen('#messageInput', 'color', theme.input.text);
+    applyToElementIfNotInHomescreen('#messageInput', 'textShadow', '0 1px 2px rgba(0,0,0,0.1)');
 
-    // Apply to buttons and icons only if not in homescreen
+    // Apply to buttons and icons only if not in homescreen with enhanced styling
     const allElements = document.querySelectorAll('*');
     allElements.forEach(element => {
       if (isInHomescreen(element)) return;
@@ -984,6 +1026,9 @@ export const ChatThemeProvider = ({ children }) => {
           element.style.background = theme.buttons.background;
           element.style.color = theme.buttons.text;
           element.style.border = 'none';
+          element.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
+          element.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+          element.style.transition = 'all 0.3s ease';
         }
          
         if (element.tagName === 'I' || element.tagName === 'SVG') {
@@ -994,11 +1039,34 @@ export const ChatThemeProvider = ({ children }) => {
           if (parentClassStr.includes('chat') && !parentClassStr.includes('chat-list')) {
             element.style.color = theme.header.iconColor;
             element.style.stroke = theme.header.iconColor;
+            element.style.filter = 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))';
+            element.style.transition = 'all 0.3s ease';
+          }
+        }
+        
+        // Enhanced message bubble styling
+        if (classNameStr.includes('message-bubble') || classNameStr.includes('message')) {
+          if (classNameStr.includes('sent')) {
+            element.style.background = theme.sentMessage.background;
+            element.style.color = theme.sentMessage.text;
+            element.style.border = theme.sentMessage.border || 'none';
+            element.style.boxShadow = theme.sentMessage.shadow || '0 2px 8px rgba(0,0,0,0.15)';
+            element.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
+          } else if (classNameStr.includes('received')) {
+            element.style.background = theme.receivedMessage.background;
+            element.style.color = theme.receivedMessage.text;
+            element.style.border = theme.receivedMessage.border || 'none';
+            element.style.boxShadow = theme.receivedMessage.shadow || '0 2px 8px rgba(0,0,0,0.1)';
+            element.style.textShadow = '0 1px 2px rgba(0,0,0,0.1)';
           }
         }
       }
     });
 
+    // Add theme class to body for CSS targeting
+    document.body.className = document.body.className.replace(/theme-\w+/g, '');
+    document.body.classList.add(`theme-${themeKey.replace('_', '-')}`);
+    
     // Theme applied successfully (completely excludes homescreen)
   };
 

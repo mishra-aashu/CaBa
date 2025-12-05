@@ -28,6 +28,10 @@ import { IncomingCallModal } from './components/IncomingCallModal';
 import MessagingLoader from './components/MessagingLoader';
 import AuthDebug from './components/AuthDebug';
 
+// Import enhanced theme styles
+import './styles/enhanced-themes.css';
+import './styles/theme-integration.css';
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
@@ -69,6 +73,22 @@ const CallProviderWrapper = ({ children }) => {
 function App() {
   const [showIntro, setShowIntro] = useState(true);
   const { supabase } = useSupabase();
+  
+  // Apply theme integration on app load
+  useEffect(() => {
+    // Add theme integration class to body
+    document.body.classList.add('theme-integrated');
+    
+    // Ensure perfect visibility CSS is loaded
+    const themeLink = document.createElement('link');
+    themeLink.rel = 'stylesheet';
+    themeLink.href = '/CaBa/src/styles/theme-integration.css';
+    document.head.appendChild(themeLink);
+    
+    return () => {
+      document.body.classList.remove('theme-integrated');
+    };
+  }, []);
 
   useEffect(() => {
     const { pathname, search } = window.location;
