@@ -28,7 +28,7 @@ import { IncomingCallModal } from './components/IncomingCallModal';
 import MessagingLoader from './components/MessagingLoader';
 import AuthDebug from './components/AuthDebug';
 
-// Import enhanced theme styles - moved to index.css to avoid 404 errors
+
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();
@@ -72,15 +72,7 @@ function App() {
   const [showIntro, setShowIntro] = useState(true);
   const { supabase } = useSupabase();
   
-  // Apply theme integration on app load
-  useEffect(() => {
-    // Add theme integration class to body
-    document.body.classList.add('theme-integrated');
-    
-    return () => {
-      document.body.classList.remove('theme-integrated');
-    };
-  }, []);
+
 
   useEffect(() => {
     const { pathname, search } = window.location;
