@@ -5,6 +5,7 @@ import './QRCodeGenerator.css';
 const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) => {
   const canvasRef = useRef(null);
   const [qrData, setQrData] = useState('');
+  const [qrDataURL, setQrDataURL] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,6 +56,11 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
             }
           });
           console.log('QR code generated successfully');
+
+          // Set the data URL for display
+          const dataURL = canvasRef.current.toDataURL();
+          setQrDataURL(dataURL);
+
           setLoading(false);
           return;
         }
@@ -81,7 +87,7 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
         link.download = `${userName}-CaBa-QR.png`;
         link.href = canvas.toDataURL();
         link.click();
-        
+
         if (onDownload) {
           onDownload();
         }
@@ -91,6 +97,7 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
       alert('Failed to download QR code');
     }
   };
+
 
   return (
     <div className="qr-generator-modal">
@@ -111,9 +118,14 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
           ) : (
             <>
               <div className="qr-canvas-container">
-                <canvas ref={canvasRef} className="qr-canvas"></canvas>
+                <img
+                  src={qrDataURL}
+                  alt="QR Code"
+                  className="qr-canvas"
+                  style={{ width: '256px', height: '256px' }}
+                />
               </div>
-              
+
               <div className="qr-info">
                 <p className="qr-title">{userName}</p>
                 {userPhone && <p className="qr-phone">📱 {userPhone}</p>}
@@ -121,7 +133,7 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
                   Scan this QR code to view my CaBa profile
                 </p>
               </div>
-              
+
               <div className="qr-actions">
                 <button className="qr-download-btn" onClick={handleDownload}>
                   <i className="fas fa-download"></i>
