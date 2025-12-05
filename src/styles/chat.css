@@ -888,27 +888,32 @@
 
 /* Scroll to Bottom Button */
 .scroll-bottom-btn {
-  position: absolute;
-  bottom: 80px;
+  position: fixed;
+  bottom: 90px;
   right: 20px;
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: var(--primary-color, #007bff);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   transition: all 0.3s ease;
-  z-index: 100;
+  z-index: 1000;
+  font-size: 20px;
 }
 
 .scroll-bottom-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.scroll-bottom-btn:active {
+  transform: scale(0.95);
 }
 
 .scroll-bottom-btn .unread-count {
@@ -1052,10 +1057,11 @@
 
 
   .scroll-bottom-btn {
-    bottom: 70px;
+    bottom: 80px;
     right: 16px;
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
   }
 }
 
