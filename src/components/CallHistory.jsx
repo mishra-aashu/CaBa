@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCallHistory } from '../hooks/useCallHistory';
 import { Phone, PhoneIncoming, PhoneMissed, PhoneOutgoing, Video } from 'lucide-react';
+import '../styles/pro-cards.css';
 
 export function CallHistory({ userId }) {
   const { history, loading, error, missedCount } = useCallHistory(userId);
@@ -59,71 +60,74 @@ export function CallHistory({ userId }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+    <div className="call-history-container">
       {/* Header */}
-      <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-        <h2 className="text-xl font-bold dark:text-white">Call History</h2>
+      <div className="call-history-header">
+        <h2>Call History</h2>
         {missedCount > 0 && (
-          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+          <span className="missed-badge">
             {missedCount} missed
           </span>
         )}
       </div>
 
       {/* Call List */}
-      <div className="divide-y dark:divide-gray-700">
+      <div className="call-history-list">
         {history.length > 0 ? (
           history.map((call) => (
-            <div
-              key={call.id}
-              className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
+            <div key={call.id} className="call-card">
               {/* Avatar */}
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="call-avatar">
                 {call.other_user_avatar ? (
                   <img
                     src={call.other_user_avatar}
                     alt={call.other_user_name}
-                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-white font-bold text-lg">
+                  <div>
                     {call.other_user_name?.charAt(0) || '?'}
-                  </span>
+                  </div>
                 )}
               </div>
 
               {/* Info */}
-              <div className="flex-1">
-                <h3 className="font-semibold dark:text-white">
+              <div className="call-info">
+                <h3 className="call-name">
                   {call.other_user_name || 'Unknown'}
                 </h3>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  {getCallIcon(call)}
-                  <span>{call.call_type === 'video' ? 'Video' : 'Voice'}</span>
-                  <span>•</span>
-                  <span>{formatDuration(call.call_duration)}</span>
+                <div className="call-details">
+                  <div className="call-icon">
+                    {getCallIcon(call)}
+                  </div>
+                  <span className="call-type-badge">
+                    {call.call_type === 'video' ? 'Video' : 'Voice'}
+                  </span>
+                  <span className="call-duration">
+                    {formatDuration(call.call_duration)}
+                  </span>
                 </div>
               </div>
 
               {/* Time & Call Button */}
-              <div className="text-right">
-                <span className="text-sm text-gray-500">
+              <div className="call-meta">
+                <span className="call-time">
                   {formatTime(call.started_at)}
                 </span>
-                <div className="mt-1">
+                <button className="call-action" title="Call back">
                   {call.call_type === 'video' ? (
-                    <Video className="w-5 h-5 text-blue-500 inline" />
+                    <Video size={20} />
                   ) : (
-                    <Phone className="w-5 h-5 text-green-500 inline" />
+                    <Phone size={20} />
                   )}
-                </div>
+                </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="p-8 text-center text-gray-500">
-            No call history yet
+          <div className="empty-state">
+            <Phone size={64} />
+            <h3>No call history yet</h3>
+            <p>Your call history will appear here</p>
           </div>
         )}
       </div>

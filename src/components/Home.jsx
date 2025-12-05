@@ -13,6 +13,7 @@ import { useChatListRealtime } from '../hooks/useChatListRealtime';
 import '../styles/home.css';
 import '../styles/layout-fixes.css';
 import '../styles/mobile-improvements.css';
+import '../styles/pro-cards.css';
 
 const Home = () => {
   const { supabase } = useSupabase();
@@ -831,52 +832,51 @@ const Home = () => {
 
           {/* Chat List */}
           <div className="chat-list-container">
-            <div className="chat-list">
-              {chatsLoading ? (
-                <div className="loading-state">
-                  <p>Loading chats...</p>
-                </div>
-              ) : filteredChats.length > 0 ? (
-                filteredChats.map(chat => (
-                  <div
-                    key={chat.id}
-                    className="chat-item"
-                    onClick={() => handleChatClick(chat)}
-                  >
-                    <div className="chat-avatar">
-                      {chat.otherUser?.avatar ? (
-                        <img src={parseInt(chat.otherUser.avatar) ? dpOptions.find(dp => dp.id === parseInt(chat.otherUser.avatar))?.path : chat.otherUser.avatar} alt={chat.otherUser.name} />
-                      ) : (
-                        <div>{getInitials(chat.otherUser?.name || 'U')}</div>
-                      )}
-                      <span className={`online-status ${chat.otherUser?.is_online ? 'online' : ''}`}></span>
+            {chatsLoading ? (
+              <div className="loading-state">
+                <div className="loading-spinner"></div>
+                <p>Loading chats...</p>
+              </div>
+            ) : filteredChats.length > 0 ? (
+              filteredChats.map(chat => (
+                <div
+                  key={chat.id}
+                  className="chat-card"
+                  onClick={() => handleChatClick(chat)}
+                >
+                  <div className="chat-avatar">
+                    {chat.otherUser?.avatar ? (
+                      <img src={parseInt(chat.otherUser.avatar) ? dpOptions.find(dp => dp.id === parseInt(chat.otherUser.avatar))?.path : chat.otherUser.avatar} alt={chat.otherUser.name} />
+                    ) : (
+                      <div>{getInitials(chat.otherUser?.name || 'U')}</div>
+                    )}
+                    <span className={`online-status ${chat.otherUser?.is_online ? 'online' : ''}`}></span>
+                  </div>
+                  <div className="chat-info">
+                    <div className="chat-header">
+                      <h3 className="chat-name">{chat.otherUser?.name || 'Unknown'}</h3>
+                      <span className="chat-time">
+                        {formatTime(chat.last_message_time)}
+                      </span>
                     </div>
-                    <div className="chat-info">
-                      <div className="chat-header">
-                        <h3 className="chat-name">{chat.otherUser?.name || 'Unknown'}</h3>
-                        <span className="chat-time">
-                          {formatTime(chat.last_message_time)}
-                        </span>
-                      </div>
-                      <div className="chat-preview">
-                        <p className="last-message">
-                          {chat.last_message || 'No messages yet'}
-                        </p>
-                        {chat.unreadCount > 0 && (
-                          <span className="unread-count">{chat.unreadCount}</span>
-                        )}
-                      </div>
+                    <div className="chat-preview">
+                      <p className="last-message">
+                        {chat.last_message || 'No messages yet'}
+                      </p>
+                      {chat.unreadCount > 0 && (
+                        <span className="unread-count">{chat.unreadCount}</span>
+                      )}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div key="empty-state" className="empty-state">
-                  <MessageCircle size={64} />
-                  <h3>No conversations yet</h3>
-                  <p>Start messaging your contacts or search by phone number</p>
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <MessageCircle size={64} />
+                <h3>No conversations yet</h3>
+                <p>Start messaging your contacts or search by phone number</p>
+              </div>
+            )}
           </div>
 
           {/* FAB */}
