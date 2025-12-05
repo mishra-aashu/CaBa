@@ -64,6 +64,9 @@ class SessionManager {
         return { success: false, error: 'Invalid password' };
       }
 
+      // Sign out any existing session first
+      await this.supabase.auth.signOut();
+
       // Sign in to Supabase auth using stored email
       const storedEmail = userData.email;
       console.log('Attempting Supabase auth sign in for phone user:', storedEmail);
