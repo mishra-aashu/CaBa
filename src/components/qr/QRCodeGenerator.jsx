@@ -20,7 +20,7 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
         throw new Error('User ID is required');
       }
 
-      const profileUrl = `${window.location.origin}/shared-profile.html?userId=${userId}`;
+      const profileUrl = `https://mishra-aashu.github.io/CaBa/shared-profile.html?userId=${userId}`;
 
       console.log('Generating QR code with URL:', profileUrl);
 
