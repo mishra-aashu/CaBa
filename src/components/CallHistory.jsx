@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCallHistory } from '../hooks/useCallHistory';
 import { Phone, PhoneIncoming, PhoneMissed, PhoneOutgoing, Video } from 'lucide-react';
-import '../styles/pro-cards.css';
+import '../styles/clean-cards.css';
 
 export function CallHistory({ userId }) {
   const { history, loading, error, missedCount } = useCallHistory(userId);
@@ -60,76 +60,70 @@ export function CallHistory({ userId }) {
   }
 
   return (
-    <div className="call-history-container">
-      {/* Header */}
-      <div className="call-history-header">
-        <h2>Call History</h2>
-        {missedCount > 0 && (
-          <span className="missed-badge">
-            {missedCount} missed
-          </span>
-        )}
-      </div>
+    <div className="call-history-wrapper">
+      <div className="call-history-card">
+        {/* Header */}
+        <div className="call-history-header">
+          <h2 className="call-history-title">Call History</h2>
+          {missedCount > 0 && (
+            <span className="missed-calls-badge">
+              {missedCount} missed
+            </span>
+          )}
+        </div>
 
-      {/* Call List */}
-      <div className="call-history-list">
-        {history.length > 0 ? (
-          history.map((call) => (
-            <div key={call.id} className="call-card">
-              {/* Avatar */}
-              <div className="call-avatar">
-                {call.other_user_avatar ? (
-                  <img
-                    src={call.other_user_avatar}
-                    alt={call.other_user_name}
-                  />
-                ) : (
-                  <div>
-                    {call.other_user_name?.charAt(0) || '?'}
-                  </div>
-                )}
-              </div>
+        {/* Call List */}
+        <div>
+          {history.length > 0 ? (
+            history.map((call) => (
+              <div key={call.id} className="call-item">
+                {/* Avatar */}
+                <div className="call-avatar">
+                  {call.other_user_avatar ? (
+                    <img
+                      src={call.other_user_avatar}
+                      alt={call.other_user_name}
+                    />
+                  ) : (
+                    call.other_user_name?.charAt(0) || '?'
+                  )}
+                </div>
 
-              {/* Info */}
-              <div className="call-info">
-                <h3 className="call-name">
-                  {call.other_user_name || 'Unknown'}
-                </h3>
+                {/* Info */}
                 <div className="call-details">
-                  <div className="call-icon">
+                  <h3 className="call-name">
+                    {call.other_user_name || 'Unknown'}
+                  </h3>
+                  <div className="call-info">
                     {getCallIcon(call)}
+                    <span>{call.call_type === 'video' ? 'Video' : 'Voice'}</span>
+                    <span>{formatDuration(call.call_duration)}</span>
                   </div>
-                  <span className="call-type-badge">
-                    {call.call_type === 'video' ? 'Video' : 'Voice'}
-                  </span>
-                  <span className="call-duration">
-                    {formatDuration(call.call_duration)}
-                  </span>
+                </div>
+
+                {/* Time & Call Button */}
+                <div className="call-meta">
+                  <div className="call-time">
+                    {formatTime(call.started_at)}
+                  </div>
+                  <button className="call-button">
+                    {call.call_type === 'video' ? (
+                      <Video size={18} />
+                    ) : (
+                      <Phone size={18} />
+                    )}
+                  </button>
                 </div>
               </div>
-
-              {/* Time & Call Button */}
-              <div className="call-meta">
-                <span className="call-time">
-                  {formatTime(call.started_at)}
-                </span>
-                <button className="call-action" title="Call back">
-                  {call.call_type === 'video' ? (
-                    <Video size={20} />
-                  ) : (
-                    <Phone size={20} />
-                  )}
-                </button>
-              </div>
+            ))
+          ) : (
+            <div className="empty-state">
+              <Phone size={48} />
+              <h3>No call history</h3>
+              <p>Your calls will appear here</p>
             </div>
-          ))
-        ) : (
-          <div className="empty-state">
-            <Phone size={64} />
-            <h3>No call history yet</h3>
-            <p>Your call history will appear here</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
