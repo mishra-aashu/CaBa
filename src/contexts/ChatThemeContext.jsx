@@ -7,31 +7,31 @@ const chatThemes = {
     name: 'Classic Purple',
     category: 'Default',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #667eea 0%, #764ba2 100%)
+      radial-gradient(circle at 25% 75%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 75% 25%, rgba(168, 85, 247, 0.12) 0%, transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 70%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #4c6ef5 0%, #5c7cfa 100%)',
-      text: '#ffffff'
+      background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+      text: '#f8fafc'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-      text: '#1a202c'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
+      text: '#0f172a'
     },
     header: {
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-      text: '#1a202c',
-      iconColor: '#667eea'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+      text: '#1e293b',
+      iconColor: '#8b5cf6'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     }
@@ -40,96 +40,97 @@ const chatThemes = {
     name: 'Electric Dreams',
     category: 'Futuristic',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(168, 85, 247, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)
+      radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 60%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0c4a6e 0%, #1e40af 50%, #581c87 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+      background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
       text: '#f0f9ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-      text: '#f1f5f9'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+      text: '#0c4a6e'
     },
     header: {
-      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-      text: '#f8fafc',
-      iconColor: '#f8fafc'
+      background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-      text: '#f8fafc',
-      iconColor: '#06b6d4'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+      text: '#0c4a6e',
+      iconColor: '#0ea5e9'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-      text: '#f8fafc',
-      iconColor: '#f8fafc'
+      background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   dark_professional: {
     name: 'Dark Professional',
     category: 'Dark',
     background: `
-      radial-gradient(circle at 25% 25%, rgba(30, 30, 46, 0.8) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(15, 23, 42, 0.6) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #1e1e2e 0%, #0f172a 50%, #1e1e2e 100%)
+      radial-gradient(circle at 30% 70%, rgba(15, 23, 42, 0.4) 0%, transparent 60%),
+      radial-gradient(circle at 70% 30%, rgba(30, 41, 59, 0.3) 0%, transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(51, 65, 85, 0.2) 0%, transparent 70%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0f172a 0%, #1e293b 50%, #334155 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #1e1e2e 0%, #0f172a 100%)',
-      text: '#e2e8f0'
-    },
-    receivedMessage: {
-      background: 'linear-gradient(135deg, #374151 0%, #4b5563 100%)',
+      background: 'linear-gradient(135deg, #475569 0%, #64748b 100%)',
       text: '#f8fafc'
     },
+    receivedMessage: {
+      background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+      text: '#e2e8f0'
+    },
     header: {
-      background: 'linear-gradient(135deg, #1e1e2e 0%, #0f172a 100%)',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
       text: '#f1f5f9',
       iconColor: '#f1f5f9'
     },
     input: {
-      background: 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
-      text: '#f9fafb',
-      iconColor: '#f9fafb'
+      background: 'linear-gradient(135deg, #334155 0%, #475569 100%)',
+      text: '#f8fafc',
+      iconColor: '#94a3b8'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #1e1e2e 0%, #0f172a 100%)',
-      text: '#f1f5f9',
-      iconColor: '#f1f5f9'
+      background: 'linear-gradient(135deg, #475569 0%, #64748b 100%)',
+      text: '#f8fafc',
+      iconColor: '#f8fafc'
     }
   },
   ocean_depths: {
     name: 'Ocean Depths',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(14, 165, 233, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(2, 132, 199, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0284c7 0%, #0369a1 50%, #075985 100%)
+      radial-gradient(circle at 25% 75%, rgba(14, 165, 233, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(2, 132, 199, 0.22) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0c4a6e 0%, #075985 50%, #0369a1 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
-      text: '#e0f7ff'
+      background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+      text: '#f0f9ff'
     },
     receivedMessage: {
       background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
-      text: '#0f172a'
+      text: '#0c4a6e'
     },
     header: {
-      background: 'linear-gradient(135deg, #075985 0%, #0369a1 100%)',
+      background: 'linear-gradient(135deg, #0c4a6e 0%, #075985 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
       text: '#0c4a6e',
       iconColor: '#0284c7'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #075985 0%, #0369a1 100%)',
+      background: 'linear-gradient(135deg, #0c4a6e 0%, #075985 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     }
@@ -138,31 +139,31 @@ const chatThemes = {
     name: 'Forest Mist',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(22, 163, 74, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 60% 40%, rgba(74, 222, 128, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #16a34a 0%, #15803d 50%, #166534 100%)
+      radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.15) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(22, 163, 74, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 60% 40%, rgba(74, 222, 128, 0.10) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #14532d 0%, #166534 50%, #15803d 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+      background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
       text: '#f0fdf4'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+      text: '#14532d'
     },
     header: {
-      background: 'linear-gradient(135deg, #166534 0%, #15803d 100%)',
+      background: 'linear-gradient(135deg, #14532d 0%, #166534 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
       text: '#14532d',
-      iconColor: '#22c55e'
+      iconColor: '#16a34a'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #166534 0%, #15803d 100%)',
+      background: 'linear-gradient(135deg, #14532d 0%, #166534 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     }
@@ -171,31 +172,31 @@ const chatThemes = {
     name: 'Sunset Glow',
     category: 'Colorful',
     background: `
-      radial-gradient(circle at 25% 75%, rgba(251, 146, 60, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(234, 88, 12, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #ea580c 0%, #c2410c 50%, #9a3412 100%)
+      radial-gradient(circle at 25% 75%, rgba(251, 146, 60, 0.16) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(234, 88, 12, 0.20) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #c2410c 0%, #ea580c 50%, #f97316 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
-      text: '#fef2e2'
+      background: 'linear-gradient(135deg, #ea580c 0%, #dc2626 100%)',
+      text: '#fff7ed'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
+      text: '#9a3412'
     },
     header: {
-      background: 'linear-gradient(135deg, #9a3412 0%, #c2410c 100%)',
+      background: 'linear-gradient(135deg, #c2410c 0%, #ea580c 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
       text: '#9a3412',
       iconColor: '#ea580c'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #9a3412 0%, #c2410c 100%)',
+      background: 'linear-gradient(135deg, #c2410c 0%, #ea580c 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     }
@@ -204,18 +205,18 @@ const chatThemes = {
     name: 'Cosmic Purple',
     category: 'Elegant',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(147, 51, 234, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(124, 58, 237, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #7c3aed 0%, #6b21a8 50%, #581c87 100%)
+      radial-gradient(circle at 30% 70%, rgba(147, 51, 234, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(124, 58, 237, 0.22) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.14) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #581c87 0%, #6b21a8 50%, #7c3aed 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+      background: 'linear-gradient(135deg, #7c3aed 0%, #6b21a8 100%)',
       text: '#f3e8ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
+      text: '#581c87'
     },
     header: {
       background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
@@ -223,7 +224,7 @@ const chatThemes = {
       iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
       text: '#581c87',
       iconColor: '#8b5cf6'
     },
@@ -237,262 +238,262 @@ const chatThemes = {
     name: 'Golden Hour',
     category: 'Colorful',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(217, 119, 6, 0.35) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #f59e0b 0%, #d97706 50%, #92400e 100%)
+      radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(217, 119, 6, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.10) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #92400e 0%, #b45309 50%, #d97706 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-      text: '#fef2e2'
+      text: '#fffbeb'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
+      text: '#92400e'
     },
     header: {
       background: 'linear-gradient(135deg, #92400e 0%, #b45309 100%)',
-      text: '#fef3c7',
-      iconColor: '#fef3c7'
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
       text: '#92400e',
-      iconColor: '#f59e0b'
+      iconColor: '#d97706'
     },
     buttons: {
       background: 'linear-gradient(135deg, #92400e 0%, #b45309 100%)',
-      text: '#fef3c7',
-      iconColor: '#fef3c7'
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   midnight_city: {
     name: 'Midnight City',
     category: 'Dark',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(30, 27, 75, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(49, 46, 129, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #1e1b4b 0%, #312e81 50%, #1e40af 100%)
+      radial-gradient(circle at 30% 70%, rgba(30, 27, 75, 0.25) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(49, 46, 129, 0.30) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0f0f23 0%, #1e1b4b 50%, #312e81 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-      text: '#cbd5e1'
+      background: 'linear-gradient(135deg, #4338ca 0%, #3730a3 100%)',
+      text: '#e0e7ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      text: '#e2e8f0'
+      background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+      text: '#c7d2fe'
     },
     header: {
-      background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-      text: '#e2e8f0',
-      iconColor: '#e2e8f0'
+      background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%)',
+      text: '#e0e7ff',
+      iconColor: '#e0e7ff'
     },
     input: {
-      background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-      text: '#f1f5f9',
-      iconColor: '#60a5fa'
+      background: 'linear-gradient(135deg, #312e81 0%, #4338ca 100%)',
+      text: '#e0e7ff',
+      iconColor: '#a5b4fc'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-      text: '#e2e8f0',
-      iconColor: '#e2e8f0'
+      background: 'linear-gradient(135deg, #4338ca 0%, #3730a3 100%)',
+      text: '#e0e7ff',
+      iconColor: '#e0e7ff'
     }
   },
   rose_garden: {
     name: 'Rose Garden',
     category: 'Colorful',
     background: `
-      radial-gradient(circle at 25% 75%, rgba(244, 63, 94, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(219, 39, 119, 0.35) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #f43f5e 0%, #db2777 50%, #be185d 100%)
+      radial-gradient(circle at 25% 75%, rgba(244, 63, 94, 0.16) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(219, 39, 119, 0.20) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #be185d 0%, #db2777 50%, #ec4899 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+      background: 'linear-gradient(135deg, #db2777 0%, #be185d 100%)',
       text: '#fdf2f8'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
+      text: '#be185d'
     },
     header: {
-      background: 'linear-gradient(135deg, #be185d 0%, #9f1239 100%)',
-      text: '#fce7f3',
-      iconColor: '#fce7f3'
+      background: 'linear-gradient(135deg, #be185d 0%, #db2777 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
       text: '#be185d',
       iconColor: '#ec4899'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #be185d 0%, #9f1239 100%)',
-      text: '#fce7f3',
-      iconColor: '#fce7f3'
+      background: 'linear-gradient(135deg, #be185d 0%, #db2777 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   emerald_forest: {
     name: 'Emerald Forest',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.35) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #10b981 0%, #059669 50%, #047857 100%)
+      radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.14) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.10) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #047857 0%, #059669 50%, #10b981 100%)
     `,
     sentMessage: {
       background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
       text: '#ecfdf5'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
+      text: '#14532d'
     },
     header: {
-      background: 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
-      text: '#d1fae5',
-      iconColor: '#d1fae5'
+      background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
       text: '#14532d',
       iconColor: '#10b981'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
-      text: '#d1fae5',
-      iconColor: '#d1fae5'
+      background: 'linear-gradient(135deg, #047857 0%, #059669 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   nebula: {
     name: 'Nebula',
     category: 'Elegant',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(236, 72, 153, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #ec4899 0%, #8b5cf6 50%, #7c3aed 100%)
+      radial-gradient(circle at 30% 70%, rgba(236, 72, 153, 0.16) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.20) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #831843 0%, #a21caf 50%, #7c3aed 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #a21caf 0%, #7c3aed 100%)',
       text: '#fdf2f8'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
+      text: '#831843'
     },
     header: {
-      background: 'linear-gradient(135deg, #831843 0%, #6b21a8 100%)',
-      text: '#fce7f3',
-      iconColor: '#fce7f3'
+      background: 'linear-gradient(135deg, #831843 0%, #a21caf 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
       text: '#831843',
       iconColor: '#ec4899'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #831843 0%, #6b21a8 100%)',
-      text: '#fce7f3',
-      iconColor: '#fce7f3'
+      background: 'linear-gradient(135deg, #831843 0%, #a21caf 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   cyberpunk: {
     name: 'Cyberpunk',
     category: 'Dark',
     background: `
-      radial-gradient(circle at 25% 75%, rgba(0, 0, 0, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(26, 26, 26, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(64, 64, 64, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0f0f0f 0%, #1a1a1a 50%, #262626 100%)
+      radial-gradient(circle at 25% 75%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 75% 25%, rgba(255, 0, 255, 0.06) 0%, transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.04) 0%, transparent 60%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #000000 0%, #0a0a0a 50%, #1a1a1a 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #000000 0%, #262626 100%)',
-      text: '#d4d4d4'
+      background: 'linear-gradient(135deg, #00ffff 0%, #0080ff 100%)',
+      text: '#000000'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #1a1a1a 0%, #404040 100%)',
-      text: '#e5e5e5'
+      background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+      text: '#00ff00'
     },
     header: {
       background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
-      text: '#e5e5e5',
-      iconColor: '#e5e5e5'
+      text: '#00ffff',
+      iconColor: '#00ffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #262626 0%, #404040 100%)',
-      text: '#f5f5f5',
-      iconColor: '#a3a3a3'
+      background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+      text: '#00ff00',
+      iconColor: '#00ffff'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
-      text: '#e5e5e5',
-      iconColor: '#e5e5e5'
+      background: 'linear-gradient(135deg, #00ffff 0%, #0080ff 100%)',
+      text: '#000000',
+      iconColor: '#000000'
     }
   },
   telegram_blue: {
     name: 'Telegram Blue',
     category: 'Professional',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(0, 136, 204, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(0, 95, 153, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #0088cc 0%, #005f99 50%, #003d5b 100%)
+      radial-gradient(circle at 30% 70%, rgba(0, 136, 204, 0.15) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(0, 95, 153, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.10) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #003d5b 0%, #0088cc 50%, #3b82f6 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #003d5b 0%, #004a6f 100%)',
-      text: '#b3e5fc'
+      background: 'linear-gradient(135deg, #0088cc 0%, #0369a1 100%)',
+      text: '#f0f9ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #002d42 0%, #003d5b 100%)',
-      text: '#b3e5fc'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+      text: '#003d5b'
     },
     header: {
-      background: 'linear-gradient(135deg, #003d5b 0%, #004a6f 100%)',
-      text: '#e0f7ff',
-      iconColor: '#e0f7ff'
+      background: 'linear-gradient(135deg, #003d5b 0%, #0088cc 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
       text: '#003d5b',
       iconColor: '#0088cc'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #003d5b 0%, #004a6f 100%)',
-      text: '#e0f7ff',
-      iconColor: '#e0f7ff'
+      background: 'linear-gradient(135deg, #003d5b 0%, #0088cc 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   spring_vibes: {
     name: 'Spring Vibes',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(255, 222, 233, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(181, 255, 252, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(236, 252, 203, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #FFDEE9 0%, #B5FFFC 50%, #A0E7E5 100%)
+      radial-gradient(circle at 20% 80%, rgba(255, 222, 233, 0.20) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(181, 255, 252, 0.25) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(236, 252, 203, 0.15) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fce7f3 0%, #ecfdf5 50%, #f0fdfa 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #ec4899 0%, #a855f7 100%)',
-      text: '#fdf2f8'
+      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      text: '#f0fdf4'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+      text: '#14532d'
     },
     header: {
-      background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
-      text: '#374151',
-      iconColor: '#ec4899'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+      text: '#14532d',
+      iconColor: '#10b981'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
       text: '#ffffff',
       iconColor: '#ffffff'
     }
@@ -501,297 +502,297 @@ const chatThemes = {
     name: 'Autumn Leaves',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 25% 75%, rgba(234, 88, 12, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(154, 52, 18, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #ea580c 0%, #9a3412 50%, #7c2d12 100%)
+      radial-gradient(circle at 25% 75%, rgba(234, 88, 12, 0.16) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(154, 52, 18, 0.20) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #7c2d12 0%, #9a3412 50%, #ea580c 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #7c2d12 0%, #92400e 100%)',
-      text: '#fde68a'
+      background: 'linear-gradient(135deg, #ea580c 0%, #dc2626 100%)',
+      text: '#fff7ed'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #431407 0%, #7c2d12 100%)',
-      text: '#fde68a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
+      text: '#7c2d12'
     },
     header: {
-      background: 'linear-gradient(135deg, #7c2d12 0%, #92400e 100%)',
-      text: '#fed7aa',
-      iconColor: '#fed7aa'
+      background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fffbeb 0%, #fed7aa 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
       text: '#7c2d12',
       iconColor: '#ea580c'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #7c2d12 0%, #92400e 100%)',
-      text: '#fed7aa',
-      iconColor: '#fed7aa'
+      background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   winter_calm: {
     name: 'Winter Calm',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(137, 247, 254, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(102, 166, 255, 0.3) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #89F7FE 0%, #66A6FF 50%, #3b82f6 100%)
+      radial-gradient(circle at 30% 70%, rgba(137, 247, 254, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(102, 166, 255, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.10) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-      text: '#bfdbfe'
+      background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+      text: '#f0f9ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)',
-      text: '#bfdbfe'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+      text: '#0c4a6e'
     },
     header: {
-      background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-      text: '#dbeafe',
-      iconColor: '#dbeafe'
+      background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-      text: '#1e40af',
-      iconColor: '#3b82f6'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+      text: '#0c4a6e',
+      iconColor: '#0284c7'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-      text: '#dbeafe',
-      iconColor: '#dbeafe'
+      background: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   desert_dunes: {
     name: 'Desert Dunes',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(253, 230, 138, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fde68a 0%, #f59e0b 50%, #d97706 100%)
+      radial-gradient(circle at 20% 80%, rgba(253, 230, 138, 0.15) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fef3c7 0%, #fde68a 50%, #facc15 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #a16207 0%, #ca8a04 100%)',
-      text: '#fde68a'
+      background: 'linear-gradient(135deg, #ca8a04 0%, #a16207 100%)',
+      text: '#fffbeb'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #78350f 0%, #a16207 100%)',
-      text: '#fde68a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
+      text: '#78350f'
     },
     header: {
-      background: 'linear-gradient(135deg, #a16207 0%, #ca8a04 100%)',
-      text: '#fef3c7',
-      iconColor: '#fef3c7'
+      background: 'linear-gradient(135deg, #78350f 0%, #ca8a04 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-      text: '#a16207',
-      iconColor: '#f59e0b'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)',
+      text: '#78350f',
+      iconColor: '#ca8a04'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #a16207 0%, #ca8a04 100%)',
-      text: '#fef3c7',
-      iconColor: '#fef3c7'
+      background: 'linear-gradient(135deg, #78350f 0%, #ca8a04 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   lavender_fields: {
     name: 'Lavender Fields',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 25% 75%, rgba(196, 181, 253, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(139, 92, 246, 0.3) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #c4b5fd 0%, #8b5cf6 50%, #7c3aed 100%)
+      radial-gradient(circle at 25% 75%, rgba(196, 181, 253, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(139, 92, 246, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #ede9fe 0%, #c4b5fd 50%, #a78bfa 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
-      text: '#ddd6fe'
+      background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+      text: '#f3e8ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%)',
-      text: '#ddd6fe'
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
+      text: '#581c87'
     },
     header: {
-      background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
-      text: '#ede9fe',
-      iconColor: '#ede9fe'
+      background: 'linear-gradient(135deg, #581c87 0%, #7c3aed 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%)',
-      text: '#5b21b6',
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
+      text: '#581c87',
       iconColor: '#8b5cf6'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
-      text: '#ede9fe',
-      iconColor: '#ede9fe'
+      background: 'linear-gradient(135deg, #581c87 0%, #7c3aed 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   cherry_blossom: {
     name: 'Cherry Blossom',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(253, 164, 175, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(244, 63, 94, 0.3) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fda4af 0%, #f43f5e 50%, #e11d48 100%)
+      radial-gradient(circle at 30% 70%, rgba(253, 164, 175, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(244, 63, 94, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fce7f3 0%, #fda4af 50%, #fb7185 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #be185d 0%, #e11d48 100%)',
-      text: '#fecdd3'
+      background: 'linear-gradient(135deg, #e11d48 0%, #be185d 100%)',
+      text: '#fdf2f8'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #9f1239 0%, #be185d 100%)',
-      text: '#fecdd3'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
+      text: '#9f1239'
     },
     header: {
-      background: 'linear-gradient(135deg, #be185d 0%, #e11d48 100%)',
-      text: '#fce7f3',
-      iconColor: '#fce7f3'
+      background: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)',
-      text: '#be185d',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fdf2f8 100%)',
+      text: '#9f1239',
       iconColor: '#f43f5e'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #be185d 0%, #e11d48 100%)',
-      text: '#fce7f3',
-      iconColor: '#fce7f3'
+      background: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   rainy_day: {
     name: 'Rainy Day',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(156, 163, 175, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(75, 85, 99, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(107, 114, 128, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #9ca3af 0%, #4b5563 50%, #374151 100%)
+      radial-gradient(circle at 20% 80%, rgba(156, 163, 175, 0.15) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(75, 85, 99, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(107, 114, 128, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #f3f4f6 0%, #d1d5db 50%, #9ca3af 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #374151 0%, #4b5563 100%)',
-      text: '#f3f4f6'
+      background: 'linear-gradient(135deg, #4b5563 0%, #374151 100%)',
+      text: '#f9fafb'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
-      text: '#f3f4f6'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
+      text: '#1f2937'
     },
     header: {
-      background: 'linear-gradient(135deg, #374151 0%, #4b5563 100%)',
-      text: '#f9fafb',
-      iconColor: '#f9fafb'
+      background: 'linear-gradient(135deg, #1f2937 0%, #4b5563 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)',
-      text: '#374151',
+      background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
+      text: '#1f2937',
       iconColor: '#6b7280'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #374151 0%, #4b5563 100%)',
-      text: '#f9fafb',
-      iconColor: '#f9fafb'
+      background: 'linear-gradient(135deg, #1f2937 0%, #4b5563 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   sunset_bliss: {
     name: 'Sunset Bliss',
     category: 'Colorful',
     background: `
-      radial-gradient(circle at 25% 75%, rgba(251, 146, 60, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(239, 68, 68, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #f97316 0%, #ef4444 50%, #dc2626 100%)
+      radial-gradient(circle at 25% 75%, rgba(251, 146, 60, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(239, 68, 68, 0.22) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.14) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #fed7aa 0%, #fb923c 50%, #f97316 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
       text: '#fef2f2'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
+      text: '#9a3412'
     },
     header: {
-      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-      text: '#fef2f2',
-      iconColor: '#fef2f2'
+      background: 'linear-gradient(135deg, #9a3412 0%, #dc2626 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
-      text: '#dc2626',
+      background: 'linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)',
+      text: '#9a3412',
       iconColor: '#f97316'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-      text: '#fef2f2',
-      iconColor: '#fef2f2'
+      background: 'linear-gradient(135deg, #9a3412 0%, #dc2626 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   mint_fresh: {
     name: 'Mint Fresh',
     category: 'Nature',
     background: `
-      radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.3) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.4) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(134, 239, 172, 0.25) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #10b981 0%, #34d399 50%, #6ee7b7 100%)
+      radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.18) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(134, 239, 172, 0.12) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #d1fae5 0%, #86efac 50%, #4ade80 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
       text: '#f0fdf4'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+      text: '#14532d'
     },
     header: {
-      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-      text: '#f0fdf4',
-      iconColor: '#f0fdf4'
+      background: 'linear-gradient(135deg, #14532d 0%, #059669 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-      text: '#047857',
+      background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+      text: '#14532d',
       iconColor: '#10b981'
     },
     buttons: {
-      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-      text: '#f0fdf4',
-      iconColor: '#f0fdf4'
+      background: 'linear-gradient(135deg, #14532d 0%, #059669 100%)',
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   },
   royal_elegance: {
     name: 'Royal Elegance',
     category: 'Elegant',
     background: `
-      radial-gradient(circle at 30% 70%, rgba(124, 58, 237, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.5) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
-      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #7c3aed 0%, #8b5cf6 50%, #a855f7 100%)
+      radial-gradient(circle at 30% 70%, rgba(124, 58, 237, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.22) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.14) 0%, transparent 65%),
+      linear-gradient(calc(135deg + var(--scroll-percentage, 0) * 1.8deg), #ede9fe 0%, #c4b5fd 50%, #a78bfa 100%)
     `,
     sentMessage: {
-      background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
+      background: 'linear-gradient(135deg, #6b21a8 0%, #581c87 100%)',
       text: '#f3e8ff'
     },
     receivedMessage: {
-      background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
-      text: '#0f172a'
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
+      text: '#581c87'
     },
     header: {
       background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
-      text: '#f3e8ff',
-      iconColor: '#f3e8ff'
+      text: '#ffffff',
+      iconColor: '#ffffff'
     },
     input: {
-      background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
+      background: 'linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)',
       text: '#581c87',
       iconColor: '#8b5cf6'
     },
     buttons: {
       background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
-      text: '#f3e8ff',
-      iconColor: '#f3e8ff'
+      text: '#ffffff',
+      iconColor: '#ffffff'
     }
   }
 };

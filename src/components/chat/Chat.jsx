@@ -902,63 +902,105 @@ const Chat = () => {
         size="large"
       >
         <div className="theme-selector">
-          <div className="theme-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '15px' }}>
+          <div className="theme-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '20px' }}>
             {Object.entries(chatThemes).map(([key, theme]) => (
-              <button
+              <div
                 key={key}
-                className={`theme-item ${chatTheme === key ? 'active' : ''}`}
+                className={`theme-card ${chatTheme === key ? 'active' : ''}`}
                 onClick={() => handleThemeSelect(key)}
                 style={{
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  border: chatTheme === key ? '3px solid var(--chat-input-icon-color, #667eea)' : '1px solid var(--chat-input-icon-color, #ddd)',
-                  height: '80px',
-                  background: 'none',
-                  padding: 0
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  transform: chatTheme === key ? 'scale(1.05)' : 'scale(1)',
+                  filter: chatTheme === key ? 'brightness(1.1)' : 'brightness(1)'
                 }}
               >
-                <div style={{
-                  width: '100%',
-                  height: '60%',
-                  background: theme.background,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}></div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  padding: '4px 8px',
-                  height: '40%',
-                  background: 'rgba(0, 0, 0, 0.2)'
-                }}>
+                <div
+                  className="theme-preview-card"
+                  style={{
+                    width: '120px',
+                    height: '80px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    border: chatTheme === key ? '3px solid #667eea' : '2px solid rgba(0,0,0,0.1)',
+                    boxShadow: chatTheme === key ? '0 8px 25px rgba(102, 126, 234, 0.3)' : '0 4px 15px rgba(0,0,0,0.1)',
+                    position: 'relative',
+                    background: 'white'
+                  }}
+                >
                   <div style={{
-                    width: '35px',
-                    height: '8px',
-                    borderRadius: '4px',
-                    background: theme.sentMessage.background
+                    width: '100%',
+                    height: '65%',
+                    background: theme.background,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
                   }}></div>
                   <div style={{
-                    width: '35px',
-                    height: '8px',
-                    borderRadius: '4px',
-                    background: theme.receivedMessage.background
-                  }}></div>
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '6px 10px',
+                    height: '35%',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)'
+                  }}>
+                    <div style={{
+                      width: '32px',
+                      height: '10px',
+                      borderRadius: '6px',
+                      background: theme.sentMessage.background,
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}></div>
+                    <div style={{
+                      width: '32px',
+                      height: '10px',
+                      borderRadius: '6px',
+                      background: theme.receivedMessage.background,
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    }}></div>
+                  </div>
+                  {chatTheme === key && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                    }}>
+                      ✓
+                    </div>
+                  )}
                 </div>
-                <div style={{
-                  position: 'absolute',
-                  bottom: '5px',
-                  left: '8px',
-                  right: '8px',
-                  fontSize: '0.7rem',
-                  fontWeight: '500',
-                  color: theme.header.text,
-                  textShadow: '0 1px 2px rgba(0,0,0,0.7)',
-                  textAlign: 'center'
-                }}>
+                <div
+                  className="theme-name"
+                  style={{
+                    marginTop: '12px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: chatTheme === key ? '#667eea' : '#374151',
+                    textAlign: 'center',
+                    fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+                    letterSpacing: '0.3px',
+                    lineHeight: '1.2',
+                    textShadow: chatTheme === key ? '0 1px 3px rgba(102, 126, 234, 0.2)' : 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
                   {theme.name}
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
