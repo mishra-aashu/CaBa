@@ -109,6 +109,7 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
           </button>
         </div>
         
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
         <div className="qr-generator-body">
           {loading ? (
             <div className="qr-loading">
