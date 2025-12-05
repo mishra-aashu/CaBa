@@ -8,7 +8,12 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    generateQRCode();
+    // Wait for component to mount and canvas to be available
+    const timer = setTimeout(() => {
+      generateQRCode();
+    }, 100); // Small delay to ensure canvas is rendered
+
+    return () => clearTimeout(timer);
   }, [userId]);
 
   const generateQRCode = async () => {
@@ -35,22 +40,32 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
       console.log('Generating QR code with data:', qrDataString);
       setQrData(qrDataString);
 
-      // Generate QR code on canvas
-      if (canvasRef.current) {
-        await QRCode.toCanvas(canvasRef.current, qrDataString, {
-          width: 256,
-          margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF'
-          }
-        });
-        console.log('QR code generated successfully');
-      } else {
-        throw new Error('Canvas element not found');
+      // Wait for canvas to be available with retry mechanism
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (attempts < maxAttempts) {
+        if (canvasRef.current) {
+          await QRCode.toCanvas(canvasRef.current, qrDataString, {
+            width: 256,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            }
+          });
+          console.log('QR code generated successfully');
+          setLoading(false);
+          return;
+        }
+
+        // Wait 100ms before next attempt
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
       }
 
-      setLoading(false);
+      throw new Error('Canvas element not found after multiple attempts');
+
     } catch (error) {
       console.error('Error generating QR code:', error);
       alert('Failed to generate QR code. Please try again.');
