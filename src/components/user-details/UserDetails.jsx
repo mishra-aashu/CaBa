@@ -46,9 +46,18 @@ const UserDetails = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mediaCounts, setMediaCounts] = useState({ images: 0, links: 0, docs: 0 });
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     initializeUserDetails();
+    
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 100);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [id]);
 
   const initializeUserDetails = async () => {
@@ -209,7 +218,7 @@ const UserDetails = () => {
 
       {/* User Profile Section */}
       <div className="user-profile-section">
-        <div className="user-avatar">
+        <div className={`user-avatar ${isScrolled ? 'scrolled' : ''}`}>
           {user.avatar ? (
             parseInt(user.avatar) ? (
               <img src={dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path || user.avatar} alt={user.name} />
