@@ -86,11 +86,6 @@ export const SupabaseProvider = ({ children }) => {
   // Setup global incoming call listener
   useEffect(() => {
     if (user && !incomingCallChannel) {
-      // Skip WebSocket subscriptions for phone users
-      if (user.id && user.id.startsWith('phone_')) {
-        console.log('Skipping incoming call listener for phone user');
-        return;
-      }
       setupGlobalIncomingCallListener();
     }
 

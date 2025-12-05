@@ -64,6 +64,19 @@ class SessionManager {
         return { success: false, error: 'Invalid password' };
       }
 
+      // Sign in to Supabase auth using stored email
+      const storedEmail = userData.email;
+      console.log('Attempting Supabase auth sign in for phone user:', storedEmail);
+      const { data: authData, error: authError } = await this.supabase.auth.signInWithPassword({
+        email: storedEmail,
+        password: password
+      });
+
+      if (authError) {
+        console.error('Supabase auth sign in error:', authError);
+        // Continue anyway, as the user can still use custom auth
+      }
+
       this.currentUser = userData;
       this.storeUser(userData);
       this.notifyListeners();
@@ -75,15 +88,27 @@ class SessionManager {
     }
   }
 
-  async signUpWithPhonePassword(phone, password, name) {
+  async signUpWithPhonePassword(phone, password, name, email) {
     try {
+      // Create Supabase auth user with real email
+      const { data: authData, error: authError } = await this.supabase.auth.signUp({
+        email: email,
+        password: password
+      });
+
+      if (authError) {
+        console.error('Supabase auth sign up error:', authError);
+        // For now, continue with custom auth if Supabase auth fails
+      }
+
       const { data: dbUser, error: dbError } = await this.supabase
         .from('users')
         .insert([{
+          id: authData?.user?.id || undefined, // Use Supabase auth user id if available
           phone: phone,
           name: name,
           password: password,
-          email: `${phone}@phone.local`,
+          email: email, // Store real email
           is_online: true,
           created_at: new Date().toISOString(),
           last_seen: new Date().toISOString()

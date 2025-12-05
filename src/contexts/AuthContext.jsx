@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(service.isAuthenticated());
 
         const unsubscribe = service.onAuthStateChange(({ user, isAuthenticated }) => {
+          console.log('🔐 Auth state changed: SIGNED_IN (phone)', { user: user?.id, isAuthenticated });
           setUser(user);
           setIsAuthenticated(isAuthenticated);
         });
@@ -125,7 +126,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     isAuthenticated,
     signInWithPhone: (phone, password) => authService?.authenticateWithPhone(phone, password),
-    signUpWithPhone: (phone, password, name) => authService?.signUpWithPhone(phone, password, name),
+    signUpWithPhone: (phone, password, name, email) => authService?.signUpWithPhone(phone, password, name, email),
     signOut: () => authService?.signOut(),
     handleGoogleCallback,
   };

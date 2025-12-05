@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { User, Phone, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Phone, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import '../../styles/auth.css';
 
 const Signup = () => {
@@ -9,6 +9,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
     password: '',
     confirmPassword: ''
@@ -32,10 +33,16 @@ const Signup = () => {
     setLoading(true);
     setError('');
 
-    const { name, phone, password, confirmPassword } = formData;
+    const { name, email, phone, password, confirmPassword } = formData;
 
     if (!name || name.trim().length < 2) {
       setError('Please enter a valid name (minimum 2 characters)');
+      setLoading(false);
+      return;
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address');
       setLoading(false);
       return;
     }
@@ -59,7 +66,7 @@ const Signup = () => {
     }
 
     try {
-      const result = await signUpWithPhone(phone, password, name);
+      const result = await signUpWithPhone(phone, password, name, email);
       if (result.success) {
         navigate('/login');
       } else {
@@ -97,6 +104,25 @@ const Signup = () => {
               value={formData.name}
               onChange={handleInputChange}
             />
+          </div>
+
+          {/* Email */}
+          <div className="input-group">
+            <label htmlFor="email">
+              <Mail size={16} className="icon" />
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email address"
+              required
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleInputChange}
+            />
+            <small>We'll send a confirmation email to verify your account</small>
           </div>
 
           {/* Phone */}
