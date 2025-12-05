@@ -326,8 +326,9 @@
 }
 
 .action-btn {
-  width: 80%;
-  max-width: 300px;
+  width: 70%;
+  max-width: 280px;
+  min-width: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,7 +344,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  margin: 0;
+  margin: 0 auto;
 }
 
 .action-btn::before {
@@ -692,10 +693,13 @@
   }
 
   .action-btn {
-    width: 90%;
+    width: 85%;
+    max-width: 320px;
+    min-width: 250px;
     padding: 18px 20px;
     font-size: 15px;
     border-radius: 14px;
+    margin: 0 auto;
   }
 
   .modal-content {
@@ -754,9 +758,16 @@
   }
 
   .action-btn {
-    width: 95%;
+    width: 90%;
+    max-width: 280px;
+    min-width: 220px;
     padding: 16px 18px;
     gap: 12px;
+    margin: 0 auto;
+  }
+
+  .profile-actions {
+    padding: 24px 16px;
   }
 
   .info-item:hover {
