@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { useChatTheme } from '../../contexts/ChatThemeContext';
 import { useCall } from '../../context/CallContext';
+import { useAuth } from '../../hooks/useAuth';
 import { Phone, Video, User, Bell, BellOff, Search, Image, Palette, Clock, Settings as SettingsIcon, Trash2, Ban, ArrowDown, ArrowLeft, ArrowRight, Copy, Edit } from 'lucide-react';
 import DropdownMenu from '../common/DropdownMenu';
 import Modal from '../common/Modal';
@@ -52,22 +53,22 @@ const dpOptionsData = [
 ];
 
 const Chat = () => {
-  const { chatId, otherUserId, userId } = useParams();
-  const navigate = useNavigate();
-  const { supabase } = useSupabase();
-  const { chatTheme, chatThemes, selectTheme, setChatId, setScrollPercentage } = useChatTheme();
-  const { startCall } = useCall();
+   const { chatId, otherUserId, userId } = useParams();
+   const navigate = useNavigate();
+   const { supabase } = useSupabase();
+   const { chatTheme, chatThemes, selectTheme, setChatId, setScrollPercentage } = useChatTheme();
+   const { startCall } = useCall();
+   const { user: currentUser, loading: authLoading, isAuthenticated } = useAuth();
 
-  // Initialize chat theme when chatId changes
-  useEffect(() => {
-    if (chatId) {
-      setChatId(chatId);
-    }
-  }, [chatId, setChatId]);
-  // State
-  const [messages, setMessages] = useState([]);
-  const [otherUser, setOtherUser] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+   // Initialize chat theme when chatId changes
+   useEffect(() => {
+     if (chatId) {
+       setChatId(chatId);
+     }
+   }, [chatId, setChatId]);
+   // State
+   const [messages, setMessages] = useState([]);
+   const [otherUser, setOtherUser] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedMessages, setSelectedMessages] = useState(new Set());
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -116,13 +117,21 @@ const Chat = () => {
   
   useMessageStatusUpdates(chatId, handleStatusUpdate);
 
-  // Initialize chat
+  // Initialize chat when auth is ready
   useEffect(() => {
-    initializeChat();
+    if (!authLoading && !isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (!authLoading && isAuthenticated && currentUser) {
+      initializeChat();
+    }
+
     return () => {
       cleanup();
     };
-  }, [chatId, otherUserId, userId]);
+  }, [chatId, otherUserId, userId, authLoading, isAuthenticated, currentUser]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -140,18 +149,9 @@ const Chat = () => {
 
   const initializeChat = async () => {
     try {
-      const userStr = localStorage.getItem('currentUser');
-      if (!userStr) {
-        console.error('No current user found');
-        navigate('/login');
-        return;
-      }
-      const user = JSON.parse(userStr);
-      setCurrentUser(user);
-
       // Handle new chat creation
       if (userId && !chatId) {
-        await handleNewChat(user, userId);
+        await handleNewChat(currentUser, userId);
       } else if (chatId && otherUserId) {
         await loadOtherUserInfo(otherUserId);
         await loadMessages();
