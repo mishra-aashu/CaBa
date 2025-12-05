@@ -781,9 +781,9 @@
    MOBILE RESPONSIVE DESIGN
    ============================================= */
 
-/* Bottom Navigation (Mobile) */
+/* Bottom Navigation (Mobile & Desktop) */
 .bottom-nav {
-  display: none;
+  display: flex;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -794,6 +794,13 @@
   justify-content: space-around;
   box-shadow: 0 -2px 10px rgba(11, 20, 26, 0.08);
   z-index: 100;
+}
+
+/* Hide on desktop when sidebar is present */
+@media (min-width: 769px) {
+  .desktop-layout .bottom-nav {
+    display: none;
+  }
 }
 
 .nav-item {
@@ -879,9 +886,9 @@
     display: none;
   }
 
-  /* Show bottom navigation */
+  /* Show bottom navigation on mobile */
   .bottom-nav {
-    display: flex;
+    display: flex !important;
   }
 
   .bottom-nav.hidden {

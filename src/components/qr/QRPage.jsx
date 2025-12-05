@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { QRCodeGenerator, QRCodeScanner } from './index';
+import BottomNavigation from '../common/BottomNavigation';
 import './QRPage.css';
 
 const QRPage = () => {
@@ -217,6 +218,9 @@ const QRPage = () => {
           </div>
         </div>
       )}
+      
+      {/* Bottom Navigation */}
+      <BottomNavigation />
     </div>
   );
 };

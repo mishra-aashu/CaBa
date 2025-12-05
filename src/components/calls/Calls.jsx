@@ -6,6 +6,7 @@ import { useCall } from '../../context/CallContext';
 import { CallHistory } from '../CallHistory';
 import { CallButton } from '../CallButton';
 import { IncomingCallModal } from '../IncomingCallModal';
+import BottomNavigation from '../common/BottomNavigation';
 import '../../styles/calls.css';
 
 const Calls = () => {
@@ -322,6 +323,9 @@ const Calls = () => {
 
       {/* Incoming Call Modal */}
       <IncomingCallModal />
+      
+      {/* Bottom Navigation */}
+      <BottomNavigation />
     </>
   );
 };

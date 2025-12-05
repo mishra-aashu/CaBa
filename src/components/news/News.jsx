@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { X } from 'lucide-react';
+import BottomNavigation from '../common/BottomNavigation';
 import './News.css';
 
 const News = () => {
@@ -247,6 +248,9 @@ const News = () => {
           )}
         </div>
       </div>
+      
+      {/* Bottom Navigation */}
+      <BottomNavigation />
     </div>
   );
 };

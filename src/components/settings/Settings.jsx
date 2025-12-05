@@ -4,6 +4,7 @@ import { useSupabase } from '../../contexts/SupabaseContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useChatTheme } from '../../contexts/ChatThemeContext';
 import { MoreVertical } from 'lucide-react';
+import BottomNavigation from '../common/BottomNavigation';
 import '../../styles/settings.css';
 
 const Settings = () => {
@@ -826,6 +827,9 @@ const Settings = () => {
           </div>
         </div>
       )}
+      
+      {/* Bottom Navigation */}
+      <BottomNavigation />
     </div>
   );
 };
