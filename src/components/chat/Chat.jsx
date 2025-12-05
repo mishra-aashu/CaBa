@@ -93,7 +93,9 @@ const Chat = () => {
   const messagesContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // Realtime hooks - stabilize callback with useCallback
+  // Realtime hooks - only activate when we have a valid chat ID
+  const validChatId = chatId && chatId !== 'new' ? chatId : null;
+
   const handleNewMessage = useCallback((newMessage) => {
     setMessages(prev => [...prev, newMessage]);
 
@@ -104,18 +106,18 @@ const Chat = () => {
       markMessagesAsRead();
     }
   }, [isScrolledToBottom]);
-  
-  useRealtimeMessages(chatId, handleNewMessage);
 
-  const { isOtherUserTyping, sendTypingStatus } = useTypingIndicator(chatId, currentUser?.id);
+  useRealtimeMessages(validChatId, handleNewMessage);
+
+  const { isOtherUserTyping, sendTypingStatus } = useTypingIndicator(validChatId, currentUser?.id);
 
   const handleStatusUpdate = useCallback((updatedMessage) => {
     setMessages(prev => prev.map(msg =>
       msg.id === updatedMessage.id ? updatedMessage : msg
     ));
   }, []);
-  
-  useMessageStatusUpdates(chatId, handleStatusUpdate);
+
+  useMessageStatusUpdates(validChatId, handleStatusUpdate);
 
   // Initialize chat when auth is ready
   useEffect(() => {
@@ -416,7 +418,7 @@ const Chat = () => {
 
   const markMessagesAsRead = useCallback(async () => {
     try {
-      if (!currentUser) return;
+      if (!currentUser || !chatId || chatId === 'new') return;
 
       await supabase
         .from('messages')
