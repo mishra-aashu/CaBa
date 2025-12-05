@@ -515,7 +515,7 @@ const Home = () => {
       handleChatClick(existingChat);
     } else {
       // Navigate to new chat - let Chat component handle creation
-      navigate(`/chat//${user.id}`);
+      navigate(`/chat/new/${user.id}`);
     }
     setShowSearch(false);
     setSearchTerm('');
@@ -530,7 +530,7 @@ const Home = () => {
       handleChatClick(existingChat);
     } else {
       // Navigate to new chat - let Chat component handle creation
-      navigate(`/chat//${contact.id}`);
+      navigate(`/chat/new/${contact.id}`);
     }
     setShowNewContactModal(false);
     setShowSelectContact(false);

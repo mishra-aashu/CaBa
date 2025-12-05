@@ -150,7 +150,7 @@ const Chat = () => {
   const initializeChat = async () => {
     try {
       // Handle new chat creation
-      if (userId && !chatId) {
+      if (userId && (!chatId || chatId === 'new')) {
         await handleNewChat(currentUser, userId);
       } else if (chatId && otherUserId) {
         await loadOtherUserInfo(otherUserId);
