@@ -925,8 +925,8 @@ const Chat = () => {
                     height: '80px',
                     borderRadius: '12px',
                     overflow: 'hidden',
-                    border: chatTheme === key ? '3px solid #667eea' : '2px solid rgba(0,0,0,0.1)',
-                    boxShadow: chatTheme === key ? '0 8px 25px rgba(102, 126, 234, 0.3)' : '0 4px 15px rgba(0,0,0,0.1)',
+                    border: chatTheme === key ? '3px solid #25d366' : '2px solid rgba(0,0,0,0.1)',
+                    boxShadow: chatTheme === key ? '0 8px 25px rgba(37, 211, 102, 0.3)' : '0 4px 15px rgba(0,0,0,0.1)',
                     position: 'relative',
                     background: 'white'
                   }}
@@ -970,7 +970,7 @@ const Chat = () => {
                       width: '20px',
                       height: '20px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                      background: 'linear-gradient(135deg, #25d366, #128c7e)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -989,12 +989,12 @@ const Chat = () => {
                     marginTop: '12px',
                     fontSize: '13px',
                     fontWeight: '600',
-                    color: chatTheme === key ? '#667eea' : '#374151',
+                    color: chatTheme === key ? '#25d366' : '#374151',
                     textAlign: 'center',
                     fontFamily: '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
                     letterSpacing: '0.3px',
                     lineHeight: '1.2',
-                    textShadow: chatTheme === key ? '0 1px 3px rgba(102, 126, 234, 0.2)' : 'none',
+                    textShadow: chatTheme === key ? '0 1px 3px rgba(37, 211, 102, 0.2)' : 'none',
                     transition: 'all 0.3s ease'
                   }}
                 >
