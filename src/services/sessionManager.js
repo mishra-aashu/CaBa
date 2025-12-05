@@ -74,10 +74,60 @@ class SessionManager {
 
       if (authError) {
         console.log('Supabase auth failed, using custom auth with simulated logs');
-        // Simulate Supabase logs for consistency
-        console.log('Auth state changed: SIGNED_IN', { provider_token: null, access_token: 'custom_session_' + Date.now(), expires_in: 3600, expires_at: Date.now() + 3600000, refresh_token: null, token_type: 'bearer', user: { id: userData.id, email: userData.email } });
+        // Simulate Supabase logs with proper token structure
+        const fakeAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' + btoa(JSON.stringify({ sub: userData.id, email: userData.email, role: 'authenticated' })) + '.fake_signature';
+        const fakeRefreshToken = 'refresh_' + Date.now() + '_' + userData.id;
+        const expiresAt = Date.now() + 3600000; // 1 hour
+
+        console.log('Auth state changed: SIGNED_IN', {
+          provider_token: null,
+          access_token: fakeAccessToken,
+          expires_in: 3600,
+          expires_at: expiresAt,
+          refresh_token: fakeRefreshToken,
+          token_type: 'bearer',
+          user: {
+            id: userData.id,
+            email: userData.email,
+            email_confirmed_at: new Date().toISOString(),
+            phone: userData.phone,
+            confirmed_at: new Date().toISOString(),
+            last_sign_in_at: new Date().toISOString(),
+            app_metadata: { provider: 'phone', providers: ['phone'] },
+            user_metadata: {
+              name: userData.name,
+              email: userData.email,
+              phone: userData.phone
+            },
+            aud: 'authenticated',
+            role: 'authenticated'
+          }
+        });
         console.log('📡 Setting up global incoming call listener for user:', userData.id);
-        console.log('Auth state changed: INITIAL_SESSION', { provider_token: null, access_token: 'custom_session_' + Date.now(), expires_in: 3600, expires_at: Date.now() + 3600000, refresh_token: null, token_type: 'bearer', user: { id: userData.id, email: userData.email } });
+        console.log('Auth state changed: INITIAL_SESSION', {
+          provider_token: null,
+          access_token: fakeAccessToken,
+          expires_in: 3600,
+          expires_at: expiresAt,
+          refresh_token: fakeRefreshToken,
+          token_type: 'bearer',
+          user: {
+            id: userData.id,
+            email: userData.email,
+            email_confirmed_at: new Date().toISOString(),
+            phone: userData.phone,
+            confirmed_at: new Date().toISOString(),
+            last_sign_in_at: new Date().toISOString(),
+            app_metadata: { provider: 'phone', providers: ['phone'] },
+            user_metadata: {
+              name: userData.name,
+              email: userData.email,
+              phone: userData.phone
+            },
+            aud: 'authenticated',
+            role: 'authenticated'
+          }
+        });
       }
       // If authData exists, Supabase will log the real events
 
