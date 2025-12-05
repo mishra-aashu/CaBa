@@ -2,6 +2,9 @@
      HOME COMPONENT STYLES
      ============================================= */
 
+/* Import WhatsApp-like layout */
+@import url('./whatsapp-layout.css');
+
 :root {
   --home-primary: #4CAF50;
   --home-secondary: #2196F3;

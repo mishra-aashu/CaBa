@@ -11,6 +11,8 @@ import Chat from './chat/Chat';
 import MessagingLoader from './MessagingLoader';
 import { useChatListRealtime } from '../hooks/useChatListRealtime';
 import '../styles/home.css';
+import '../styles/layout-fixes.css';
+import '../styles/mobile-improvements.css';
 
 const Home = () => {
   const { supabase } = useSupabase();

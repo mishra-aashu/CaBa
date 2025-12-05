@@ -16,6 +16,7 @@ import { useRealtimeMessages } from '../../hooks/useRealtimeMessages';
 import { useTypingIndicator } from '../../hooks/useRealtimeTyping';
 import { useMessageStatusUpdates } from '../../hooks/useMessageStatusUpdates';
 import '../../styles/chat.css';
+import '../../styles/layout-fixes.css';
 import './AttachmentMenu.css';
 
 // DP options for avatar display

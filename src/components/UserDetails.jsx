@@ -7,6 +7,8 @@ import DropdownMenu from './common/DropdownMenu';
 import Modal from './common/Modal';
 import MessagingLoader from './MessagingLoader';
 import './user-details/UserDetails.css';
+import '../styles/layout-fixes.css';
+import '../styles/mobile-improvements.css';
 
 // DP options for avatar display
 const baseUrl = import.meta.env.BASE_URL || '/';
