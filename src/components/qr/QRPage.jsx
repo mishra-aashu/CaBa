@@ -82,6 +82,17 @@ const QRPage = () => {
     );
   }
 
+  // Debug: Log user object to console
+  console.log('QR Page - User object:', user);
+
+  // Ensure user has required properties with fallbacks
+  const userData = {
+    id: user.id || '',
+    name: user.name || user.user_metadata?.full_name || user.user_metadata?.name || 'User',
+    phone: user.phone || user.user_metadata?.phone || '',
+    email: user.email || ''
+  };
+
   return (
     <div className="qr-page">
       <div className="qr-page-header">
@@ -140,9 +151,9 @@ const QRPage = () => {
       {/* QR Code Generator Modal */}
       {showGenerator && user && (
         <QRCodeGenerator
-          userId={user.id}
-          userName={user.name}
-          userPhone={user.phone}
+          userId={userData.id}
+          userName={userData.name}
+          userPhone={userData.phone}
           onClose={() => setShowGenerator(false)}
         />
       )}

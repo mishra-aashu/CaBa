@@ -14,18 +14,25 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
   const generateQRCode = async () => {
     try {
       setLoading(true);
+
+      // Validate required data
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
       const profileUrl = `${window.location.origin}/shared-profile.html?userId=${userId}`;
-      
+
       // Enhanced QR data with user information
       const qrDataString = JSON.stringify({
         type: 'caba_profile',
         userId: userId,
-        userName: userName,
-        userPhone: userPhone,
+        userName: userName || 'User',
+        userPhone: userPhone || '',
         url: profileUrl,
         timestamp: Date.now()
       });
 
+      console.log('Generating QR code with data:', qrDataString);
       setQrData(qrDataString);
 
       // Generate QR code on canvas
@@ -38,11 +45,15 @@ const QRCodeGenerator = ({ userId, userName, userPhone, onDownload, onClose }) =
             light: '#FFFFFF'
           }
         });
+        console.log('QR code generated successfully');
+      } else {
+        throw new Error('Canvas element not found');
       }
-      
+
       setLoading(false);
     } catch (error) {
       console.error('Error generating QR code:', error);
+      alert('Failed to generate QR code. Please try again.');
       setLoading(false);
     }
   };
