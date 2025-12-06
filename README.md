@@ -1,185 +1,131 @@
-# React + Vite
+# CaBa - Real-Time Communication Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+*CaBa* derives from the Bhojpuri greeting "Kaa Baa?" (meaning "What's up?" or "How are things?"), embodying the essence of casual, friendly communication - much like how WhatsApp represents "What's up?" in modern messaging.
 
-Currently, two official plugins are available:
+A comprehensive real-time communication platform built with React and Supabase, offering secure messaging, voice/video calling, and social features with a modern, responsive interface that brings people together through meaningful conversations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Real-time Messaging** - Instant text messaging with typing indicators
+- **Voice & Video Calls** - WebRTC-based calling with TURN server support
+- **Media Sharing** - Upload and share images, videos, and files
+- **QR Code Integration** - Quick contact sharing via QR codes
+- **Group Conversations** - Multi-user chat rooms
+- **Call History** - Comprehensive call logs with duration tracking
+- **Reminders System** - Personal reminder creation and management
+- **News Feed** - Integrated news reading functionality
+- **Theme Customization** - Multiple chat themes and wallpapers
+- **Progressive Web App** - App-like experience across devices
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Frontend**: React 19.2.0, React Router DOM 7.9.6
+- **Build Tool**: Vite 7.2.2 with HMR
+- **Backend**: Supabase 2.83.0 (PostgreSQL, Auth, Storage)
+- **Communication**: WebRTC, TURN servers
+- **UI**: Lucide React icons, CSS custom properties
+- **QR Codes**: html5-qrcode, qrcode libraries
+- **HTTP Client**: Axios 1.13.2
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Configuration
 
-## File Structure
+1. Set up Supabase project and update `src/config/supabase.js`
+2. Configure TURN servers in `public/turn-config.js`
+3. Update environment variables in `.env`
+4. Configure database schema using provided SQL files
 
-```
-react-chat-app/
-├── .env
-├── .gitignore
-├── calling-system-schema.sql
-├── database-schema.sql
-├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── README.md
-├── vite.config.js
-├── .github/
-├── CaBa/
-├── public/
-│   ├── 404.html
-│   ├── supabase-config.js
-│   ├── turn-config.js
-│   ├── vite.svg
-│   ├── webrtc-calling.js
-│   └── assets/
-│       ├── audio/
-│       │   └── (various .mp3 files)
-│       └── images/
-│           └── dp-options/
-│               └── (various images and dp-options.json)
+## Architecture
+
+### Component Structure
+- **Feature-based organization** - Components grouped by functionality
+- **Custom hooks** - Reusable logic for real-time updates, media handling
+- **Context API** - Global state management for themes and authentication
+- **Modular CSS** - Scoped styling with CSS custom properties
+
+### Key Directories
+- `src/components/` - React components organized by feature
+- `src/hooks/` - Custom hooks for business logic
+- `src/contexts/` - React Context providers
+- `src/services/` - WebRTC and call management services
+- `src/utils/` - Utility functions and helpers
+- `public/` - Static assets and configuration files
+
+CaBa/
+├── public/                    # Static assets & config
+│   ├── assets/audio/         # Notification sounds
+│   ├── assets/images/        # Static images
+│   ├── *.html               # Auth pages (login, signup, etc.)
+│   ├── supabase-config.js   # Supabase configuration
+│   ├── turn-config.js       # WebRTC TURN servers
+│   └── webrtc-calling.js    # Standalone calling script
+│
 ├── src/
-│   ├── App.css
-│   ├── App.jsx
-│   ├── index.css
-│   ├── main.jsx
-│   ├── security.js
-│   ├── assets/
-│   │   └── react.svg
-│   ├── components/
-│   │   ├── ActiveCallScreen.jsx
-│   │   ├── CallButton.jsx
-│   │   ├── CallHistory.jsx
-│   │   ├── CallScreen.jsx
-│   │   ├── CallStatusIndicator.jsx
-│   │   ├── Home.jsx
-│   │   ├── Home.jsx.corrupted
-│   │   ├── IncomingCallModal.jsx
-│   │   ├── IncomingCallProvider.jsx
-│   │   ├── Intro.jsx
-│   │   ├── MessagingLoader.jsx
-│   │   ├── UserDetails.css
-│   │   ├── UserDetails.jsx
-│   │   ├── auth/
-│   │   │   ├── ForgotPassword.jsx
-│   │   │   ├── index.js
-│   │   │   ├── Login.jsx
-│   │   │   ├── ResetPassword.jsx
-│   │   │   └── Signup.jsx
-│   │   ├── blocked/
-│   │   │   ├── Blocked.css
-│   │   │   ├── Blocked.jsx
-│   │   │   └── index.js
-│   │   ├── calls/
-│   │   │   ├── CallInterface.jsx
-│   │   │   ├── Calls.css
-│   │   │   ├── Calls.jsx
-│   │   │   ├── IncomingCall.jsx
-│   │   │   └── index.js
-│   │   ├── chat/
-│   │   │   ├── AttachmentMenu.jsx
-│   │   │   ├── Chat.css
-│   │   │   ├── Chat.jsx
-│   │   │   ├── Chat.jsx.backup
-│   │   │   ├── index.js
-│   │   │   ├── MediaMessage.jsx
-│   │   │   ├── MessageInput.jsx
-│   │   │   ├── MessageItem.jsx
-│   │   │   ├── MessageList.jsx
-│   │   │   ├── TypingIndicator.jsx
-│   │   │   └── WallpaperSelector.jsx
-│   │   ├── common/
-│   │   │   ├── DropdownMenu.css
-│   │   │   ├── DropdownMenu.jsx
-│   │   │   ├── EmojiPicker.css
-│   │   │   ├── EmojiPicker.jsx
-│   │   │   ├── Modal.css
-│   │   │   └── Modal.jsx
-│   │   ├── media/
-│   │   │   ├── AvatarUpload.jsx
-│   │   │   ├── index.js
-│   │   │   ├── MediaCleanup.jsx
-│   │   │   ├── MediaUpload.jsx
-│   │   │   ├── MediaViewer.jsx
-│   │   │   ├── P2PTransfer.jsx
-│   │   │   ├── StorageFallback.jsx
-│   │   │   ├── TURNConfig.jsx
-│   │   │   └── WebRTCCalling.jsx
-│   │   ├── news/
-│   │   │   ├── index.js
-│   │   │   ├── News.css
-│   │   │   └── News.jsx
-│   │   ├── profile/
-│   │   │   ├── index.js
-│   │   │   └── Profile.jsx
-│   │   ├── reminders/
-│   │   │   ├── CreateReminder.css
-│   │   │   ├── CreateReminder.jsx
-│   │   │   ├── index.js
-│   │   │   ├── Reminders.css
-│   │   │   ├── Reminders.jsx
-│   │   │   ├── ReminderSettings.css
-│   │   │   └── ReminderSettings.jsx
-│   │   ├── settings/
-│   │   │   ├── index.js
-│   │   │   └── Settings.jsx
-│   │   ├── shared-profile/
-│   │   │   ├── index.js
-│   │   │   ├── SharedProfile.css
-│   │   │   └── SharedProfile.jsx
-│   │   └── user-details/
-│   │       ├── index.js
-│   │       ├── UserDetails.css
-│   │       └── UserDetails.jsx
-│   ├── config/
-│   │   └── supabase.js
-│   ├── context/
-│   │   └── CallContext.jsx
-│   ├── contexts/
-│   │   ├── ChatThemeContext.jsx
-│   │   ├── SupabaseContext.jsx
-│   │   └── ThemeContext.jsx
-│   ├── hooks/
-│   │   ├── useCallHistory.js
-│   │   ├── useChatListRealtime.js
-│   │   ├── useMessageStatusUpdates.js
-│   │   ├── useRealtimeMessages.js
-│   │   ├── useRealtimeTyping.js
-│   │   └── media/
-│   │       ├── index.js
-│   │       ├── useAvatarUpload.js
-│   │       ├── useMediaCleanup.js
-│   │       ├── useMediaDownload.js
-│   │       ├── useMediaUpload.js
-│   │       ├── useMediaViewer.js
-│   │       ├── useP2PTransfer.js
-│   │       ├── useStorageFallback.js
-│   │       ├── useTURNConfig.js
-│   │       └── useWebRTCCalling.js
-│   ├── services/
-│   │   ├── callService.js
-│   │   └── webrtcService.js
-│   ├── styles/
-│   │   ├── admin.css
-│   │   ├── auth.css
-│   │   ├── calls.css
-│   │   ├── chat.css
-│   │   ├── global.css
-│   │   ├── home.css
-│   │   ├── intro.css
-│   │   ├── news-style.css
-│   │   ├── news.css
-│   │   ├── profile.css
-│   │   ├── reminders.css
-│   │   └── settings.css
-│   └── utils/
-│       ├── cacheManager.js
-│       ├── callUtils.js
-│       ├── notificationSound.js
-│       └── supabase.js
-```
+│   ├── components/          # React components by feature
+│   │   ├── auth/           # Authentication (login, signup, reset)
+│   │   ├── chat/           # Messaging (chat, messages, typing)
+│   │   ├── calls/          # Voice/video calling interface
+│   │   ├── media/          # File upload/download, WebRTC
+│   │   ├── qr/             # QR code scanner/generator
+│   │   ├── profile/        # User profile management
+│   │   ├── reminders/      # Reminder system
+│   │   ├── news/           # News feed
+│   │   ├── settings/       # App settings
+│   │   ├── blocked/        # Blocked users management
+│   │   ├── shared-profile/ # Public profile sharing
+│   │   └── common/         # Reusable UI (modals, dropdowns)
+│   │
+│   ├── contexts/           # React Context providers
+│   │   ├── SupabaseContext.jsx    # Database & auth state
+│   │   ├── ChatThemeContext.jsx   # Theme management
+│   │   └── ThemeContext.jsx       # Global theming
+│   │
+│   ├── hooks/              # Custom React hooks
+│   │   ├── media/          # Media handling hooks
+│   │   ├── useAuth.jsx     # Authentication logic
+│   │   ├── useRealtimeMessages.js # Real-time messaging
+│   │   └── useCallHistory.js      # Call management
+│   │
+│   ├── services/           # Business logic services
+│   │   ├── authService.js     # Authentication service
+│   │   ├── callService.js     # Call management
+│   │   └── webrtcService.js   # WebRTC communication
+│   │
+│   ├── utils/              # Helper functions
+│   │   ├── cacheManager.js    # Local storage management
+│   │   ├── callUtils.js       # Call utilities
+│   │   └── supabase.js        # Database helpers
+│   │
+│   ├── styles/             # CSS files
+│   │   ├── global.css         # Global styles
+│   │   ├── theme-*.css        # Theme variations
+│   │   └── [feature].css      # Feature-specific styles
+│   │
+│   ├── config/             # Configuration
+│   │   └── supabase.js        # Supabase client setup
+│   │
+│   ├── App.jsx             # Main app component & routing
+│   └── main.jsx            # React DOM entry point
+│
+├── .github/workflows/      # CI/CD deployment
+├── package.json           # Dependencies & scripts
+└── vite.config.js         # Build configuration
+
+
+## Browser Support
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- WebRTC support required for calling features
+- Progressive Web App capabilities
+
+## Contributing
+
+Follow the established patterns:
+- Functional components with hooks
+- Consistent import organization
+- Error handling with try-catch blocks
+- Real-time subscriptions cleanup
+- Mobile-first responsive design
+
+## License
+
+This project is licensed under the MIT License.
+
