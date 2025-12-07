@@ -124,11 +124,15 @@
                         throw dbError;
                     }
 
-                    // Store user data
-                    sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
-                    
-                    // Redirect to React app
-                    window.location.href = '/CaBa/';
+                    // Check if phone number is required
+                    if (!dbUser.phone || dbUser.phone.trim() === '') {
+                        // Redirect to phone input page
+                        window.location.href = `/CaBa/phone-input.html?userId=${dbUser.id}`;
+                    } else {
+                        // Store user data and redirect to React app
+                        sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
+                        window.location.href = '/CaBa/';
+                    }
                 } else {
                     throw new Error('No session found');
                 }

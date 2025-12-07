@@ -247,13 +247,17 @@
                     throw new Error('Database error occurred');
                 }
 
+                // Check if phone is required
+                const phoneRequired = !userData.phone || userData.phone.trim() === '';
+
                 // Store auth result for the app to pick up
                 const authData = {
                     user: userData,
                     session: session,
+                    phoneRequired: phoneRequired,
                     timestamp: Date.now()
                 };
-                
+
                 localStorage.setItem(`external_auth_${sessionId}`, JSON.stringify(authData));
                 
                 console.log('✅ Authentication data stored for session:', sessionId);
