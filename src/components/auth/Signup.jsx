@@ -1,57 +1,22 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useSupabase } from '../../contexts/SupabaseContext';
-import { isInWebView, generateSessionId } from '../../utils/appDetection';
-import ExternalAuthService from '../../services/externalAuthService';
-import BrowserFallback from './BrowserFallback';
 import '../../styles/auth.css';
 
 const Signup = () => {
   const { signUpWithGoogle } = useAuth();
-  const { supabase } = useSupabase();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isWebView] = useState(isInWebView());
-  const [showFallback, setShowFallback] = useState(false);
-  const [authUrl, setAuthUrl] = useState('');
-
-
 
   const handleGoogleSignup = async () => {
     try {
       setLoading(true);
       setError('');
-      
-      if (isWebView) {
-        // Use external browser authentication for webview apps
-        const externalAuth = new ExternalAuthService(supabase);
-        const result = await externalAuth.signInWithGoogleExternal();
-        
-        if (result.success && result.data) {
-          // Authentication successful, navigate to home
-          navigate('/');
-        } else if (!result.success) {
-          // Show fallback options
-          const sessionId = generateSessionId();
-          const fallbackUrl = `${window.location.origin}/CaBa/external-login.html?session=${sessionId}&action=signup`;
-          setAuthUrl(fallbackUrl);
-          setShowFallback(true);
-          setError('');
-        }
-      } else {
-        // Use normal Google OAuth for regular browsers
-        const result = await signUpWithGoogle();
-        
-        if (!result.success) {
-          // Show fallback options
-          const sessionId = generateSessionId();
-          const fallbackUrl = `${window.location.origin}/CaBa/external-login.html?session=${sessionId}&action=signup`;
-          setAuthUrl(fallbackUrl);
-          setShowFallback(true);
-          setError('');
-        }
+
+      const result = await signUpWithGoogle();
+
+      if (!result.success) {
+        setError(result.error || 'Google sign up failed');
       }
     } catch (error) {
       setError('An error occurred. Please try again.');
@@ -66,18 +31,6 @@ const Signup = () => {
         <div className="auth-header">
           <h1>Create Account</h1>
           <p>Join CaBa messaging platform</p>
-          {isWebView && (
-            <div style={{ 
-              background: '#e3f2fd', 
-              padding: '10px', 
-              borderRadius: '8px', 
-              marginTop: '10px',
-              fontSize: '14px',
-              color: '#1976d2'
-            }}>
-              📱 App Mode: Authentication will open in your browser
-            </div>
-          )}
         </div>
 
         <div className="auth-form">
@@ -86,17 +39,6 @@ const Signup = () => {
             <div className="error-message">
               {error}
             </div>
-          )}
-          
-          {/* Browser Fallback */}
-          {showFallback && (
-            <BrowserFallback 
-              authUrl={authUrl}
-              onCancel={() => {
-                setShowFallback(false);
-                setAuthUrl('');
-              }}
-            />
           )}
 
           {/* Google Signup Button */}
