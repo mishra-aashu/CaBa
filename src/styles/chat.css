@@ -1311,7 +1311,7 @@
 
 .whatsapp-menu-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -1408,23 +1408,23 @@
 /* Mobile responsive styles for attachment menu */
 @media (max-width: 768px) {
   .whatsapp-menu-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
-  
+
   .whatsapp-icon-circle {
     width: 48px;
     height: 48px;
   }
-  
+
   .whatsapp-icon-circle i {
     font-size: 20px;
   }
-  
+
   .whatsapp-item-name {
     font-size: 11px;
   }
-  
+
   .file-size-info {
     font-size: 9px;
   }
@@ -1432,19 +1432,19 @@
 
 @media (max-width: 480px) {
   .whatsapp-menu-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
   }
-  
+
   .whatsapp-attachment-popup {
     padding: 16px;
   }
-  
+
   .whatsapp-icon-circle {
     width: 44px;
     height: 44px;
   }
-  
+
   .whatsapp-icon-circle i {
     font-size: 18px;
   }
