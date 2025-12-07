@@ -81,6 +81,16 @@
             try {
                 console.log('🔄 Starting auth callback processing...');
 
+                // Check for URL parameters indicating errors
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlError = urlParams.get('error');
+                const errorDescription = urlParams.get('error_description');
+                
+                if (urlError) {
+                    console.error('❌ URL contains error:', { error: urlError, description: errorDescription });
+                    throw new Error(errorDescription || urlError);
+                }
+
                 // Get the current session
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -99,35 +109,47 @@
                     let { data: dbUser, error: dbError } = await supabase
                         .from('users')
                         .select('*')
-                        .eq('email', user.email)
+                        .eq('id', user.id)
                         .single();
 
                     // If user doesn't exist, create them
                     if (dbError && dbError.code === 'PGRST116') {
+                        const userData = {
+                            id: user.id,
+                            email: user.email,
+                            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                            phone: user.user_metadata?.phone || '',
+                            avatar: user.user_metadata?.avatar_url || null,
+                            is_online: true,
+                            created_at: new Date().toISOString(),
+                            last_seen: new Date().toISOString()
+                        };
+
                         const { data: newUser, error: insertError } = await supabase
                             .from('users')
-                            .insert([{
-                                id: user.id,
-                                email: user.email,
-                                name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-                                phone: user.user_metadata?.phone || '',
-                                password: 'google_oauth', // Placeholder for OAuth users
-                                auth_password: 'google_oauth',
-                                email_confirmed_at: new Date().toISOString(),
-                                is_online: true,
-                                created_at: new Date().toISOString(),
-                                last_seen: new Date().toISOString()
-                            }])
+                            .insert([userData])
                             .select()
                             .single();
 
                         if (insertError) {
-                            throw insertError;
+                            console.error('❌ Database insert error:', insertError);
+                            throw new Error(`Failed to create user: ${insertError.message}`);
                         }
                         
                         dbUser = newUser;
                     } else if (dbError) {
-                        throw dbError;
+                        console.error('❌ Database query error:', dbError);
+                        throw new Error(`Database error: ${dbError.message}`);
+                    } else {
+                        // User exists, update their online status and last seen
+                        await supabase
+                            .from('users')
+                            .update({
+                                is_online: true,
+                                last_seen: new Date().toISOString(),
+                                avatar: user.user_metadata?.avatar_url || dbUser.avatar
+                            })
+                            .eq('id', user.id);
                     }
 
                     // Check if phone number is required
@@ -148,7 +170,17 @@
                 document.querySelector('.spinner').style.display = 'none';
                 const errorDiv = document.getElementById('error');
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Authentication failed: ' + error.message;
+                
+                let errorMessage = 'Authentication failed';
+                if (error.message.includes('Database error saving new user')) {
+                    errorMessage = 'Account setup failed. Please try signing in again.';
+                } else if (error.message.includes('No session found')) {
+                    errorMessage = 'Session expired. Redirecting to login...';
+                } else {
+                    errorMessage = error.message;
+                }
+                
+                errorDiv.textContent = errorMessage;
                 
                 // Redirect to login after 3 seconds
                 setTimeout(() => {
@@ -157,8 +189,21 @@
             }
         }
 
-        // Handle the callback when page loads
-        window.addEventListener('load', handleAuthCallback);
+        // Handle the callback when page loads with timeout
+        window.addEventListener('load', () => {
+            // Set a timeout to prevent infinite loading
+            const timeoutId = setTimeout(() => {
+                console.error('⏰ Auth callback timeout');
+                document.querySelector('.loading').textContent = 'Authentication timeout. Redirecting...';
+                setTimeout(() => {
+                    window.location.href = '/CaBa/login.html';
+                }, 2000);
+            }, 10000); // 10 second timeout
+            
+            handleAuthCallback().finally(() => {
+                clearTimeout(timeoutId);
+            });
+        });
     </script>
 </body>
 </html>
