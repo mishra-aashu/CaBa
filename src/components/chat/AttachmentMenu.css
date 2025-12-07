@@ -85,7 +85,6 @@
   gap: 8px;
   cursor: pointer;
   padding: 16px;
-  border-radius: 12px;
   background: transparent;
   transition: all 0.3s ease;
   opacity: 0;
@@ -97,7 +96,6 @@
 
 .attachment-menu-item:hover {
   transform: scale(1.05);
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .attachment-menu-item:active {
