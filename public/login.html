@@ -38,6 +38,18 @@
         .google-btn:hover { background: #3367d6; }
         .loading { display: none; color: #666; }
         .error { color: red; margin-top: 10px; }
+        .link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -46,6 +58,10 @@
         <button id="googleBtn" class="google-btn">Continue with Google</button>
         <div id="loading" class="loading">Please wait...</div>
         <div id="error" class="error"></div>
+
+        <div class="link">
+            <a href="signup.html">Don't have an account? Sign up</a>
+        </div>
     </div>
 
     <script type="module" src="supabase-config.js"></script>
