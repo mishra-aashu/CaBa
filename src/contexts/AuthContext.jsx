@@ -84,9 +84,12 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google'
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/CaBa/auth-callback.html`
+        }
       });
-      
+
       return error ? { success: false, error: error.message } : { success: true };
     } catch (error) {
       return { success: false, error: error.message };
