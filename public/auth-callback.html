@@ -80,49 +80,67 @@
         async function handleAuthCallback() {
             try {
                 // Get authenticated user
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
                 
-                if (!user) {
-                    throw new Error('No user found');
+                if (userError || !user) {
+                    console.error('User error:', userError);
+                    throw new Error('Authentication failed');
                 }
 
-                // Create user in database
-                const userData = {
-                    id: user.id,
-                    email: user.email,
-                    name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-                    phone: '',
-                    avatar: user.user_metadata?.avatar_url || null,
-                    is_online: true
-                };
+                console.log('User found:', user.email);
 
-                // Insert user (ignore if exists)
-                await supabase.from('users').upsert([userData]);
-
-                // Get user data
-                const { data: dbUser } = await supabase
+                // Check if user already exists
+                const { data: existingUser } = await supabase
                     .from('users')
                     .select('*')
                     .eq('id', user.id)
                     .single();
 
+                let dbUser = existingUser;
+
+                if (!existingUser) {
+                    // Create new user
+                    const userData = {
+                        id: user.id,
+                        email: user.email,
+                        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                        phone: '',
+                        avatar: user.user_metadata?.avatar_url || null,
+                        is_online: true
+                    };
+
+                    const { data: newUser, error: insertError } = await supabase
+                        .from('users')
+                        .insert([userData])
+                        .select()
+                        .single();
+
+                    if (insertError) {
+                        console.error('Insert error:', insertError);
+                        throw new Error('Failed to create user: ' + insertError.message);
+                    }
+
+                    dbUser = newUser;
+                }
+
                 if (dbUser) {
                     sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
                     window.location.href = '/CaBa/';
                 } else {
-                    throw new Error('Failed to create profile');
+                    throw new Error('No user data found');
                 }
                 
             } catch (error) {
+                console.error('Callback error:', error);
                 document.querySelector('.loading').style.display = 'none';
                 document.querySelector('.spinner').style.display = 'none';
                 const errorDiv = document.getElementById('error');
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Setup failed. Redirecting...';
+                errorDiv.textContent = error.message || 'Setup failed';
                 
                 setTimeout(() => {
                     window.location.href = '/CaBa/login.html';
-                }, 2000);
+                }, 3000);
             }
         }
 
