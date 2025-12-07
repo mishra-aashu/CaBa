@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CaBa - Redirecting</title>
+</head>
+<body>
+    <script>
+        // Handle OAuth errors and redirect properly
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        
+        if (error) {
+            // Redirect to auth callback with error
+            window.location.href = '/CaBa/auth-callback.html' + window.location.search;
+        } else {
+            // Normal redirect to login
+            window.location.href = '/CaBa/login.html';
+        }
+    </script>
+</body>
+</html>
