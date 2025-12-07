@@ -10,17 +10,12 @@ const AttachmentMenu = ({
   chatId,
   receiverId
 }) => {
-  const [isOpen, setIsOpen] = useState(isVisible);
   const [uploadingType, setUploadingType] = useState(null);
   const menuRef = useRef(null);
   const fileInputRefs = useRef({});
   
-  // Get theme context for dynamic colors
-  const { currentThemeData } = useChatTheme();
-
   const { uploadFile } = useMediaUpload();
 
-  // Menu items with unique distinctive icons and colors
   const menuItems = [
     {
       id: 1,
@@ -79,93 +74,51 @@ const AttachmentMenu = ({
     }
   ];
 
-  // Sync with parent visibility
-  useEffect(() => {
-    setIsOpen(isVisible);
-  }, [isVisible]);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        handleClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  const handleClose = () => {
-    setIsOpen(false);
-    onClose();
-  };
-
-  // Handle file selection and upload
   const handleFileSelect = async (itemType) => {
     const item = menuItems.find(i => i.type === itemType);
     if (!item) return;
 
-    // Handle special cases (location, reminder)
     if (item.type === 'location') {
       handleLocationShare();
-      handleClose();
+      onClose();
       return;
     }
     
     if (item.type === 'reminder') {
       handleReminderShare();
-      handleClose();
+      onClose();
       return;
     }
 
-    // Handle special cases for camera and images
     if (item.isCamera) {
       handleCameraCapture();
       return;
     }
     
-    // Handle file uploads
     if (fileInputRefs.current[itemType]) {
       fileInputRefs.current[itemType].click();
     }
   };
 
-  // Handle camera capture
   const handleCameraCapture = () => {
     if (fileInputRefs.current['camera']) {
       fileInputRefs.current['camera'].click();
     }
   };
 
-  // Handle file upload with backend integration
   const handleFileUpload = async (file, fileType) => {
     if (!file || !fileType) return;
 
     setUploadingType(fileType);
     
     try {
-      // Get current user
       const currentUser = JSON.parse(localStorage.getItem('currentUser'));
       if (!currentUser) {
         alert('Please log in to send files');
         return;
       }
 
-      // Validate file type
-      const validation = validateFile(file, fileType);
-      if (!validation.valid) {
-        alert(validation.error);
-        return;
-      }
-
-      // Upload file using existing hook
       const uploadResult = await uploadFile(file, fileType, currentUser.id);
-
-      // Send message with media
       await sendMediaMessage(uploadResult, fileType, file);
 
     } catch (error) {
@@ -176,10 +129,8 @@ const AttachmentMenu = ({
     }
   };
 
-  // Send media message through backend
   const sendMediaMessage = async (uploadResult, fileType, originalFile) => {
     try {
-      // Create media data for message
       const mediaData = {
         mediaUrl: uploadResult.storageUrl,
         mediaType: fileType,
@@ -188,7 +139,6 @@ const AttachmentMenu = ({
         mimeType: originalFile.type
       };
 
-      // Call parent's onFileSelect with media data
       onFileSelect(mediaData);
       
     } catch (error) {
@@ -197,52 +147,6 @@ const AttachmentMenu = ({
     }
   };
 
-  // File validation
-  const validateFile = (file, fileType) => {
-    const supportedTypes = {
-      camera: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-      images: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-      video: ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'],
-      audio: ['audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/wav', 'audio/webm']
-    };
-
-    const maxSizes = {
-      camera: 20 * 1024 * 1024,    // 20MB
-      images: 20 * 1024 * 1024,    // 20MB
-      video: 100 * 1024 * 1024,    // 100MB
-      audio: 10 * 1024 * 1024      // 10MB
-    };
-
-    // Check file type
-    const validTypes = supportedTypes[fileType];
-    if (!validTypes || !validTypes.includes(file.type)) {
-      return {
-        valid: false,
-        error: `Unsupported file type. Supported types: ${validTypes.join(', ')}`
-      };
-    }
-
-    // Check file size
-    const maxSize = maxSizes[fileType];
-    if (file.size > maxSize) {
-      const formatFileSize = (bytes) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-      };
-      
-      return {
-        valid: false,
-        error: `File too large. Maximum size: ${formatFileSize(maxSize)}`
-      };
-    }
-
-    return { valid: true };
-  };
-
-  // Location sharing
   const handleLocationShare = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -265,7 +169,6 @@ const AttachmentMenu = ({
     }
   };
 
-  // Reminder sharing
   const handleReminderShare = () => {
     const reminderData = {
       type: 'reminder',
@@ -281,66 +184,47 @@ const AttachmentMenu = ({
   
   return (
     <>
-      {/* Overlay */}
-      <div className="whatsapp-attachment-overlay" onClick={handleClose} />
+      <div className="whatsapp-attachment-overlay" onClick={onClose} />
 
-      {/* WhatsApp-Style Bottom Attachment Menu */}
-      <div
-        className="whatsapp-attachment-popup"
-        ref={menuRef}
-      >
+      <div className="whatsapp-attachment-popup" ref={menuRef}>
         <div className="whatsapp-attachment-header">
-          <button
-            className="whatsapp-attachment-close"
-            onClick={handleClose}
-          >
+          <button className="whatsapp-attachment-close" onClick={onClose}>
             <i className="fas fa-times"></i>
           </button>
-          <h3>
-            Share
-          </h3>
+          <h3>Share</h3>
           <div></div>
         </div>
 
         <div className="attachment-menu-grid">
-          {menuItems.map((item, index) => {
-            return (
+          {menuItems.map((item, index) => (
+            <div
+              key={item.id}
+              className={`attachment-menu-item ${uploadingType === item.type ? 'uploading' : ''}`}
+              onClick={() => handleFileSelect(item.type)}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
               <div
-                key={item.id}
-                className={`attachment-menu-item ${uploadingType === item.type ? 'uploading' : ''}`}
-                onClick={() => {
-                  handleFileSelect(item.type);
-                }}
-                style={{
-                  animationDelay: `${index * 0.1}s`
-                }}
+                className="attachment-icon-container"
+                style={{ backgroundColor: item.color }}
               >
-                <div
-                  className="attachment-icon-container"
-                  style={{
-                    backgroundColor: item.color
-                  }}
-                >
-                  {uploadingType === item.type ? (
-                    <i className="fas fa-spinner upload-spinner"></i>
-                  ) : (
-                    <i className={item.icon}></i>
-                  )}
-                </div>
-                <span className="attachment-item-name">
-                  {item.name}
-                </span>
-                {item.maxSize && (
-                  <div className="attachment-size-info">
-                    Max {item.maxSize}
-                  </div>
+                {uploadingType === item.type ? (
+                  <i className="fas fa-spinner upload-spinner"></i>
+                ) : (
+                  <i className={item.icon}></i>
                 )}
               </div>
-            );
-          })}
+              <span className="attachment-item-name">
+                {item.name}
+              </span>
+              {item.maxSize && (
+                <div className="attachment-size-info">
+                  Max {item.maxSize}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* Hidden file inputs for each file type */}
         {menuItems
           .filter(item => item.accept && !item.isCamera)
           .map(item => (
@@ -353,13 +237,12 @@ const AttachmentMenu = ({
               onChange={(e) => {
                 if (e.target.files[0]) {
                   handleFileUpload(e.target.files[0], item.type);
-                  handleClose();
+                  onClose();
                 }
               }}
             />
           ))}
 
-        {/* Camera capture input with camera capture attribute */}
         <input
           ref={el => fileInputRefs.current['camera'] = el}
           type="file"
@@ -369,7 +252,7 @@ const AttachmentMenu = ({
           onChange={(e) => {
             if (e.target.files[0]) {
               handleFileUpload(e.target.files[0], 'camera');
-              handleClose();
+              onClose();
             }
           }}
         />
