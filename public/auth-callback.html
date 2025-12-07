@@ -79,81 +79,50 @@
     <script>
         async function handleAuthCallback() {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlError = urlParams.get('error');
-                const code = urlParams.get('code');
+                // Get authenticated user
+                const { data: { user } } = await supabase.auth.getUser();
                 
-                console.log('URL params:', { error: urlError, hasCode: !!code });
-                
-                if (urlError) {
-                    console.error('OAuth error from URL:', urlError);
-                    throw new Error('OAuth failed. Check Supabase redirect URL settings.');
+                if (!user) {
+                    throw new Error('No user found');
                 }
 
-                // Wait for session to be established
-                let session = null;
-                let attempts = 0;
-                
-                while (!session && attempts < 10) {
-                    const { data } = await supabase.auth.getSession();
-                    session = data.session;
-                    
-                    if (!session) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        attempts++;
-                    }
-                }
-                
-                if (!session?.user) {
-                    throw new Error('Authentication session not found');
-                }
+                // Create user in database
+                const userData = {
+                    id: user.id,
+                    email: user.email,
+                    name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                    phone: '',
+                    avatar: user.user_metadata?.avatar_url || null,
+                    is_online: true
+                };
 
-                const user = session.user;
-                console.log('User authenticated:', user.email);
-                
-                // Wait for database trigger to create user
-                let dbUser = null;
-                attempts = 0;
-                
-                while (!dbUser && attempts < 5) {
-                    const { data } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', user.id)
-                        .single();
-                    
-                    dbUser = data;
-                    
-                    if (!dbUser) {
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        attempts++;
-                    }
-                }
+                // Insert user (ignore if exists)
+                await supabase.from('users').upsert([userData]);
 
-                if (!dbUser) {
-                    throw new Error('User creation failed. Please try again.');
-                }
-
-                // Update online status
-                await supabase
+                // Get user data
+                const { data: dbUser } = await supabase
                     .from('users')
-                    .update({ is_online: true, last_seen: new Date().toISOString() })
-                    .eq('id', user.id);
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
 
-                sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
-                window.location.href = '/CaBa/';
+                if (dbUser) {
+                    sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
+                    window.location.href = '/CaBa/';
+                } else {
+                    throw new Error('Failed to create profile');
+                }
                 
             } catch (error) {
-                console.error('Auth callback error:', error);
                 document.querySelector('.loading').style.display = 'none';
                 document.querySelector('.spinner').style.display = 'none';
                 const errorDiv = document.getElementById('error');
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = error.message;
+                errorDiv.textContent = 'Setup failed. Redirecting...';
                 
                 setTimeout(() => {
                     window.location.href = '/CaBa/login.html';
-                }, 3000);
+                }, 2000);
             }
         }
 

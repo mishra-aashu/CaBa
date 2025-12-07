@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaBa - Setting up your account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error { color: red; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Setting up your account...</h2>
+        <div class="spinner"></div>
+        <p>Please wait while we create your profile</p>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script type="module" src="supabase-config.js"></script>
+    <script>
+        async function setupAccount() {
+            try {
+                // Get the authenticated user
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                
+                if (userError || !user) {
+                    throw new Error('Authentication failed');
+                }
+
+                // Create user profile in database
+                const userData = {
+                    id: user.id,
+                    email: user.email,
+                    name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                    phone: '',
+                    avatar: user.user_metadata?.avatar_url || null,
+                    is_online: true,
+                    created_at: new Date().toISOString(),
+                    last_seen: new Date().toISOString()
+                };
+
+                // Try to insert user (will be ignored if already exists due to trigger)
+                await supabase.from('users').insert([userData]);
+
+                // Get the user data from database
+                const { data: dbUser } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (dbUser) {
+                    // Store user data
+                    sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
+                    
+                    // Redirect to app
+                    window.location.href = '/CaBa/';
+                } else {
+                    throw new Error('Failed to create user profile');
+                }
+
+            } catch (error) {
+                console.error('Setup error:', error);
+                document.getElementById('error').textContent = 'Setup failed. Redirecting to login...';
+                setTimeout(() => {
+                    window.location.href = '/CaBa/simple-login.html';
+                }, 3000);
+            }
+        }
+
+        // Start setup when page loads
+        window.addEventListener('load', setupAccount);
+    </script>
+</body>
+</html>

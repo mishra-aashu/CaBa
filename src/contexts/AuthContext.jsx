@@ -57,76 +57,26 @@ export const AuthProvider = ({ children }) => {
 
   const handleGoogleCallback = async () => {
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return { success: false, error: 'No user found' };
 
-      if (error) {
-        console.error('Google callback error:', error);
-        return { success: false, error: error.message };
-      }
+      const userData = {
+        id: user.id,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+        email: user.email,
+        phone: '',
+        avatar: user.user_metadata?.avatar_url || null,
+        is_online: true
+      };
 
-      if (session && session.user) {
-        // Check if user exists in database
-        const { data: existingUser, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        let userData;
-
-        if (userError || !existingUser) {
-          // Create new user
-          userData = {
-            id: session.user.id,
-            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'User',
-            email: session.user.email,
-            phone: session.user.user_metadata?.phone || '',
-            avatar: session.user.user_metadata?.avatar_url || null,
-            is_online: true,
-            created_at: new Date().toISOString(),
-            last_seen: new Date().toISOString()
-          };
-
-          const { error: insertError } = await supabase
-            .from('users')
-            .insert([userData]);
-
-          if (insertError) {
-            console.error('Error creating user:', insertError);
-            return { success: false, error: insertError.message };
-          }
-        } else {
-          // Update existing user
-          userData = {
-            ...existingUser,
-            is_online: true,
-            last_seen: new Date().toISOString(),
-            avatar: session.user.user_metadata?.avatar_url || existingUser.avatar
-          };
-
-          await supabase
-            .from('users')
-            .update({
-              is_online: true,
-              last_seen: new Date().toISOString(),
-              avatar: session.user.user_metadata?.avatar_url || existingUser.avatar
-            })
-            .eq('id', existingUser.id);
-        }
-
-        // Store in localStorage for consistency
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-
-        // Update context state
-        setUser(userData);
-        setIsAuthenticated(true);
-
-        return { success: true, user: userData };
-      }
-
-      return { success: false, error: 'No session found' };
+      await supabase.from('users').upsert([userData]);
+      
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return { success: true, user: userData };
     } catch (error) {
-      console.error('Google callback processing error:', error);
       return { success: false, error: error.message };
     }
   };
@@ -134,20 +84,11 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html'
-        }
+        provider: 'google'
       });
       
-      if (error) {
-        console.error('Google sign in error:', error);
-        return { success: false, error: error.message };
-      }
-      
-      return { success: true };
+      return error ? { success: false, error: error.message } : { success: true };
     } catch (error) {
-      console.error('Google sign in error:', error);
       return { success: false, error: error.message };
     }
   };
