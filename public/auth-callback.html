@@ -98,8 +98,15 @@
             // Proceed with normal auth callback handling
             async function handleAuthCallback() {
                 try {
-                    // Get authenticated user
-                    const { data: { user }, error: userError } = await supabase.auth.getUser();
+                    // Get authenticated session to ensure auth context is set
+                    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+                    if (sessionError || !session) {
+                        console.error('Session error:', sessionError);
+                        throw new Error('Authentication session not found');
+                    }
+
+                    const user = session.user;
 
                     if (userError || !user) {
                         console.error('User error:', userError);
