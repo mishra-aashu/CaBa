@@ -288,51 +288,15 @@ const AttachmentMenu = ({
       <div
         className="whatsapp-attachment-popup"
         ref={menuRef}
-        style={{
-          position: 'fixed',
-          bottom: '0',
-          left: '0',
-          right: '0',
-          background: 'var(--chat-input-bg, #233138)',
-          color: 'var(--chat-input-text, #e9edef)',
-          zIndex: '999999',
-          transform: 'translateY(0)',
-          opacity: 1,
-          visibility: 'visible',
-          padding: '20px',
-          borderRadius: '16px 16px 0 0',
-          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.3)'
-        }}
       >
-        <div className="whatsapp-attachment-header" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '20px',
-          paddingBottom: '15px',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
-        }}>
+        <div className="whatsapp-attachment-header">
           <button
             className="whatsapp-attachment-close"
             onClick={handleClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--chat-input-icon-color, #8696a0)',
-              fontSize: '20px',
-              cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '50%'
-            }}
           >
             <i className="fas fa-times"></i>
           </button>
-          <h3 style={{
-            margin: '0',
-            color: 'var(--chat-input-text, #e9edef)',
-            fontSize: '18px',
-            fontWeight: '600'
-          }}>
+          <h3>
             Share
           </h3>
           <div></div>
