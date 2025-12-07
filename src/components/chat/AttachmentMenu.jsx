@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useMediaUpload } from '../../hooks/media/useMediaUpload';
 import { useChatTheme } from '../../contexts/ChatThemeContext';
+import { useAuth } from '../../hooks/useAuth';
 import './AttachmentMenu.css';
 
 const AttachmentMenu = ({
@@ -17,6 +18,7 @@ const AttachmentMenu = ({
   
   // Get theme context for dynamic colors
   const { currentThemeData } = useChatTheme();
+  const { user: currentUser, isAuthenticated } = useAuth();
 
   const { uploadFile } = useMediaUpload();
 
@@ -146,11 +148,10 @@ const AttachmentMenu = ({
     if (!file || !fileType) return;
 
     setUploadingType(fileType);
-    
+
     try {
-      // Get current user
-      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-      if (!currentUser) {
+      // Check authentication
+      if (!isAuthenticated || !currentUser) {
         alert('Please log in to send files');
         return;
       }

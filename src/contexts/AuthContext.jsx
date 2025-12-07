@@ -26,6 +26,16 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
+        // Check for user from phone authentication (backward compatibility)
+        const localUser = localStorage.getItem('currentUser');
+        if (localUser) {
+          const userData = JSON.parse(localUser);
+          setUser(userData);
+          setIsAuthenticated(true);
+          setLoading(false);
+          return;
+        }
+
         // Listen for Supabase auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('🔐 Auth state changed:', event);
@@ -109,19 +119,22 @@ export const AuthProvider = ({ children }) => {
     try {
       // Clear session storage
       sessionStorage.removeItem('_auth_user');
-      
+
+      // Clear localStorage (for phone auth compatibility)
+      localStorage.removeItem('currentUser');
+
       // Sign out from Supabase
       await supabase.auth.signOut();
-      
+
       // Clear auth service
       if (authService) {
         authService.signOut();
       }
-      
+
       // Update state
       setUser(null);
       setIsAuthenticated(false);
-      
+
       // Redirect to HTML login
       window.location.href = '/CaBa/login.html';
     } catch (error) {

@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import AttachmentMenu from './AttachmentMenu';
+import { useAuth } from '../../hooks/useAuth';
 
-const MessageInput = ({ 
-  onSendMessage, 
-  onTyping, 
-  replyingTo, 
+const MessageInput = ({
+  onSendMessage,
+  onTyping,
+  replyingTo,
   onCancelReply,
   chatId,
   receiverId
@@ -15,6 +16,7 @@ const MessageInput = ({
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const textareaRef = useRef(null);
+  const { user: currentUser } = useAuth();
 
   // Default quick reply messages
   const quickReplies = [
@@ -129,7 +131,7 @@ const MessageInput = ({
         <div className="reply-preview-bar">
           <div className="reply-preview-content">
             <div className="reply-author">
-              Replying to {replyingTo.sender_id === JSON.parse(localStorage.getItem('currentUser')).id ? 'You' : 'Them'}
+              Replying to {replyingTo.sender_id === currentUser?.id ? 'You' : 'Them'}
             </div>
             <div className="reply-text">{replyingTo.content}</div>
           </div>
