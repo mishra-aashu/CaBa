@@ -26,25 +26,101 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        const service = new AuthService(supabase);
-        await service.initialize();
-        
-        setAuthService(service);
+        // Listen for Supabase auth state changes (for OAuth)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('🔐 Supabase auth state changed:', event, session?.user?.id);
 
-        const currentUser = service.getUser();
-        setUser(currentUser);
-        setIsAuthenticated(service.isAuthenticated());
+          if (event === 'SIGNED_IN' && session?.user) {
+            try {
+              // Check if user exists in database
+              const { data: existingUser, error: dbError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', session.user.email)
+                .single();
 
-        const unsubscribe = service.onAuthStateChange(({ user, isAuthenticated }) => {
-          console.log('🔐 Auth state changed: SIGNED_IN (phone)', { user: user?.id, isAuthenticated });
-          setUser(user);
-          setIsAuthenticated(isAuthenticated);
+              let dbUser;
+
+              if (dbError && dbError.code === 'PGRST116') {
+                // User doesn't exist, create new user
+                const userData = {
+                  id: session.user.id,
+                  email: session.user.email,
+                  name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0],
+                  phone: '',
+                  avatar: session.user.user_metadata?.avatar_url || null,
+                  is_online: true
+                };
+
+                const { data: newUser, error: insertError } = await supabase
+                  .from('users')
+                  .insert([userData])
+                  .select()
+                  .single();
+
+                if (insertError) {
+                  console.error('Insert error:', insertError);
+                  // Still set the user even if database insert fails
+                  dbUser = userData;
+                } else {
+                  dbUser = newUser;
+                }
+              } else if (existingUser) {
+                // User exists, update their status
+                await supabase
+                  .from('users')
+                  .update({
+                    is_online: true,
+                    last_seen: new Date().toISOString()
+                  })
+                  .eq('id', existingUser.id);
+
+                dbUser = existingUser;
+              } else {
+                // Fallback - create user object from session
+                dbUser = {
+                  id: session.user.id,
+                  email: session.user.email,
+                  name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0],
+                  phone: '',
+                  avatar: session.user.user_metadata?.avatar_url || null,
+                  is_online: true
+                };
+              }
+
+              // Store user data and update state
+              sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
+              setUser(dbUser);
+              setIsAuthenticated(true);
+
+              // Redirect to main app if not already there
+              if (!window.location.pathname.includes('/CaBa/') || window.location.pathname === '/CaBa/') {
+                window.location.href = '/CaBa/';
+              }
+
+            } catch (error) {
+              console.error('Error handling auth state change:', error);
+            }
+          } else if (event === 'SIGNED_OUT') {
+            sessionStorage.removeItem('_auth_user');
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+
+          setLoading(false);
         });
 
-        setLoading(false);
+        // Check current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          // User is already signed in, trigger the auth state change handler
+          supabase.auth.onAuthStateChange('SIGNED_IN', session);
+        } else {
+          setLoading(false);
+        }
 
         return () => {
-          unsubscribe();
+          subscription?.unsubscribe();
         };
       } catch (error) {
         console.error('Auth context initialization error:', error);
@@ -59,10 +135,7 @@ export const AuthProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/callback.html`
-        }
+        provider: 'google'
       });
 
       if (error) {

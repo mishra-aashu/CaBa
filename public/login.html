@@ -61,10 +61,7 @@
 
             try {
                 const { error: authError } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: 'https://mishra-aashu.github.io/callback.html'
-                    }
+                    provider: 'google'
                 });
 
                 if (authError) throw authError;
