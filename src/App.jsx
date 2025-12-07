@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useSupabase } from './contexts/SupabaseContext';
 import { useAuth } from './hooks/useAuth';
 import { CallProvider } from './context/CallContext';
-import { Login, Signup, ForgotPassword, ResetPassword, AuthCallback } from './components/auth';
+import { Login, Signup, ForgotPassword, ResetPassword } from './components/auth';
 import { Chat } from './components/chat';
 import Home from './components/Home';
 import Profile from './components/profile';
@@ -101,7 +101,6 @@ function App() {
             {/* Login/Signup routes removed - now handled by HTML pages */}
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
             <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/chat/:chatId/:otherUserId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/chat/new/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/call/:callId" element={<ProtectedRoute><CallScreen /></ProtectedRoute>} />
