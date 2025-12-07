@@ -126,8 +126,9 @@ const Home = () => {
       localStorage.setItem('currentUser', JSON.stringify(currentUserData));
       setIsAdmin(user.is_admin || false);
 
-      // Check if user needs phone number
-      if (!user.phone) {
+      // Check if user has completed profile (has phone number)
+      const profileCompleted = localStorage.getItem('profile_completed') === 'true';
+      if (!profileCompleted && !user.phone) {
         setShowPhoneModal(true);
       }
 
@@ -274,6 +275,7 @@ const Home = () => {
         avatar: user.user_metadata?.avatar_url || null
       };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      localStorage.setItem('profile_completed', 'true'); // Mark profile as completed
       setCurrentUser(updatedUser);
 
       // Close modal
