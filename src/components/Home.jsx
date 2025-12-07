@@ -126,11 +126,8 @@ const Home = () => {
       localStorage.setItem('currentUser', JSON.stringify(currentUserData));
       setIsAdmin(user.is_admin || false);
 
-      // Check if user has completed profile (has phone number)
-      const profileCompleted = localStorage.getItem('profile_completed') === 'true';
-      if (!profileCompleted && !user.phone) {
-        setShowPhoneModal(true);
-      }
+      // Check if user has phone number in database
+      await checkProfileCompletion(user.id);
 
       setLoading(false);
     } catch (error) {
@@ -139,6 +136,28 @@ const Home = () => {
     }
   };
 
+
+  const checkProfileCompletion = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('phone')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error checking profile completion:', error);
+        return;
+      }
+
+      // Show phone modal if user doesn't have a phone number
+      if (!data || !data.phone || data.phone.trim() === '') {
+        setShowPhoneModal(true);
+      }
+    } catch (error) {
+      console.error('Error in checkProfileCompletion:', error);
+    }
+  };
 
   const loadSavedContacts = async () => {
     try {
@@ -275,7 +294,6 @@ const Home = () => {
         avatar: user.user_metadata?.avatar_url || null
       };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      localStorage.setItem('profile_completed', 'true'); // Mark profile as completed
       setCurrentUser(updatedUser);
 
       // Close modal
