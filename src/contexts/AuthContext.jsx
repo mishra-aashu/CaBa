@@ -55,42 +55,18 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, [supabase]);
 
-  const handleGoogleCallback = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) return { success: false, error: 'No user found' };
-
-      const userData = {
-        id: user.id,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-        email: user.email,
-        phone: '',
-        avatar: user.user_metadata?.avatar_url || null,
-        is_online: true
-      };
-
-      await supabase.from('users').upsert([userData]);
-      
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      return { success: true, user: userData };
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  };
 
   const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/CaBa/auth-callback.html`
-        }
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google'
       });
 
-      return error ? { success: false, error: error.message } : { success: true };
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -133,7 +109,6 @@ export const AuthProvider = ({ children }) => {
     signInWithGoogle,
     signUpWithGoogle,
     signOut,
-    handleGoogleCallback,
   };
 
   return (

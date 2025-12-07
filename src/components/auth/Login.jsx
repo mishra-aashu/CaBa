@@ -1,59 +1,22 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useSupabase } from '../../contexts/SupabaseContext';
-import { isInWebView, generateSessionId } from '../../utils/appDetection';
-import ExternalAuthService from '../../services/externalAuthService';
-import BrowserFallback from './BrowserFallback';
 import '../../styles/auth.css';
 
 const Login = () => {
   const { signInWithGoogle } = useAuth();
-  const { supabase } = useSupabase();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isWebView] = useState(isInWebView());
-  const [showFallback, setShowFallback] = useState(false);
-  const [authUrl, setAuthUrl] = useState('');
-
-
 
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
       setError('');
-      
-      if (isWebView) {
-        // Use external browser authentication for webview apps
-        console.log('📱 WebView detected, using external browser auth');
-        
-        const externalAuth = new ExternalAuthService(supabase);
-        const result = await externalAuth.signInWithGoogleExternal();
-        
-        console.log('🔍 External auth result:', result);
-        
-        if (result.success && result.data) {
-          // Authentication successful, navigate to home
-          navigate('/');
-        } else if (result.success && result.redirected) {
-          // Window was redirected, show message
-          setError('Redirected to browser for authentication. Please return to app after login.');
-        } else if (!result.success) {
-          // Show fallback options
-          const sessionId = generateSessionId();
-          const fallbackUrl = `${window.location.origin}/CaBa/external-login.html?session=${sessionId}&action=login`;
-          setAuthUrl(fallbackUrl);
-          setShowFallback(true);
-          setError('');
-        }
-      } else {
-        // Use normal Google OAuth for regular browsers
-        const result = await signInWithGoogle();
-        
-        if (!result.success) {
-          setError(result.error || 'Google sign in failed');
-        }
+
+      const result = await signInWithGoogle();
+
+      if (!result.success) {
+        setError(result.error || 'Google sign in failed');
       }
     } catch (error) {
       setError('An error occurred. Please try again.');
@@ -68,34 +31,6 @@ const Login = () => {
         <div className="auth-header">
           <h1>Welcome Back</h1>
           <p>Login to your CaBa account</p>
-          {isWebView && (
-            <div style={{ 
-              background: '#e3f2fd', 
-              padding: '10px', 
-              borderRadius: '8px', 
-              marginTop: '10px',
-              fontSize: '14px',
-              color: '#1976d2'
-            }}>
-              📱 App Mode: Authentication will open in your browser
-              <br />
-              <small>If browser doesn't open, check popup settings</small>
-            </div>
-          )}
-          
-          {/* Debug info for testing */}
-          {process.env.NODE_ENV === 'development' && (
-            <div style={{
-              background: '#f5f5f5',
-              padding: '8px',
-              borderRadius: '4px',
-              marginTop: '10px',
-              fontSize: '12px',
-              color: '#666'
-            }}>
-              Debug: WebView={isWebView.toString()}, UA={navigator.userAgent.substring(0, 50)}...
-            </div>
-          )}
         </div>
 
         <div className="auth-form">
@@ -104,17 +39,6 @@ const Login = () => {
             <div className="error-message">
               {error}
             </div>
-          )}
-          
-          {/* Browser Fallback */}
-          {showFallback && (
-            <BrowserFallback 
-              authUrl={authUrl}
-              onCancel={() => {
-                setShowFallback(false);
-                setAuthUrl('');
-              }}
-            />
           )}
 
           {/* Google Login Button */}
