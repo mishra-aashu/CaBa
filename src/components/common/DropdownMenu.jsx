@@ -23,16 +23,29 @@ const DropdownMenu = ({
             }
         };
 
+        const handleTouchOutside = (event) => {
+            // Check if the touch target is outside the dropdown
+            const touch = event.touches[0] || event.changedTouches[0];
+            if (touch && dropdownRef.current && !dropdownRef.current.contains(touch.target)) {
+                setIsOpen(false);
+            }
+        };
+
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchstart', handleTouchOutside, { passive: true });
         }
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleTouchOutside);
         };
     }, [isOpen]);
 
-    const handleItemClick = (item) => {
+    const handleItemClick = (item, event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (item.onClick) {
             item.onClick();
         }
@@ -43,7 +56,10 @@ const DropdownMenu = ({
         <div className="dropdown" ref={dropdownRef}>
             <button
                 className={`icon-btn ${buttonClassName}`}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                }}
                 title="Menu"
             >
                 {icon}
@@ -58,7 +74,7 @@ const DropdownMenu = ({
                             ) : (
                                 <button
                                     className={`dropdown-item ${item.danger ? 'danger' : ''} ${item.className || ''}`}
-                                    onClick={() => handleItemClick(item)}
+                                    onClick={(e) => handleItemClick(item, e)}
                                     disabled={item.disabled}
                                     style={{
                                         ...item.style,
