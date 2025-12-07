@@ -22,16 +22,26 @@
     <div id="root"></div>
     <script type="module" src="src/main.jsx"></script>
     <script>
-      // Check if user is authenticated, if not redirect to HTML login
-      window.addEventListener('load', () => {
+      // Check for OAuth error parameters first
+      const urlParams = new URLSearchParams(window.location.search);
+      const error = urlParams.get('error');
+      const errorCode = urlParams.get('error_code');
+      const errorDescription = urlParams.get('error_description');
+
+      if (error) {
+        // Display error and redirect to login
+        alert('Authentication Error: ' + (errorDescription || errorCode || error || 'Unknown error'));
+        window.location.href = '/CaBa/login.html';
+      } else {
+        // Check if user is authenticated, if not redirect to HTML login
         const storedUser = sessionStorage.getItem('_auth_user');
-        if (!storedUser && !window.location.pathname.includes('auth-callback')) {
+        if (!storedUser) {
           // Only redirect if we're at the root and not authenticated
           if (window.location.pathname === '/CaBa/' || window.location.pathname === '/CaBa/index.html') {
             window.location.href = '/CaBa/login.html';
           }
         }
-      });
+      }
     </script>
   </body>
 </html>

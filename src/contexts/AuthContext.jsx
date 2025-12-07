@@ -52,18 +52,38 @@ export const AuthProvider = ({ children }) => {
                   is_online: true
                 };
 
-                const { data: newUser, error: insertError } = await supabase
-                  .from('users')
-                  .insert([userData])
-                  .select()
-                  .single();
+                // Try to insert the user, but don't fail if it already exists
+                try {
+                  const { data: newUser, error: insertError } = await supabase
+                    .from('users')
+                    .insert([userData])
+                    .select()
+                    .single();
 
-                if (insertError) {
-                  console.error('Insert error:', insertError);
-                  // Still set the user even if database insert fails
-                  dbUser = userData;
-                } else {
-                  dbUser = newUser;
+                  if (insertError) {
+                    console.error('Insert error:', insertError);
+                    // If insert fails due to duplicate email, try to get existing user
+                    if (insertError.code === '23505') { // unique constraint violation
+                      const { data: existingUser } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('email', session.user.email)
+                        .single();
+
+                      if (existingUser) {
+                        dbUser = existingUser;
+                      } else {
+                        dbUser = userData; // fallback
+                      }
+                    } else {
+                      dbUser = userData; // fallback for other errors
+                    }
+                  } else {
+                    dbUser = newUser;
+                  }
+                } catch (error) {
+                  console.error('User creation error:', error);
+                  dbUser = userData; // fallback
                 }
               } else if (existingUser) {
                 // User exists, update their status
