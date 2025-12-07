@@ -275,7 +275,7 @@ const AttachmentMenu = ({
     onFileSelect(reminderData);
   };
 
-  if (!isOpen) {
+  if (!isVisible) {
     return null;
   }
   
