@@ -79,110 +79,52 @@
     <script>
         async function handleAuthCallback() {
             try {
-                console.log('🔄 Starting auth callback processing...');
-
-                // Check for URL parameters indicating errors
+                // Check for URL errors first
                 const urlParams = new URLSearchParams(window.location.search);
                 const urlError = urlParams.get('error');
-                const errorDescription = urlParams.get('error_description');
                 
                 if (urlError) {
-                    console.error('❌ URL contains error:', { error: urlError, description: errorDescription });
-                    throw new Error(errorDescription || urlError);
+                    throw new Error('OAuth authentication failed. Please try again.');
                 }
 
-                // Get the current session
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-                console.log('📋 Session check result:', { hasSession: !!session, hasUser: !!session?.user, error: sessionError });
-
-                if (sessionError) {
-                    console.error('❌ Session error:', sessionError);
-                    throw sessionError;
-                }
-
-                if (session && session.user) {
-                    const user = session.user;
-                    console.log('✅ Found authenticated user:', { id: user.id, email: user.email });
-
-                    // Check if user exists in our database
-                    let { data: dbUser, error: dbError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', user.id)
-                        .single();
-
-                    // If user doesn't exist, create them
-                    if (dbError && dbError.code === 'PGRST116') {
-                        const userData = {
-                            id: user.id,
-                            email: user.email,
-                            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-                            phone: user.user_metadata?.phone || '',
-                            avatar: user.user_metadata?.avatar_url || null,
-                            is_online: true,
-                            created_at: new Date().toISOString(),
-                            last_seen: new Date().toISOString()
-                        };
-
-                        const { data: newUser, error: insertError } = await supabase
-                            .from('users')
-                            .insert([userData])
-                            .select()
-                            .single();
-
-                        if (insertError) {
-                            console.error('❌ Database insert error:', insertError);
-                            throw new Error(`Failed to create user: ${insertError.message}`);
-                        }
-                        
-                        dbUser = newUser;
-                    } else if (dbError) {
-                        console.error('❌ Database query error:', dbError);
-                        throw new Error(`Database error: ${dbError.message}`);
-                    } else {
-                        // User exists, update their online status and last seen
-                        await supabase
-                            .from('users')
-                            .update({
-                                is_online: true,
-                                last_seen: new Date().toISOString(),
-                                avatar: user.user_metadata?.avatar_url || dbUser.avatar
-                            })
-                            .eq('id', user.id);
-                    }
-
-                    // Check if phone number is required
-                    if (!dbUser.phone || dbUser.phone.trim() === '') {
-                        // Redirect to phone input page
-                        window.location.href = `/CaBa/phone-input.html?userId=${dbUser.id}`;
-                    } else {
-                        // Store user data and redirect to React app
-                        sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
-                        window.location.href = '/CaBa/';
-                    }
-                } else {
+                // Get session
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (!session?.user) {
                     throw new Error('No session found');
                 }
+
+                const user = session.user;
+                
+                // Get or create user in database
+                let { data: dbUser } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                // User should be created by trigger, but if not, redirect to login
+                if (!dbUser) {
+                    throw new Error('User not found in database');
+                }
+
+                // Update online status
+                await supabase
+                    .from('users')
+                    .update({ is_online: true, last_seen: new Date().toISOString() })
+                    .eq('id', user.id);
+
+                // Store and redirect
+                sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
+                window.location.href = '/CaBa/';
+                
             } catch (error) {
-                console.error('Auth callback error:', error);
                 document.querySelector('.loading').style.display = 'none';
                 document.querySelector('.spinner').style.display = 'none';
                 const errorDiv = document.getElementById('error');
                 errorDiv.style.display = 'block';
+                errorDiv.textContent = error.message;
                 
-                let errorMessage = 'Authentication failed';
-                if (error.message.includes('Database error saving new user')) {
-                    errorMessage = 'Account setup failed. Please try signing in again.';
-                } else if (error.message.includes('No session found')) {
-                    errorMessage = 'Session expired. Redirecting to login...';
-                } else {
-                    errorMessage = error.message;
-                }
-                
-                errorDiv.textContent = errorMessage;
-                
-                // Redirect to login after 3 seconds
                 setTimeout(() => {
                     window.location.href = '/CaBa/login.html';
                 }, 3000);
