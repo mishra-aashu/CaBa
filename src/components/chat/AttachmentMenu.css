@@ -17,18 +17,17 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-  border-radius: 24px 24px 0 0;
-  padding: 24px;
+  background: var(--chat-input-bg, #233138);
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
   transform: translateY(100%);
   opacity: 0;
   visibility: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4), 0 -2px 16px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  color: #f8fafc;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease forwards;
+  color: var(--chat-input-text, #e9edef);
 }
 
 .whatsapp-attachment-popup.open {
@@ -83,41 +82,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   cursor: pointer;
-  padding: 20px 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 16px;
+  border-radius: 12px;
+  background: transparent;
+  transition: all 0.3s ease;
   opacity: 0;
   transform: scale(0.8) translateY(20px);
-  animation: popIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  position: relative;
-  overflow: hidden;
+  animation: popIn 0.5s ease forwards;
 }
 
-.attachment-menu-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.6s;
-}
 
-.attachment-menu-item:hover::before {
-  left: 100%;
-}
 
 .attachment-menu-item:hover {
-  transform: translateY(-8px) scale(1.05);
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .attachment-menu-item:active {
@@ -130,38 +110,30 @@
 }
 
 .attachment-icon-container {
-  width: 72px;
-  height: 72px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .attachment-menu-item:hover .attachment-icon-container {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.attachment-emoji-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  transition: all 0.3s ease;
-}
-
-.attachment-menu-item:hover .attachment-emoji-icon {
   transform: scale(1.1);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.attachment-icon-container i {
+  font-size: 24px;
+  color: white;
 }
 
 .upload-spinner {
-  font-size: 28px;
+  font-size: 20px;
+  color: white;
   animation: spin 1s linear infinite;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes spin {
@@ -170,20 +142,17 @@
 }
 
 .attachment-item-name {
-  font-size: 13px;
-  color: #e2e8f0;
+  font-size: 12px;
+  color: var(--chat-input-text, #e9edef);
   text-align: center;
-  font-weight: 600;
-  letter-spacing: 0.025em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: 500;
 }
 
 .attachment-size-info {
   font-size: 10px;
-  color: #94a3b8;
+  color: var(--chat-input-icon-color, #8696a0);
   text-align: center;
-  font-weight: 500;
-  opacity: 0.8;
+  font-weight: 400;
 }
 
 @keyframes popIn {

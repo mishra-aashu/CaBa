@@ -25,8 +25,8 @@ const AttachmentMenu = ({
     {
       id: 1,
       name: 'Camera',
-      icon: '📸',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      icon: 'fas fa-camera',
+      color: '#E91E63',
       type: 'camera',
       isCamera: true,
       accept: 'image/*',
@@ -35,8 +35,8 @@ const AttachmentMenu = ({
     {
       id: 2,
       name: 'Gallery',
-      icon: '🖼️',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      icon: 'fas fa-images',
+      color: '#9C27B0',
       type: 'images',
       accept: 'image/*',
       maxSize: '20MB'
@@ -44,8 +44,8 @@ const AttachmentMenu = ({
     {
       id: 3,
       name: 'Video',
-      icon: '🎬',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      icon: 'fas fa-video',
+      color: '#FF5722',
       type: 'video',
       accept: 'video/*',
       maxSize: '100MB'
@@ -53,8 +53,8 @@ const AttachmentMenu = ({
     {
       id: 4,
       name: 'Audio',
-      icon: '🎵',
-      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      icon: 'fas fa-microphone',
+      color: '#FF9800',
       type: 'audio',
       accept: 'audio/*',
       maxSize: '10MB'
@@ -62,8 +62,8 @@ const AttachmentMenu = ({
     {
       id: 5,
       name: 'Location',
-      icon: '📍',
-      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      icon: 'fas fa-map-marker-alt',
+      color: '#4CAF50',
       type: 'location',
       accept: null,
       maxSize: null
@@ -71,8 +71,8 @@ const AttachmentMenu = ({
     {
       id: 6,
       name: 'Reminder',
-      icon: '⏰',
-      gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      icon: 'fas fa-bell',
+      color: '#00BCD4',
       type: 'reminder',
       accept: null,
       maxSize: null
@@ -354,13 +354,13 @@ const AttachmentMenu = ({
                 <div
                   className="attachment-icon-container"
                   style={{
-                    background: item.gradient
+                    backgroundColor: item.color
                   }}
                 >
                   {uploadingType === item.type ? (
-                    <div className="upload-spinner">⏳</div>
+                    <i className="fas fa-spinner upload-spinner"></i>
                   ) : (
-                    <span className="attachment-emoji-icon">{item.icon}</span>
+                    <i className={item.icon}></i>
                   )}
                 </div>
                 <span className="attachment-item-name">
