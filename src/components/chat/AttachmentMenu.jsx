@@ -25,8 +25,8 @@ const AttachmentMenu = ({
     {
       id: 1,
       name: 'Camera',
-      icon: 'fas fa-camera-retro',
-      color: '#E91E63',
+      icon: '📸',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       type: 'camera',
       isCamera: true,
       accept: 'image/*',
@@ -34,9 +34,9 @@ const AttachmentMenu = ({
     },
     {
       id: 2,
-      name: 'Images',
-      icon: 'fas fa-image',
-      color: '#9C27B0',
+      name: 'Gallery',
+      icon: '🖼️',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
       type: 'images',
       accept: 'image/*',
       maxSize: '20MB'
@@ -44,8 +44,8 @@ const AttachmentMenu = ({
     {
       id: 3,
       name: 'Video',
-      icon: 'fas fa-video',
-      color: '#FF5722',
+      icon: '🎬',
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
       type: 'video',
       accept: 'video/*',
       maxSize: '100MB'
@@ -53,8 +53,8 @@ const AttachmentMenu = ({
     {
       id: 4,
       name: 'Audio',
-      icon: 'fas fa-microphone',
-      color: '#FF9800',
+      icon: '🎵',
+      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
       type: 'audio',
       accept: 'audio/*',
       maxSize: '10MB'
@@ -62,8 +62,8 @@ const AttachmentMenu = ({
     {
       id: 5,
       name: 'Location',
-      icon: 'fas fa-map-marker-alt',
-      color: '#4CAF50',
+      icon: '📍',
+      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
       type: 'location',
       accept: null,
       maxSize: null
@@ -71,8 +71,8 @@ const AttachmentMenu = ({
     {
       id: 6,
       name: 'Reminder',
-      icon: 'fas fa-stopwatch',
-      color: '#00BCD4',
+      icon: '⏰',
+      gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
       type: 'reminder',
       accept: null,
       maxSize: null
@@ -338,70 +338,36 @@ const AttachmentMenu = ({
           <div></div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '20px'
-        }}>
+        <div className="attachment-menu-grid">
           {menuItems.map((item, index) => {
             return (
               <div
                 key={item.id}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '10px',
-                  cursor: 'pointer',
-                  padding: '18px',
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  border: `2px solid ${item.color}`,
-                  transition: 'transform 0.2s',
-                  minHeight: '90px'
-                }}
+                className={`attachment-menu-item ${uploadingType === item.type ? 'uploading' : ''}`}
                 onClick={() => {
                   handleFileSelect(item.type);
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = 'scale(1.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = 'scale(1)';
+                style={{
+                  animationDelay: `${index * 0.1}s`
                 }}
               >
                 <div
+                  className="attachment-icon-container"
                   style={{
-                    backgroundColor: item.color,
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '3px solid white'
+                    background: item.gradient
                   }}
                 >
-                  <i className={item.icon} style={{
-                    fontSize: '32px',
-                    color: 'white'
-                  }}></i>
+                  {uploadingType === item.type ? (
+                    <div className="upload-spinner">⏳</div>
+                  ) : (
+                    <span className="attachment-emoji-icon">{item.icon}</span>
+                  )}
                 </div>
-                <span style={{
-                  fontSize: '12px',
-                  color: 'var(--chat-input-text, #e9edef)',
-                  textAlign: 'center',
-                  fontWeight: '500'
-                }}>
+                <span className="attachment-item-name">
                   {item.name}
                 </span>
                 {item.maxSize && (
-                  <div style={{
-                    fontSize: '10px',
-                    color: 'var(--chat-input-icon-color, #6b7280)',
-                    textAlign: 'center',
-                    marginTop: '2px'
-                  }}>
+                  <div className="attachment-size-info">
                     Max {item.maxSize}
                   </div>
                 )}
