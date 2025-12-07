@@ -57,8 +57,12 @@ const DropdownMenu = ({
             <button
                 className={`icon-btn ${buttonClassName}`}
                 onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     setIsOpen(!isOpen);
+                }}
+                onMouseEnter={() => {
+                    // Explicitly do nothing on hover - only respond to clicks
                 }}
                 title="Menu"
             >
