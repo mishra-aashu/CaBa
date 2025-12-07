@@ -25,29 +25,29 @@ const AttachmentMenu = ({ isVisible, onClose, onFileSelect }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="attachment-overlay">
-      <div className="attachment-popup">
-        <div className="attachment-header">
+    <div className="whatsapp-attachment-overlay">
+      <div className={`whatsapp-attachment-popup ${isVisible ? 'open' : ''}`}>
+        <div className="whatsapp-attachment-header">
           <h3>Share</h3>
-          <button onClick={onClose} className="close-btn">
+          <button onClick={onClose} className="whatsapp-attachment-close">
             <i className="fas fa-times"></i>
           </button>
         </div>
-        
-        <div className="attachment-grid">
+
+        <div className="whatsapp-menu-grid">
           {attachmentOptions.map((option) => (
-            <div 
+            <div
               key={option.id}
-              className="attachment-option"
+              className="whatsapp-menu-item"
               onClick={() => handleOptionClick(option)}
             >
-              <div 
-                className="attachment-icon"
+              <div
+                className="whatsapp-icon-circle"
                 style={{ backgroundColor: option.color }}
               >
                 <i className={option.icon}></i>
               </div>
-              <span className="attachment-name">{option.name}</span>
+              <span className="whatsapp-item-name">{option.name}</span>
             </div>
           ))}
         </div>
