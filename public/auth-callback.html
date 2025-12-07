@@ -79,16 +79,22 @@
     <script>
         async function handleAuthCallback() {
             try {
+                console.log('🔄 Starting auth callback processing...');
+
                 // Get the current session
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                
+
+                console.log('📋 Session check result:', { hasSession: !!session, hasUser: !!session?.user, error: sessionError });
+
                 if (sessionError) {
+                    console.error('❌ Session error:', sessionError);
                     throw sessionError;
                 }
 
                 if (session && session.user) {
                     const user = session.user;
-                    
+                    console.log('✅ Found authenticated user:', { id: user.id, email: user.email });
+
                     // Check if user exists in our database
                     let { data: dbUser, error: dbError } = await supabase
                         .from('users')
