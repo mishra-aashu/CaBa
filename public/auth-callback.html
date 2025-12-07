@@ -108,17 +108,17 @@
 
                     console.log('User found:', user.email);
 
-                    // Check if user already exists
-                    const { data: existingUser } = await supabase
+                    // Check if user already exists by email
+                    const { data: existingUser, error: dbError } = await supabase
                         .from('users')
                         .select('*')
-                        .eq('id', user.id)
+                        .eq('email', user.email)
                         .single();
 
-                    let dbUser = existingUser;
+                    let dbUser;
 
-                    if (!existingUser) {
-                        // Create new user
+                    if (dbError && dbError.code === 'PGRST116') {
+                        // User doesn't exist, create new user
                         const userData = {
                             id: user.id,
                             email: user.email,
@@ -140,6 +140,19 @@
                         }
 
                         dbUser = newUser;
+                    } else if (existingUser) {
+                        // User exists, update their status
+                        await supabase
+                            .from('users')
+                            .update({
+                                is_online: true,
+                                last_seen: new Date().toISOString()
+                            })
+                            .eq('id', existingUser.id);
+
+                        dbUser = existingUser;
+                    } else {
+                        throw new Error('Database error occurred');
                     }
 
                     if (dbUser) {
