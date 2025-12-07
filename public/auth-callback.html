@@ -77,88 +77,108 @@
 
     <script type="module" src="supabase-config.js"></script>
     <script>
-        async function handleAuthCallback() {
-            try {
-                // Get authenticated user
-                const { data: { user }, error: userError } = await supabase.auth.getUser();
-                
-                if (userError || !user) {
-                    console.error('User error:', userError);
-                    throw new Error('Authentication failed');
-                }
+        // Check for error parameters in URL first
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const errorCode = urlParams.get('error_code');
+        const errorDescription = urlParams.get('error_description');
 
-                console.log('User found:', user.email);
+        if (error) {
+            // Display error from URL parameters
+            document.querySelector('.loading').style.display = 'none';
+            document.querySelector('.spinner').style.display = 'none';
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = errorDescription || errorCode || error || 'Authentication failed';
 
-                // Check if user already exists
-                const { data: existingUser } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
+            setTimeout(() => {
+                window.location.href = '/CaBa/login.html';
+            }, 5000);
+        } else {
+            // Proceed with normal auth callback handling
+            async function handleAuthCallback() {
+                try {
+                    // Get authenticated user
+                    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-                let dbUser = existingUser;
-
-                if (!existingUser) {
-                    // Create new user
-                    const userData = {
-                        id: user.id,
-                        email: user.email,
-                        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
-                        phone: '',
-                        avatar: user.user_metadata?.avatar_url || null,
-                        is_online: true
-                    };
-
-                    const { data: newUser, error: insertError } = await supabase
-                        .from('users')
-                        .insert([userData])
-                        .select()
-                        .single();
-
-                    if (insertError) {
-                        console.error('Insert error:', insertError);
-                        throw new Error('Failed to create user: ' + insertError.message);
+                    if (userError || !user) {
+                        console.error('User error:', userError);
+                        throw new Error('Authentication failed');
                     }
 
-                    dbUser = newUser;
-                }
+                    console.log('User found:', user.email);
 
-                if (dbUser) {
-                    sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
-                    window.location.href = '/CaBa/';
-                } else {
-                    throw new Error('No user data found');
+                    // Check if user already exists
+                    const { data: existingUser } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+
+                    let dbUser = existingUser;
+
+                    if (!existingUser) {
+                        // Create new user
+                        const userData = {
+                            id: user.id,
+                            email: user.email,
+                            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                            phone: '',
+                            avatar: user.user_metadata?.avatar_url || null,
+                            is_online: true
+                        };
+
+                        const { data: newUser, error: insertError } = await supabase
+                            .from('users')
+                            .insert([userData])
+                            .select()
+                            .single();
+
+                        if (insertError) {
+                            console.error('Insert error:', insertError);
+                            throw new Error('Failed to create user: ' + insertError.message);
+                        }
+
+                        dbUser = newUser;
+                    }
+
+                    if (dbUser) {
+                        sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
+                        window.location.href = '/CaBa/';
+                    } else {
+                        throw new Error('No user data found');
+                    }
+
+                } catch (error) {
+                    console.error('Callback error:', error);
+                    document.querySelector('.loading').style.display = 'none';
+                    document.querySelector('.spinner').style.display = 'none';
+                    const errorDiv = document.getElementById('error');
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = error.message || 'Setup failed';
+
+                    setTimeout(() => {
+                        window.location.href = '/CaBa/login.html';
+                    }, 3000);
                 }
-                
-            } catch (error) {
-                console.error('Callback error:', error);
-                document.querySelector('.loading').style.display = 'none';
-                document.querySelector('.spinner').style.display = 'none';
-                const errorDiv = document.getElementById('error');
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = error.message || 'Setup failed';
-                
-                setTimeout(() => {
-                    window.location.href = '/CaBa/login.html';
-                }, 3000);
             }
-        }
 
-        // Handle the callback when page loads with timeout
-        window.addEventListener('load', () => {
-            // Set a timeout to prevent infinite loading
-            const timeoutId = setTimeout(() => {
-                console.error('⏰ Auth callback timeout');
-                document.querySelector('.loading').textContent = 'Authentication timeout. Redirecting...';
-                setTimeout(() => {
-                    window.location.href = '/CaBa/login.html';
-                }, 2000);
-            }, 10000); // 10 second timeout
-            
-            handleAuthCallback().finally(() => {
-                clearTimeout(timeoutId);
+            // Handle the callback when page loads with timeout
+            window.addEventListener('load', () => {
+                // Set a timeout to prevent infinite loading
+                const timeoutId = setTimeout(() => {
+                    console.error('⏰ Auth callback timeout');
+                    document.querySelector('.loading').textContent = 'Authentication timeout. Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = '/CaBa/login.html';
+                    }, 2000);
+                }, 10000); // 10 second timeout
+
+                handleAuthCallback().finally(() => {
+                    clearTimeout(timeoutId);
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
