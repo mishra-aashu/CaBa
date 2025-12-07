@@ -79,33 +79,59 @@
     <script>
         async function handleAuthCallback() {
             try {
-                // Check for URL errors first
                 const urlParams = new URLSearchParams(window.location.search);
                 const urlError = urlParams.get('error');
+                const code = urlParams.get('code');
+                
+                console.log('URL params:', { error: urlError, hasCode: !!code });
                 
                 if (urlError) {
-                    throw new Error('OAuth authentication failed. Please try again.');
+                    console.error('OAuth error from URL:', urlError);
+                    throw new Error('OAuth failed. Check Supabase redirect URL settings.');
                 }
 
-                // Get session
-                const { data: { session } } = await supabase.auth.getSession();
+                // Wait for session to be established
+                let session = null;
+                let attempts = 0;
+                
+                while (!session && attempts < 10) {
+                    const { data } = await supabase.auth.getSession();
+                    session = data.session;
+                    
+                    if (!session) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        attempts++;
+                    }
+                }
                 
                 if (!session?.user) {
-                    throw new Error('No session found');
+                    throw new Error('Authentication session not found');
                 }
 
                 const user = session.user;
+                console.log('User authenticated:', user.email);
                 
-                // Get or create user in database
-                let { data: dbUser } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
+                // Wait for database trigger to create user
+                let dbUser = null;
+                attempts = 0;
+                
+                while (!dbUser && attempts < 5) {
+                    const { data } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    dbUser = data;
+                    
+                    if (!dbUser) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        attempts++;
+                    }
+                }
 
-                // User should be created by trigger, but if not, redirect to login
                 if (!dbUser) {
-                    throw new Error('User not found in database');
+                    throw new Error('User creation failed. Please try again.');
                 }
 
                 // Update online status
@@ -114,11 +140,11 @@
                     .update({ is_online: true, last_seen: new Date().toISOString() })
                     .eq('id', user.id);
 
-                // Store and redirect
                 sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
                 window.location.href = '/CaBa/';
                 
             } catch (error) {
+                console.error('Auth callback error:', error);
                 document.querySelector('.loading').style.display = 'none';
                 document.querySelector('.spinner').style.display = 'none';
                 const errorDiv = document.getElementById('error');

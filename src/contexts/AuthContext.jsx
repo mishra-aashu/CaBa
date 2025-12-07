@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/CaBa/auth-callback.html`
+          redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html'
         }
       });
       
