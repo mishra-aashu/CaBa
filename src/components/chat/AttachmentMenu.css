@@ -17,15 +17,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--chat-input-bg, #233138);
-  border-radius: 16px 16px 0 0;
+  background: transparent;
   padding: 20px;
   transform: translateY(100%);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease forwards;
   color: var(--chat-input-text, #e9edef);
 }
