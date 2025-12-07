@@ -1,223 +1,120 @@
-/* Modern Attachment Menu with Gradient Icons */
-.whatsapp-attachment-overlay {
+.attachment-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  z-index: 999;
-  opacity: 0;
-  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
 }
 
-.whatsapp-attachment-popup {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.attachment-popup {
+  width: 100%;
   background: #1f2937;
   border-radius: 20px 20px 0 0;
   padding: 24px;
-  transform: translateY(0);
-  opacity: 1;
-  visibility: visible;
-  z-index: 1000;
+  color: white;
   box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.4);
-  color: #ffffff;
 }
 
-.whatsapp-attachment-popup.open {
-  transform: translateY(0);
-  opacity: 1;
-  visibility: visible;
-}
-
-.whatsapp-attachment-header {
+.attachment-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.whatsapp-attachment-header h3 {
+.attachment-header h3 {
   margin: 0;
-  color: #ffffff;
   font-size: 18px;
   font-weight: 600;
+  color: white;
 }
 
-.whatsapp-attachment-close {
+.close-btn {
   background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #9ca3af;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.whatsapp-attachment-close:hover {
+.close-btn:hover {
   background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  color: white;
 }
 
-.attachment-menu-grid {
+.attachment-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  padding: 8px;
 }
 
-.attachment-menu-item {
+.attachment-option {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   padding: 16px;
-  background: transparent;
-  transition: all 0.3s ease;
-  opacity: 0;
-  transform: scale(0.8) translateY(20px);
-  animation: popIn 0.5s ease forwards;
+  border-radius: 12px;
+  transition: all 0.2s ease;
 }
 
-
-
-.attachment-menu-item:hover {
+.attachment-option:hover {
+  background: rgba(255, 255, 255, 0.05);
   transform: scale(1.05);
 }
 
-.attachment-menu-item:active {
-  transform: translateY(-4px) scale(1.02);
-}
-
-.attachment-menu-item.uploading {
-  pointer-events: none;
-  opacity: 0.7;
-}
-
-.attachment-icon-container {
+.attachment-icon {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.attachment-menu-item:hover .attachment-icon-container {
-  transform: scale(1.1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.attachment-icon-container i {
+.attachment-icon i {
   font-size: 24px;
   color: white;
 }
 
-.upload-spinner {
-  font-size: 20px;
-  color: white;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.attachment-item-name {
+.attachment-name {
   font-size: 12px;
-  color: var(--chat-input-text, #e9edef);
+  color: white;
   text-align: center;
   font-weight: 500;
 }
 
-.attachment-size-info {
-  font-size: 10px;
-  color: var(--chat-input-icon-color, #8696a0);
-  text-align: center;
-  font-weight: 400;
-}
-
-@keyframes popIn {
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  to {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-  }
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .attachment-menu-grid {
+@media (max-width: 480px) {
+  .attachment-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
   
-  .attachment-icon-container {
-    width: 64px;
-    height: 64px;
+  .attachment-icon {
+    width: 50px;
+    height: 50px;
   }
   
-  .attachment-emoji-icon {
-    font-size: 28px;
+  .attachment-icon i {
+    font-size: 20px;
   }
   
-  .attachment-item-name {
-    font-size: 12px;
-  }
-  
-  .attachment-size-info {
-    font-size: 9px;
-  }
-}
-
-@media (max-width: 480px) {
-  .attachment-menu-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-  
-  .whatsapp-attachment-popup {
-    padding: 20px;
-  }
-  
-  .attachment-menu-item {
-    padding: 16px 12px;
-  }
-  
-  .attachment-icon-container {
-    width: 56px;
-    height: 56px;
-  }
-  
-  .attachment-emoji-icon {
-    font-size: 24px;
-  }
-  
-  .attachment-item-name {
+  .attachment-name {
     font-size: 11px;
   }
 }
