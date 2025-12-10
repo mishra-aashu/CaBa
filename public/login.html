@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: https://accounts.google.com https://apis.google.com https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https: wss:; frame-src 'self' https://accounts.google.com; child-src 'self' blob: https://accounts.google.com;">
     <title>CaBa - Login</title>
     <style>
         body {
@@ -71,70 +70,33 @@
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
 
-        // Check network connectivity before login
-        function checkNetwork() {
-            if (!navigator.onLine) {
-                error.textContent = 'No internet connection. Please check your network.';
-                return false;
-            }
-            return true;
-        }
-
         googleBtn.onclick = async () => {
-            if (!checkNetwork()) return;
-
             googleBtn.style.display = 'none';
             loading.style.display = 'block';
             error.textContent = '';
 
             try {
-                // Check if Supabase is properly initialized
-                if (!window.supabase) {
-                    throw new Error('Authentication service not available');
-                }
-
                 const { error: authError } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html',
-                        queryParams: {
-                            access_type: 'offline',
-                            prompt: 'consent'
-                        }
+                        redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html'
                     }
                 });
 
-                if (authError) {
-                    console.error('Login error:', authError);
-                    throw authError;
-                }
+                if (authError) throw authError;
             } catch (err) {
-                console.error('Login failed:', err);
                 googleBtn.style.display = 'block';
                 loading.style.display = 'none';
-                error.textContent = err.message || 'Login failed. Please try again.';
+                error.textContent = 'Login failed. Please try again.';
             }
         };
 
         // Check if already logged in
         window.addEventListener('load', () => {
-            try {
-                const storedUser = sessionStorage.getItem('_auth_user');
-                if (storedUser) {
-                    window.location.href = '/CaBa/';
-                }
-            } catch (e) {
-                console.error('Error checking login status:', e);
+            const storedUser = sessionStorage.getItem('_auth_user');
+            if (storedUser) {
+                window.location.href = '/CaBa/';
             }
-        });
-
-        // Add network status listener
-        window.addEventListener('offline', () => {
-            error.textContent = 'You are offline. Please check your connection.';
-        });
-
-        window.addEventListener('online', () => {
-            error.textContent = '';
         });
     </script>
 </body>

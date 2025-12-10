@@ -16,74 +16,23 @@ export const AuthProvider = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        console.log('🔐 [AUTH] Initializing authentication...');
-
         // Check for user from HTML login pages first
         const storedUser = sessionStorage.getItem('_auth_user');
         if (storedUser) {
-          try {
-            const userData = JSON.parse(storedUser);
-            console.log('🔐 [AUTH] Found user in sessionStorage:', userData.email);
-            setUser(userData);
-            setIsAuthenticated(true);
-            setLoading(false);
-            return;
-          } catch (parseError) {
-            console.error('🔐 [AUTH] Error parsing sessionStorage user:', parseError);
-            sessionStorage.removeItem('_auth_user');
-          }
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          setIsAuthenticated(true);
+          setLoading(false);
+          return;
         }
 
-        // Listen for Supabase auth state changes with better error handling
-        let subscription = null;
-        try {
-          const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('🔐 [AUTH] Auth state changed:', event, session?.user?.email);
+        // Listen for Supabase auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('🔐 Auth state changed:', event);
 
-            try {
-              if (event === 'SIGNED_IN' && session?.user) {
-                // User is signed in, but user creation is handled by callback page
-                // Just update the UI state
-                const userData = {
-                  id: session.user.id,
-                  email: session.user.email,
-                  name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0],
-                  phone: '',
-                  avatar: session.user.user_metadata?.avatar_url || null,
-                  is_online: true
-                };
-
-                console.log('🔐 [AUTH] User signed in:', userData.email);
-                setUser(userData);
-                setIsAuthenticated(true);
-              } else if (event === 'SIGNED_OUT') {
-                console.log('🔐 [AUTH] User signed out');
-                sessionStorage.removeItem('_auth_user');
-                setUser(null);
-                setIsAuthenticated(false);
-              } else if (event === 'TOKEN_REFRESHED') {
-                console.log('🔐 [AUTH] Token refreshed');
-              }
-            } catch (eventError) {
-              console.error('🔐 [AUTH] Error handling auth event:', eventError);
-            }
-
-            setLoading(false);
-          });
-
-          subscription = authSubscription;
-        } catch (subscriptionError) {
-          console.error('🔐 [AUTH] Error setting up auth subscription:', subscriptionError);
-        }
-
-        // Check current session with error handling
-        try {
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-          if (sessionError) {
-            console.error('🔐 [AUTH] Session error:', sessionError.message);
-          } else if (session?.user) {
-            // User is already signed in
+          if (event === 'SIGNED_IN' && session?.user) {
+            // User is signed in, but user creation is handled by callback page
+            // Just update the UI state
             const userData = {
               id: session.user.id,
               email: session.user.email,
@@ -93,12 +42,32 @@ export const AuthProvider = ({ children }) => {
               is_online: true
             };
 
-            console.log('🔐 [AUTH] Found existing session:', userData.email);
             setUser(userData);
             setIsAuthenticated(true);
+          } else if (event === 'SIGNED_OUT') {
+            sessionStorage.removeItem('_auth_user');
+            setUser(null);
+            setIsAuthenticated(false);
           }
-        } catch (sessionCheckError) {
-          console.error('🔐 [AUTH] Error checking session:', sessionCheckError);
+
+          setLoading(false);
+        });
+
+        // Check current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          // User is already signed in
+          const userData = {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0],
+            phone: '',
+            avatar: session.user.user_metadata?.avatar_url || null,
+            is_online: true
+          };
+
+          setUser(userData);
+          setIsAuthenticated(true);
         }
 
         setLoading(false);
@@ -107,7 +76,7 @@ export const AuthProvider = ({ children }) => {
           subscription?.unsubscribe();
         };
       } catch (error) {
-        console.error('🔐 [AUTH] Auth context initialization error:', error);
+        console.error('Auth context initialization error:', error);
         setLoading(false);
       }
     };
@@ -118,36 +87,17 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithGoogle = async () => {
     try {
-      // Check if we're in a browser environment
-      if (typeof window === 'undefined') {
-        return { success: false, error: 'Not in browser environment' };
-      }
-
-      // Check network connectivity
-      if (!navigator.onLine) {
-        return { success: false, error: 'No internet connection' };
-      }
-
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html',
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
-        }
+        provider: 'google'
       });
 
       if (error) {
-        console.error('Google sign-in error:', error);
-        return { success: false, error: error.message || 'Google sign-in failed' };
+        return { success: false, error: error.message };
       }
 
       return { success: true };
     } catch (error) {
-      console.error('Google sign-in exception:', error);
-      return { success: false, error: error.message || 'An unexpected error occurred' };
+      return { success: false, error: error.message };
     }
   };
 

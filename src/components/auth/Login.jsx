@@ -1,41 +1,25 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useNetworkStatus } from '../../hooks/useNetworkStatus';
-import AuthErrorHandler from '../common/AuthErrorHandler';
 import '../../styles/auth.css';
 
 const Login = () => {
   const { signInWithGoogle } = useAuth();
-  const { isOnline } = useNetworkStatus();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleRetry = () => {
-    setError('');
-    handleGoogleLogin();
-  };
-
   const handleGoogleLogin = async () => {
     try {
-      // Check network connectivity
-      if (!navigator.onLine) {
-        setError('No internet connection. Please check your network.');
-        return;
-      }
-
       setLoading(true);
       setError('');
 
       const result = await signInWithGoogle();
 
       if (!result.success) {
-        console.error('Google sign-in failed:', result.error);
         setError(result.error || 'Google sign in failed');
       }
     } catch (error) {
-      console.error('Google sign-in exception:', error);
-      setError(error.message || 'An error occurred. Please try again.');
+      setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -51,11 +35,11 @@ const Login = () => {
 
         <div className="auth-form">
           {/* Error Display */}
-          <AuthErrorHandler
-            error={error}
-            onRetry={handleRetry}
-            onDismiss={() => setError('')}
-          />
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
           {/* Google Login Button */}
           <button
