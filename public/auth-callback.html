@@ -80,54 +80,108 @@
         // Handle Supabase OAuth callback
         async function handleAuthCallback() {
             try {
+                console.log('🔐 [CALLBACK] Starting auth callback processing...');
+
+                // Check if Supabase is available
+                if (!window.supabase) {
+                    throw new Error('Authentication service not available');
+                }
+
                 // Get the current session
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
                 if (sessionError) {
+                    console.error('🔐 [CALLBACK] Session error:', sessionError);
                     throw new Error('Session error: ' + sessionError.message);
                 }
 
                 if (!session) {
+                    console.error('🔐 [CALLBACK] No session found');
                     throw new Error('No authentication session found');
                 }
 
                 const user = session.user;
-                console.log('Authenticated user:', user.email);
+                console.log('🔐 [CALLBACK] Authenticated user:', user.email);
 
-                // Check if user exists in database
-                const { data: existingUser, error: dbError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', user.email)
-                    .single();
+                // Check if user exists in database with retry logic
+                let existingUser = null;
+                let dbError = null;
+                let retryCount = 0;
+                const maxRetries = 3;
+
+                while (retryCount < maxRetries && !existingUser) {
+                    try {
+                        const { data, error } = await supabase
+                            .from('users')
+                            .select('*')
+                            .eq('email', user.email)
+                            .single();
+
+                        if (error && error.code === 'PGRST116') {
+                            // User doesn't exist
+                            break;
+                        } else if (error) {
+                            dbError = error;
+                            retryCount++;
+                            console.log(`🔐 [CALLBACK] Database query attempt ${retryCount} failed, retrying...`);
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        } else {
+                            existingUser = data;
+                        }
+                    } catch (queryError) {
+                        console.error('🔐 [CALLBACK] Database query error:', queryError);
+                        dbError = queryError;
+                        retryCount++;
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
 
                 let dbUser;
 
-                if (dbError && dbError.code === 'PGRST116') {
+                if (!existingUser && (!dbError || dbError.code === 'PGRST116')) {
                     // User doesn't exist, create new user
+                    console.log('🔐 [CALLBACK] Creating new user...');
                     const userData = {
                         id: user.id,
                         email: user.email,
                         name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
                         phone: '',
                         avatar: user.user_metadata?.avatar_url || null,
-                        is_online: true
+                        is_online: true,
+                        created_at: new Date().toISOString(),
+                        last_seen: new Date().toISOString()
                     };
 
-                    const { data: newUser, error: insertError } = await supabase
-                        .from('users')
-                        .insert([userData])
-                        .select()
-                        .single();
+                    // Create user with retry logic
+                    let insertError = null;
+                    retryCount = 0;
+
+                    while (retryCount < maxRetries && insertError) {
+                        const { data: newUser, error } = await supabase
+                            .from('users')
+                            .insert([userData])
+                            .select()
+                            .single();
+
+                        if (error) {
+                            insertError = error;
+                            retryCount++;
+                            console.log(`🔐 [CALLBACK] User creation attempt ${retryCount} failed, retrying...`);
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        } else {
+                            dbUser = newUser;
+                            break;
+                        }
+                    }
 
                     if (insertError) {
-                        console.error('Insert error:', insertError);
+                        console.error('🔐 [CALLBACK] Failed to create user after retries:', insertError);
                         throw new Error('Failed to create user account');
                     }
 
-                    dbUser = newUser;
                 } else if (existingUser) {
                     // User exists, update their status
+                    console.log('🔐 [CALLBACK] Updating existing user...');
                     await supabase
                         .from('users')
                         .update({
@@ -138,15 +192,17 @@
 
                     dbUser = existingUser;
                 } else {
+                    console.error('🔐 [CALLBACK] Database error after retries:', dbError);
                     throw new Error('Database error occurred');
                 }
 
                 // Store user data and redirect
+                console.log('🔐 [CALLBACK] Authentication successful, redirecting...');
                 sessionStorage.setItem('_auth_user', JSON.stringify(dbUser));
                 window.location.href = '/CaBa/';
 
             } catch (error) {
-                console.error('Auth callback error:', error);
+                console.error('🔐 [CALLBACK] Auth callback error:', error);
 
                 // Show error and redirect to login
                 document.querySelector('.loading').style.display = 'none';
@@ -162,7 +218,10 @@
         }
 
         // Start handling the callback
-        window.addEventListener('load', handleAuthCallback);
+        window.addEventListener('load', () => {
+            console.log('🔐 [CALLBACK] Page loaded, starting callback processing...');
+            handleAuthCallback();
+        });
     </script>
 </body>
 </html>

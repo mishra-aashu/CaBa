@@ -70,33 +70,70 @@
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
 
+        // Check network connectivity before login
+        function checkNetwork() {
+            if (!navigator.onLine) {
+                error.textContent = 'No internet connection. Please check your network.';
+                return false;
+            }
+            return true;
+        }
+
         googleBtn.onclick = async () => {
+            if (!checkNetwork()) return;
+
             googleBtn.style.display = 'none';
             loading.style.display = 'block';
             error.textContent = '';
 
             try {
+                // Check if Supabase is properly initialized
+                if (!window.supabase) {
+                    throw new Error('Authentication service not available');
+                }
+
                 const { error: authError } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html'
+                        redirectTo: window.location.origin + '/auth-callback.html',
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent'
+                        }
                     }
                 });
 
-                if (authError) throw authError;
+                if (authError) {
+                    console.error('Login error:', authError);
+                    throw authError;
+                }
             } catch (err) {
+                console.error('Login failed:', err);
                 googleBtn.style.display = 'block';
                 loading.style.display = 'none';
-                error.textContent = 'Login failed. Please try again.';
+                error.textContent = err.message || 'Login failed. Please try again.';
             }
         };
 
         // Check if already logged in
         window.addEventListener('load', () => {
-            const storedUser = sessionStorage.getItem('_auth_user');
-            if (storedUser) {
-                window.location.href = '/CaBa/';
+            try {
+                const storedUser = sessionStorage.getItem('_auth_user');
+                if (storedUser) {
+                    window.location.href = '/CaBa/';
+                }
+            } catch (e) {
+                console.error('Error checking login status:', e);
             }
+        });
+
+        // Add network status listener
+        window.addEventListener('offline', () => {
+            error.textContent = 'You are offline. Please check your connection.';
+        });
+
+        window.addEventListener('online', () => {
+            error.textContent = '';
         });
     </script>
 </body>

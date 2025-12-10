@@ -221,23 +221,40 @@
 
         // Google signup
         googleSignupBtn.addEventListener('click', async () => {
+            // Check network connectivity
+            if (!navigator.onLine) {
+                showMessage('No internet connection. Please check your network.');
+                return;
+            }
+
             showLoading(true);
             messageDiv.innerHTML = '';
 
             try {
+                // Check if Supabase is properly initialized
+                if (!window.supabase) {
+                    throw new Error('Authentication service not available');
+                }
+
                 const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html'
+                        redirectTo: window.location.origin + '/auth-callback.html',
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent'
+                        }
                     }
                 });
 
                 if (error) {
+                    console.error('Signup error:', error);
                     throw error;
                 }
             } catch (error) {
+                console.error('Signup failed:', error);
                 showLoading(false);
-                showMessage('Google signup failed: ' + error.message);
+                showMessage('Google signup failed: ' + (error.message || 'Please try again'));
             }
         });
 
