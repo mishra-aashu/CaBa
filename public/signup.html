@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: https://accounts.google.com https://apis.google.com https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https: wss:; frame-src 'self' https://accounts.google.com; child-src 'self' blob: https://accounts.google.com;">
     <title>CaBa - Sign Up</title>
     <style>
         * {
@@ -239,7 +240,7 @@
                 const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/auth-callback.html',
+                        redirectTo: 'https://mishra-aashu.github.io/CaBa/auth-callback.html',
                         queryParams: {
                             access_type: 'offline',
                             prompt: 'consent'
