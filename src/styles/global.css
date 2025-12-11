@@ -112,29 +112,48 @@ a {
 .m-3 { margin: 1rem; }
 .m-4 { margin: 1.5rem; }
 
-/* Theme variables */
+/* =========================
+   WHATSAPP AUTHENTIC COLORS
+   ========================= */
 :root {
-  /* Light Theme */
-  --primary-color: #075E54;
-  --secondary-color: #128C7E;
+  /* WhatsApp Light Mode (Classic) */
+  --wa-bg-app: #FFFFFF;
+  --wa-bg-chat: #ECE5DD;
+  --wa-header: #008069;
+  --wa-header-dark: #075E54;
+  --wa-bubble-sent: #DCF8C6;
+  --wa-bubble-received: #FFFFFF;
+  --wa-text-primary: #111B21;
+  --wa-text-secondary: #667781;
+  --wa-accent: #25D366;
+  --wa-checkmark: #53BDEB;
+  --wa-border: #E9EDEF;
+  --wa-hover: #F5F6F6;
+  --wa-input-bg: #F0F2F5;
+  
+  /* Mapped Variables for Compatibility */
+  --primary-color: #008069;
+  --secondary-color: #075E54;
   --accent-color: #25D366;
   --background-color: #ECE5DD;
-  --text-color: #000000;
-  --header-background: #005E54;
-  --chat-background: #E5DDD5;
+  --text-color: #111B21;
+  --header-background: #008069;
+  --chat-background: #ECE5DD;
   --message-background: #FFFFFF;
   --sent-message-background: #DCF8C6;
   --received-message-background: #FFFFFF;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --background: #ffffff;
-  --surface: #f8f9fa;
-  --border-color: #dddddd;
-  --hover-color: #f5f5f5;
-  --success-color: #4CAF50;
-  --error-color: #f44336;
-  --warning-color: #ff9800;
-  --info-color: #2196F3;
+  --text-primary: #111B21;
+  --text-secondary: #667781;
+  --background: #FFFFFF;
+  --surface: #F0F2F5;
+  --border-color: #E9EDEF;
+  --hover-color: #F5F6F6;
+  --success-color: #25D366;
+  --error-color: #E53935;
+  --warning-color: #FF9800;
+  --info-color: #53BDEB;
+  
+  /* Spacing & Layout */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
@@ -143,57 +162,77 @@ a {
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  --shadow-sm: 0 1px 0.5px rgba(0,0,0,0.13);
+  --shadow-md: 0 1px 2px rgba(0,0,0,0.15);
+  --shadow-lg: 0 2px 5px rgba(0,0,0,0.2);
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
 
-  /* Icon colors */
-  --icon-primary: #075E54;
-  --icon-secondary: #666666;
+  /* Icon Colors */
+  --icon-primary: #667781;
+  --icon-secondary: #8696A0;
   --icon-accent: #25D366;
+  --icon-active: #008069;
 
-  /* Button colors */
-  --btn-primary-bg: #075E54;
-  --btn-primary-text: #ffffff;
-  --btn-secondary-bg: #f8f9fa;
-  --btn-secondary-text: #333333;
-  --btn-danger-bg: #f44336;
-  --btn-danger-text: #ffffff;
+  /* Button Colors */
+  --btn-primary-bg: #008069;
+  --btn-primary-text: #FFFFFF;
+  --btn-secondary-bg: #F0F2F5;
+  --btn-secondary-text: #111B21;
+  --btn-danger-bg: #E53935;
+  --btn-danger-text: #FFFFFF;
 }
 
-/* Dark theme */
+/* WhatsApp Dark Mode (Modern Night Theme) */
 [data-theme="dark"] {
-  --primary-color: #25D366;
-  --secondary-color: #128C7E;
-  --accent-color: #075E54;
-  --background-color: #0d1117;
-  --text-color: #f0f6fc;
-  --header-background: #161b22;
-  --chat-background: #0d1117;
-  --message-background: #161b22;
-  --sent-message-background: #1f2937;
-  --received-message-background: #21262d;
-  --text-primary: #f0f6fc;
-  --text-secondary: #c9d1d9;
-  --background: #0d1117;
-  --surface: #161b22;
-  --border-color: #30363d;
-  --hover-color: #21262d;
+  --wa-bg-app: #111B21;
+  --wa-bg-chat: #0B141A;
+  --wa-header: #202C33;
+  --wa-bubble-sent: #005C4B;
+  --wa-bubble-received: #202C33;
+  --wa-text-primary: #E9EDEF;
+  --wa-text-secondary: #8696A0;
+  --wa-accent: #00A884;
+  --wa-checkmark: #53BDEB;
+  --wa-border: #2A3942;
+  --wa-hover: #2A3942;
+  --wa-input-bg: #2A3942;
+  
+  /* Mapped Variables */
+  --primary-color: #00A884;
+  --secondary-color: #005C4B;
+  --accent-color: #00A884;
+  --background-color: #0B141A;
+  --text-color: #E9EDEF;
+  --header-background: #202C33;
+  --chat-background: #0B141A;
+  --message-background: #202C33;
+  --sent-message-background: #005C4B;
+  --received-message-background: #202C33;
+  --text-primary: #E9EDEF;
+  --text-secondary: #8696A0;
+  --background: #111B21;
+  --surface: #202C33;
+  --border-color: #2A3942;
+  --hover-color: #2A3942;
+  --success-color: #00A884;
+  --error-color: #F15C6D;
+  --warning-color: #FFA726;
+  --info-color: #53BDEB;
 
-  /* Icon colors for dark theme */
-  --icon-primary: #58a6ff;
-  --icon-secondary: #8b949e;
-  --icon-accent: #79c0ff;
+  /* Icon Colors Dark */
+  --icon-primary: #8696A0;
+  --icon-secondary: #667781;
+  --icon-accent: #00A884;
+  --icon-active: #00A884;
 
-  /* Button colors for dark theme */
-  --btn-primary-bg: #238636;
-  --btn-primary-text: #ffffff;
-  --btn-secondary-bg: #30363d;
-  --btn-secondary-text: #f0f6fc;
-  --btn-danger-bg: #da3633;
-  --btn-danger-text: #ffffff;
+  /* Button Colors Dark */
+  --btn-primary-bg: #00A884;
+  --btn-primary-text: #FFFFFF;
+  --btn-secondary-bg: #2A3942;
+  --btn-secondary-text: #E9EDEF;
+  --btn-danger-bg: #F15C6D;
+  --btn-danger-text: #FFFFFF;
 }
 
 /* Responsive breakpoints */

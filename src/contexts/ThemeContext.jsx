@@ -18,7 +18,19 @@ export const ThemeProvider = ({ children }) => {
 
   // Apply theme to document when theme changes
   useEffect(() => {
+    // Set data-theme attribute for CSS variables
     document.documentElement.setAttribute('data-theme', theme);
+    
+    // Also set body class for backward compatibility
+    if (theme === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
+    } else {
+      document.body.classList.add('light-mode');
+      document.body.classList.remove('dark-mode');
+    }
+    
+    // Save to localStorage
     localStorage.setItem('theme', theme);
   }, [theme]);
 

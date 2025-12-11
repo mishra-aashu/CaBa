@@ -1,47 +1,15 @@
  import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSupabase } from '../contexts/SupabaseContext';
-import { useCall } from '../context/CallContext';
-import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit, MoreVertical } from 'lucide-react';
-import DropdownMenu from './common/DropdownMenu';
-import Modal from './common/Modal';
-import MessagingLoader from './MessagingLoader';
-import './user-details/UserDetails.css';
-import '../styles/layout-fixes.css';
-import '../styles/mobile-improvements.css';
-
-// DP options for avatar display
-const baseUrl = import.meta.env.BASE_URL || '/';
-const dpOptionsData = [
-  { id: 1, path: `${baseUrl}assets/images/dp-options/00701602b0eac0390b3107b9e2a665e0.jpg` },
-  { id: 2, path: `${baseUrl}assets/images/dp-options/1691130988954.jpg` },
-  { id: 3, path: `${baseUrl}assets/images/dp-options/aesthetic-cartoon-funny-dp-for-instagram.webp` },
-  { id: 4, path: `${baseUrl}assets/images/dp-options/boy-cartoon-dp-with-hoodie.webp` },
-  { id: 5, path: `${baseUrl}assets/images/dp-options/download (1).jpg` },
-  { id: 6, path: `${baseUrl}assets/images/dp-options/download.jpg` },
-  { id: 7, path: `${baseUrl}assets/images/dp-options/funny-profile-picture-wd195eo9rpjy7ax1.jpg` },
-  { id: 8, path: `${baseUrl}assets/images/dp-options/funny-whatsapp-dp-for-girls.webp` },
-  { id: 9, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575118_y.jpg` },
-  { id: 10, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575119_y.jpg` },
-  { id: 11, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575120_y.jpg` },
-  { id: 12, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575121_y.jpg` },
-  { id: 13, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575122_y.jpg` },
-  { id: 14, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575123_y.jpg` },
-  { id: 15, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575124_y.jpg` },
-  { id: 16, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575125_y.jpg` },
-  { id: 17, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575126_y.jpg` },
-  { id: 18, path: `${baseUrl}assets/images/dp-options/photo_5230962651624575127_y.jpg` },
-  { id: 19, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267708_w.jpg` },
-  { id: 20, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267709_w.jpg` },
-  { id: 21, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267710_w.jpg` },
-  { id: 22, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267711_w.jpg` },
-  { id: 23, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267712_w.jpg` },
-  { id: 24, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267713_w.jpg` },
-  { id: 25, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267714_w.jpg` },
-  { id: 26, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267715_w.jpg` },
-  { id: 27, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267716_w.jpg` },
-  { id: 28, path: `${baseUrl}assets/images/dp-options/photo_5235923888607267717_w.jpg` }
-];
+ import { useParams, useNavigate } from 'react-router-dom';
+ import { useSupabase } from '../contexts/SupabaseContext';
+ import { useCall } from '../context/CallContext';
+ import { dpOptions } from '../utils/dpOptions';
+ import { ArrowLeft, Phone, Video, MessageCircle, Image, Link as LinkIcon, FileText, Bell, BellOff, UserPlus, Share2, Download, Ban, Flag, Trash2, Edit, MoreVertical } from 'lucide-react';
+ import DropdownMenu from './common/DropdownMenu';
+ import Modal from './common/Modal';
+ import MessagingLoader from './MessagingLoader';
+ import './user-details/UserDetails.css';
+ import '../styles/layout-fixes.css';
+ import '../styles/mobile-improvements.css';
 
 const UserDetails = () => {
     const { id: userId } = useParams();
@@ -664,13 +632,13 @@ const UserDetails = () => {
             <div className="user-profile-section">
                 <div className="user-details-avatar" id="userDetailAvatar" onClick={() => user.avatar && setShowImageModal(true)} style={{ cursor: user.avatar ? 'pointer' : 'default' }}>
                     {user.avatar ? (
-                        parseInt(user.avatar) ? (
-                            <img id="userDetailImg" src={dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path} alt={user.name} />
-                        ) : (
-                            <img id="userDetailImg" src={user.avatar} alt={user.name} />
-                        )
+                      parseInt(user.avatar) ? (
+                        <img id="userDetailImg" src={dpOptions.find(dp => dp.id === parseInt(user.avatar))?.path} alt={user.name} />
+                      ) : (
+                        <img id="userDetailImg" src={user.avatar} alt={user.name} />
+                      )
                     ) : (
-                        <div className="dp-preview-initials" id="userDetailInitials">{getInitials(user.name)}</div>
+                      <div className="dp-preview-initials" id="userDetailInitials">{getInitials(user.name)}</div>
                     )}
                 </div>
                 <h2 className="user-detail-name" id="userDetailName">{user.name}</h2>
@@ -906,7 +874,7 @@ const UserDetails = () => {
                         <div className="image-modal-content">
                             {user.avatar && (
                                 <img
-                                    src={parseInt(user.avatar) ? dpOptionsData.find(dp => dp.id === parseInt(user.avatar))?.path : user.avatar}
+                                    src={parseInt(user.avatar) ? dpOptions.find(dp => dp.id === parseInt(user.avatar))?.path : user.avatar}
                                     alt={user.name}
                                     className="full-screen-image"
                                     onClick={() => setShowImageModal(false)}
