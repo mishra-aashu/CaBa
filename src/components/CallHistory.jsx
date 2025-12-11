@@ -109,26 +109,22 @@ export function CallHistory({ userId, userAvatar, userName }) {
                   </h3>
                   <div className="call-status-info">
                     {call.call_status === 'missed' ? (
-                      <>
-                        <PhoneMissed size={16} className="status-icon missed" />
-                        <span className="status-text missed">Missed</span>
-                      </>
+                      <PhoneMissed size={16} className="status-icon missed" />
+                    ) : call.caller_id === userId ? (
+                      <PhoneOutgoing size={16} className="status-icon outgoing" />
                     ) : (
-                      <>
-                        <Phone size={16} className="status-icon picked" />
-                        <span className="status-text picked">Picked</span>
-                      </>
+                      <PhoneIncoming size={16} className="status-icon incoming" />
                     )}
-                    <span className="call-time-small">{formatTime(call.started_at)}</span>
+                    <span className="call-time-text">{formatTime(call.started_at)}</span>
                   </div>
                 </div>
 
                 {/* Call Button */}
-                <button className="call-action-btn">
+                <button className="call-action-btn" onClick={() => window.location.href = `/call/${call.other_user_id}`}>
                   {call.call_type === 'video' ? (
-                    <Video size={20} />
+                    <Video size={22} />
                   ) : (
-                    <Phone size={20} />
+                    <Phone size={22} />
                   )}
                 </button>
               </div>

@@ -8,18 +8,18 @@
 }
 
 .call-history-card {
-  background: #111b21;
+  background: var(--bg-primary, #111b21);
   overflow: hidden;
 }
 
 .call-history-header {
-  background: #111b21;
-  color: #e9edef;
+  background: var(--bg-primary, #111b21);
+  color: var(--text-primary, #e9edef);
   padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #2a3942;
+  border-bottom: 1px solid var(--border-color, #2a3942);
 }
 
 .header-content {
@@ -56,7 +56,7 @@
   font-size: 16px;
   font-weight: 500;
   margin: 0;
-  color: #8696a0;
+  color: var(--text-secondary, #8696a0);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -72,16 +72,16 @@
 
 .call-item {
   padding: 12px 16px;
-  border-bottom: 1px solid #2a3942;
+  border-bottom: 1px solid var(--border-color, #2a3942);
   display: flex;
   align-items: center;
   gap: 12px;
   transition: background 0.2s;
-  background: #111b21;
+  background: var(--bg-primary, #111b21);
 }
 
 .call-item:hover {
-  background: #202c33;
+  background: var(--bg-hover, #202c33);
 }
 
 .call-item:last-child {
@@ -117,7 +117,7 @@
 .call-name {
   font-size: 16px;
   font-weight: 400;
-  color: #e9edef;
+  color: var(--text-primary, #e9edef);
   margin: 0 0 4px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -139,25 +139,17 @@
   color: #ea4335;
 }
 
-.status-icon.picked {
+.status-icon.incoming {
   color: #00a884;
 }
 
-.status-text {
-  font-weight: 400;
+.status-icon.outgoing {
+  color: var(--text-secondary, #8696a0);
 }
 
-.status-text.missed {
-  color: #ea4335;
-}
-
-.status-text.picked {
-  color: #8696a0;
-}
-
-.call-time-small {
-  color: #8696a0;
-  margin-left: 4px;
+.call-time-text {
+  color: var(--text-secondary, #8696a0);
+  font-size: 13px;
 }
 
 .call-action-btn {
@@ -176,7 +168,49 @@
 }
 
 .call-action-btn:hover {
-  background: #202c33;
+  background: var(--bg-hover, #202c33);
+}
+
+/* Light Mode */
+@media (prefers-color-scheme: light) {
+  .call-history-card {
+    --bg-primary: #ffffff;
+    --bg-hover: #f5f5f5;
+    --text-primary: #000000;
+    --text-secondary: #667781;
+    --border-color: #e9edef;
+  }
+  
+  .call-avatar {
+    background: #25d366;
+  }
+  
+  .call-action-btn {
+    color: #25d366;
+  }
+  
+  .status-icon.outgoing {
+    color: #667781;
+  }
+  
+  .empty-state {
+    color: #667781;
+  }
+  
+  .empty-state h3 {
+    color: #000000;
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .call-history-card {
+    --bg-primary: #111b21;
+    --bg-hover: #202c33;
+    --text-primary: #e9edef;
+    --text-secondary: #8696a0;
+    --border-color: #2a3942;
+  }
 }
 
 /* Chat List */

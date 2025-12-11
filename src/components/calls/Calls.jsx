@@ -37,6 +37,25 @@ const Calls = () => {
         return;
       }
       const user = JSON.parse(userStr);
+
+      // Add default DP if user doesn't have one
+      if (!user.avatar) {
+        // Select a random DP from the available options
+        const dpOptions = [
+          '/assets/images/dp-options/00701602b0eac0390b3107b9e2a665e0.jpg',
+          '/assets/images/dp-options/1691130988954.jpg',
+          '/assets/images/dp-options/aesthetic-cartoon-funny-dp-for-instagram.webp',
+          '/assets/images/dp-options/boy-cartoon-dp-with-hoodie.webp',
+          '/assets/images/dp-options/funny-profile-picture-wd195eo9rpjy7ax1.jpg',
+          '/assets/images/dp-options/funny-whatsapp-dp-for-girls.webp',
+          '/assets/images/dp-options/photo_5230962651624575118_y.jpg',
+          '/assets/images/dp-options/photo_5230962651624575119_y.jpg'
+        ];
+
+        // Assign a random DP
+        user.avatar = dpOptions[Math.floor(Math.random() * dpOptions.length)];
+      }
+
       setCurrentUser(user);
 
       await Promise.all([
