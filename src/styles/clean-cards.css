@@ -124,11 +124,11 @@
   text-overflow: ellipsis;
 }
 
-.call-status-info {
+.call-status-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 5px;
+  margin-top: 2px;
 }
 
 .status-icon {
@@ -150,6 +150,7 @@
 .call-time-text {
   color: var(--text-secondary, #8696a0);
   font-size: 13px;
+  line-height: 1;
 }
 
 .call-action-btn {

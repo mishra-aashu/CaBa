@@ -151,13 +151,13 @@ export function CallHistory({ userId, userAvatar, userName }) {
                   <h3 className="call-name">
                     {call.other_user_name || 'Unknown'}
                   </h3>
-                  <div className="call-status-info">
+                  <div className="call-status-row">
                     {call.call_status === 'missed' ? (
-                      <PhoneMissed size={16} className="status-icon missed" />
+                      <PhoneMissed size={14} className="status-icon missed" />
                     ) : call.caller_id === userId ? (
-                      <PhoneOutgoing size={16} className="status-icon outgoing" />
+                      <PhoneOutgoing size={14} className="status-icon outgoing" />
                     ) : (
-                      <PhoneIncoming size={16} className="status-icon incoming" />
+                      <PhoneIncoming size={14} className="status-icon incoming" />
                     )}
                     <span className="call-time-text">{formatTime(call.started_at)}</span>
                   </div>

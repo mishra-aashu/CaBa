@@ -73,13 +73,13 @@ const Calls = () => {
 
       // Handle DP assignment same as Home component
       if (!user.avatar) {
-        // Assign a random DP ID (1-28)
-        user.avatar = Math.floor(Math.random() * 28) + 1;
+        // Assign a random DP ID (1-46)
+        user.avatar = Math.floor(Math.random() * 46) + 1;
       } else if (typeof user.avatar === 'string' && !user.avatar.startsWith('http')) {
         // If avatar is a string but not a URL, try to parse as number
         const avatarId = parseInt(user.avatar);
         if (isNaN(avatarId)) {
-          user.avatar = Math.floor(Math.random() * 28) + 1;
+          user.avatar = Math.floor(Math.random() * 46) + 1;
         }
       }
 
