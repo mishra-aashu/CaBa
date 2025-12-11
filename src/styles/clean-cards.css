@@ -8,46 +8,50 @@
 }
 
 .call-history-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: #111b21;
   overflow: hidden;
 }
 
 .call-history-header {
-  background: #25d366;
-  color: white;
-  padding: 20px;
+  background: #111b21;
+  color: #e9edef;
+  padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #2a3942;
 }
 
 .call-history-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   margin: 0;
+  color: #8696a0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .missed-calls-badge {
-  background: rgba(255,255,255,0.2);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  background: #ea4335;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
 }
 
 .call-item {
-  padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2a3942;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   transition: background 0.2s;
+  background: #111b21;
 }
 
 .call-item:hover {
-  background: #f8f9fa;
+  background: #202c33;
 }
 
 .call-item:last-child {
@@ -59,13 +63,14 @@
   height: 50px;
   border-radius: 50%;
   overflow: hidden;
-  background: #25d366;
+  background: #00a884;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .call-avatar img {
@@ -76,49 +81,72 @@
 
 .call-details {
   flex: 1;
+  min-width: 0;
 }
 
 .call-name {
   font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-weight: 400;
+  color: #e9edef;
   margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.call-info {
+.call-status-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #666;
-}
-
-.call-meta {
-  text-align: right;
-}
-
-.call-time {
+  gap: 6px;
   font-size: 13px;
-  color: #666;
-  margin-bottom: 4px;
 }
 
-.call-button {
-  background: #25d366;
+.status-icon {
+  flex-shrink: 0;
+}
+
+.status-icon.missed {
+  color: #ea4335;
+}
+
+.status-icon.picked {
+  color: #00a884;
+}
+
+.status-text {
+  font-weight: 400;
+}
+
+.status-text.missed {
+  color: #ea4335;
+}
+
+.status-text.picked {
+  color: #8696a0;
+}
+
+.call-time-small {
+  color: #8696a0;
+  margin-left: 4px;
+}
+
+.call-action-btn {
+  background: transparent;
   border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #00a884;
   cursor: pointer;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
 
-.call-button:hover {
-  background: #128c7e;
+.call-action-btn:hover {
+  background: #202c33;
 }
 
 /* Chat List */

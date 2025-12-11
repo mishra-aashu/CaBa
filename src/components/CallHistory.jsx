@@ -94,26 +94,30 @@ export function CallHistory({ userId }) {
                   <h3 className="call-name">
                     {call.other_user_name || 'Unknown'}
                   </h3>
-                  <div className="call-info">
-                    {getCallIcon(call)}
-                    <span>{call.call_type === 'video' ? 'Video' : 'Voice'}</span>
-                    <span>{formatDuration(call.call_duration)}</span>
+                  <div className="call-status-info">
+                    {call.call_status === 'missed' ? (
+                      <>
+                        <PhoneMissed size={16} className="status-icon missed" />
+                        <span className="status-text missed">Missed</span>
+                      </>
+                    ) : (
+                      <>
+                        <Phone size={16} className="status-icon picked" />
+                        <span className="status-text picked">Picked</span>
+                      </>
+                    )}
+                    <span className="call-time-small">{formatTime(call.started_at)}</span>
                   </div>
                 </div>
 
-                {/* Time & Call Button */}
-                <div className="call-meta">
-                  <div className="call-time">
-                    {formatTime(call.started_at)}
-                  </div>
-                  <button className="call-button">
-                    {call.call_type === 'video' ? (
-                      <Video size={18} />
-                    ) : (
-                      <Phone size={18} />
-                    )}
-                  </button>
-                </div>
+                {/* Call Button */}
+                <button className="call-action-btn">
+                  {call.call_type === 'video' ? (
+                    <Video size={20} />
+                  ) : (
+                    <Phone size={20} />
+                  )}
+                </button>
               </div>
             ))
           ) : (
