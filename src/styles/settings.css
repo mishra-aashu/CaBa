@@ -24,14 +24,14 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: var(--wa-text-primary);
 }
 
 .back-btn {
   background: none;
   border: none;
   font-size: 20px;
-  color: #FFFFFF;
+  color: var(--wa-text-primary);
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
@@ -39,8 +39,8 @@
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFFFFF;
+  background: var(--wa-hover);
+  color: var(--wa-text-primary);
 }
 
 .settings-content {

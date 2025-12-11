@@ -736,27 +736,27 @@
   justify-content: center;
   height: 100%;
   padding: 40px;
-  background: #f0f2f5;
+  background: var(--home-surface);
 }
 
 .chat-preview-placeholder svg {
   margin-bottom: 32px;
   opacity: 0.3;
-  color: #54656f;
+  color: var(--home-text-muted);
 }
 
 .chat-preview-placeholder h3 {
   margin: 0 0 16px 0;
   font-size: 32px;
   font-weight: 300;
-  color: #41525d;
+  color: var(--home-text);
   letter-spacing: -0.5px;
 }
 
 .chat-preview-placeholder p {
   margin: 0;
   font-size: 14px;
-  color: #667781;
+  color: var(--home-text-light);
   font-weight: 400;
   line-height: 1.4;
 }
