@@ -3,7 +3,7 @@ import { useCallHistory } from '../hooks/useCallHistory';
 import { Phone, PhoneIncoming, PhoneMissed, PhoneOutgoing, Video } from 'lucide-react';
 import '../styles/clean-cards.css';
 
-export function CallHistory({ userId }) {
+export function CallHistory({ userId, userAvatar, userName }) {
   const { history, loading, error, missedCount } = useCallHistory(userId);
 
   const formatDuration = (seconds) => {
@@ -64,11 +64,24 @@ export function CallHistory({ userId }) {
       <div className="call-history-card">
         {/* Header */}
         <div className="call-history-header">
-          <h2 className="call-history-title">Call History</h2>
-          {missedCount > 0 && (
-            <span className="missed-calls-badge">
-              {missedCount} missed
-            </span>
+          <div className="header-content">
+            <h2 className="call-history-title">Call History</h2>
+            {missedCount > 0 && (
+              <span className="missed-calls-badge">
+                {missedCount} missed
+              </span>
+            )}
+          </div>
+          {userAvatar && (
+            <div className="user-avatar-header">
+              <div className="avatar-circle">
+                {userAvatar ? (
+                  <img src={userAvatar} alt={userName || 'User'} />
+                ) : (
+                  userName?.charAt(0) || '?'
+                )}
+              </div>
+            </div>
           )}
         </div>
 

@@ -273,7 +273,11 @@ const Calls = () => {
 
         {/* Call History */}
         <div className="call-history-section">
-          <CallHistory userId={currentUser?.id} />
+          <CallHistory
+            userId={currentUser?.id}
+            userAvatar={currentUser?.avatar}
+            userName={currentUser?.name}
+          />
         </div>
 
         {/* Contacts List */}
