@@ -6,36 +6,36 @@
 @import url('./whatsapp-layout.css');
 
 :root {
-  --home-primary: #4CAF50;
-  --home-secondary: #2196F3;
-  --home-text: #1a1a1a;
-  --home-text-light: #6b7280;
-  --home-text-muted: #9ca3af;
-  --home-background: #f8fafc;
-  --home-surface: #ffffff;
-  --home-border: #e5e7eb;
-  --home-hover: #f1f5f9;
-  --home-active: #e0f2fe;
-  --home-accent: #3b82f6;
-  --home-success: #10b981;
-  --home-warning: #f59e0b;
-  --home-error: #ef4444;
+  --home-primary: #008069;
+  --home-secondary: #25D366;
+  --home-text: #111B21;
+  --home-text-light: #667781;
+  --home-text-muted: #8696A0;
+  --home-background: #FFFFFF;
+  --home-surface: #F0F2F5;
+  --home-border: #E9EDEF;
+  --home-hover: #F5F6F6;
+  --home-active: #D1F4E0;
+  --home-accent: #25D366;
+  --home-success: #25D366;
+  --home-warning: #FF9800;
+  --home-error: #E53935;
 }
 
 /* Dark theme overrides for home */
 [data-theme="dark"] {
-  --home-text: #f9fafb;
-  --home-text-light: #d1d5db;
-  --home-text-muted: #9ca3af;
-  --home-background: #0f172a;
-  --home-surface: #1e293b;
-  --home-border: #374151;
-  --home-hover: #334155;
-  --home-active: #0c4a6e;
-  --home-accent: #60a5fa;
-  --home-success: #34d399;
-  --home-warning: #fbbf24;
-  --home-error: #f87171;
+  --home-text: #E9EDEF;
+  --home-text-light: #8696A0;
+  --home-text-muted: #667781;
+  --home-background: #111B21;
+  --home-surface: #202C33;
+  --home-border: #2A3942;
+  --home-hover: #2A3942;
+  --home-active: #005C4B;
+  --home-accent: #00A884;
+  --home-success: #00A884;
+  --home-warning: #FFA726;
+  --home-error: #F15C6D;
 }
 
 /* Force neutral chat list styling - override any chat theme variables */
